@@ -1,0 +1,17 @@
+.nav-element {
+    /* Was 4px */
+    padding: 0.25rem;
+    margin: 0;
+}
+
+.horizontal-layout {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.vr {
+    /* Was 5px */
+    margin: 0.3125rem;
+}

@@ -3,7 +3,9 @@ export interface CSEvent {
     name: string;
     description: string;
     start_date: Date; // TODO - string?
+    end_date: Date; // TODO - string?
     category: string;
+    location: string;
     image?: string;
     // TODO - MORE FIELDS!
 }

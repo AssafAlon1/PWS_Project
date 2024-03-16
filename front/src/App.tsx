@@ -1,7 +1,7 @@
 import './App.css'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
-import CatalogPage from './pages/CatalogPage'
-import EventDetails from './pages/EventDetailsPage'
+import CatalogPage from './pages/CatalogPage/CatalogPage'
+import EventDetails from './pages/EventDetailsPage/EventDetailsPage'
 import NavbarComponent from './components/Navbar/Navbar'
 import NotFound from './pages/NotFound'
 

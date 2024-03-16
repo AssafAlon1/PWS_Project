@@ -6,11 +6,15 @@ import { CSEvent } from '../../types';
 import { Button, Card, Placeholder } from 'react-bootstrap';
 
 import MissingImage from "../../assets/MissingImage.png"
+import { useNavigate } from "react-router-dom";
+import { getFormattedDate } from "../../utils/formatting";
 
 const EventDetails: React.FC<{ event: CSEvent }> = ({ event }) => {
 
-    const formatter = new Intl.DateTimeFormat('he-HE', { day: '2-digit', month: '2-digit', year: 'numeric' });
-    const formattedDate = formatter.format(event.start_date);
+    const navigate = useNavigate();
+
+    const formattedDate = getFormattedDate(event.start_date);
+
 
     return (
         <Card>
@@ -25,7 +29,7 @@ const EventDetails: React.FC<{ event: CSEvent }> = ({ event }) => {
                 <Card.Text>{event.category}</Card.Text>
                 <Card.Text>From 50$</Card.Text>
                 <Card.Text>1000 tickets available</Card.Text>
-                <Button variant="primary">Purchase Tickets</Button>
+                <Button variant="primary" onClick={() => navigate("/events/" + event.id)}>Purchase Tickets</Button>
             </Card.Body>
         </Card>
     );

@@ -8,7 +8,9 @@ const allEvents = [
         description: "This is a fun event",
         // start_date: "2024-04-11T20:00",
         start_date: new Date("2024-04-11T20:00"),
+        end_date: new Date("2024-04-11T22:00"),
         category: "Sports Event",
+        location: "Madison Square Garden",
         image: "https://miro.medium.com/v2/resize:fit:1400/1*ydhn1QPAKsrbt6UWfn3YnA.jpeg"
     },
     {
@@ -16,8 +18,10 @@ const allEvents = [
         name: "Boring Event",
         // start_date: "2024-03-28T16:30",
         start_date: new Date("2024-03-28T16:30"),
+        end_date: new Date("2024-03-29T01:00"),
         description: "This is a boring event",
         category: "Conference",
+        location: "Some Conference Center idk",
     },
 ];
 

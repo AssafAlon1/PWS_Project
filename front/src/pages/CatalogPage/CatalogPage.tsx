@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { Outlet, Link } from "react-router-dom";
-import { CSEvent } from '../types';
-import { fetchEvents } from '../utils/fetchers';
-import EventDetails, { EventPlaceholder } from "../components/CatalogEventDetails/CatalogEventDetails";
+import { CSEvent } from '../../types';
+import { fetchEvents } from '../../utils/fetchers';
+import EventDetails, { EventPlaceholder } from "../../components/CatalogEventDetails/CatalogEventDetails";
 import { Col, Container, Row } from 'react-bootstrap';
 
 

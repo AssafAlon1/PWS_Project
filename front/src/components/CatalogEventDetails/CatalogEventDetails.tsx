@@ -13,7 +13,7 @@ const EventDetails: React.FC<{ event: CSEvent }> = ({ event }) => {
     const formattedDate = formatter.format(event.start_date);
 
     return (
-        <Card style={{ width: '15rem' }}>
+        <Card>
             <img src={event.image ?? MissingImage} className="card-img" />
             {/* <Card.Img
                 variant="top"
@@ -33,7 +33,7 @@ const EventDetails: React.FC<{ event: CSEvent }> = ({ event }) => {
 
 export const EventPlaceholder = () => {
     return (
-        <Card style={{ width: '15rem' }}>
+        <Card>
             {/* <Card.Img variant="top" src={MissingImage} /> */}
             <img src={MissingImage} className="card-img" />
             <Card.Body>

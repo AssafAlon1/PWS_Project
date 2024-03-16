@@ -83,6 +83,16 @@ const EventDetails: React.FC<{}> = () => {
     }
 
     const BuyTicketComponent: React.FC<{ name: string, price: number, amountLeft: number }> = ({ name, price, amountLeft }) => {
+        const [ticketAmount, setTicketAmount] = useState<number>(0);
+
+        const handleBuyNow = () => {
+            if (ticketAmount == 0) {
+                alert("No tickets.. :/");
+                return;
+            }
+            alert(`Sold! ${ticketAmount}`);
+        };
+
         return (
             <Card className="ticket-card">
                 <Card.Header>
@@ -91,6 +101,11 @@ const EventDetails: React.FC<{}> = () => {
                 <Card.Body>
                     <Card.Text>Price: ${price}</Card.Text>
                     <Card.Text>{amountLeft} tickets left!</Card.Text>
+                    <Card.Text>Choose amount of tickets:</Card.Text>
+                    <div className="direction-row">
+                        <input className="tickets-amount" type="number" value={ticketAmount} onChange={(event) => setTicketAmount(Number(event.target.value))} />
+                        <Button onClick={handleBuyNow}>Buy now</Button>
+                    </div>
                 </Card.Body>
             </Card>
         );

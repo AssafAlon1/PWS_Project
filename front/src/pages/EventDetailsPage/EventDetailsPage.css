@@ -10,9 +10,14 @@
     flex-direction: row;
     align-items: center;
     padding: 10px;
-    margin: 10px;
+    /* margin: 10px; */
 }
 
 .ticket-card {
     margin-right: 20px;
+}
+
+.tickets-amount {
+    width: 50px;
+    margin-right: 10px;
 }

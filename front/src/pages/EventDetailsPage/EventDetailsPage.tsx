@@ -1,17 +1,19 @@
 import './EventDetailsPage.css';
 
 import React, { useEffect, useState } from 'react';
-import { fetchEvent } from '../../utils/fetchers';
+import { fetchEvent, fetchTickets } from '../../utils/fetchers';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Button, Card } from 'react-bootstrap';
+import { Button, Card, Placeholder } from 'react-bootstrap';
 
 import MissingImage from "../../assets/MissingImage.png"
-import { CSEvent } from '../../types';
+import { CSEvent, Ticket } from '../../types';
 import { getFormattedDate, getFormattedTime } from '../../utils/formatting';
 
 
 const EventDetails: React.FC<{}> = () => {
     const [event, SetEvent] = useState<CSEvent | null>(null);
+    const [tickets, SetTickets] = useState<Ticket[]>([]);
+
     const { eventId } = useParams();
     const navigate = useNavigate();
 
@@ -34,15 +36,38 @@ const EventDetails: React.FC<{}> = () => {
         SetEvent(fetchedEvent);
     }
 
+    const updateTickets = async () => {
+        if (!eventId) {
+            // I believe it should be impossible to get here, but just in case...
+            return navigate("/");
+        }
+
+        let fetchedTickets;
+        try {
+            fetchedTickets = await fetchTickets(eventId);
+            if (!fetchedTickets) {
+                throw new Error(`Failed to fetch tickets for event ${eventId}`);
+            }
+        }
+        catch {
+            // TODO - Don't navigate, just display "error loading tickets"
+            return navigate("/error", { state: { errorMessage: `Failed to fetch tickets for event ${eventId}` } });
+        }
+        console.log("There are " + fetchedTickets.length + " tickets for event " + eventId)
+        SetTickets(fetchedTickets);
+    }
+
     useEffect(() => {
         updateEvent();
+        updateTickets(); // TODO - separate this? How harsh do we want to be?
     }, [eventId]);
 
     const TitleComponent = () => {
         if (event) {
             return <Card.Title>{event.name}</Card.Title>
         }
-        return <Card.Title>Loading...</Card.Title>
+        return <Placeholder as={Card.Title} animation="glow"><Placeholder xs={6} /></Placeholder>
+
     }
 
     const ImageComponent = () => {
@@ -61,14 +86,25 @@ const EventDetails: React.FC<{}> = () => {
     const PricingAndAvailabilityComponent = () => {
         if (event) {
             return (
-                <Card.Body>
-                    <Card.Text>{event?.category}</Card.Text>
-                    <Card.Text>From $20</Card.Text>
-                    <Card.Text>1000 tickets available</Card.Text>
-                </Card.Body>
+                <Card className="event-block">
+                    <Card.Body>
+                        <Card.Text>{event?.category}</Card.Text>
+                        <Card.Text>From $20</Card.Text>
+                        <Card.Text>1000 tickets available</Card.Text>
+                    </Card.Body>
+                </Card>
             )
         }
-        return <Card.Body>Loading...</Card.Body>
+
+        return (
+            <Card className="event-block">
+                <Placeholder as={Card.Body} animation="glow">
+                    <Placeholder xs={4} /> <Placeholder xs={4} />{' '}<br />
+                    <Placeholder xs={5} /> <Placeholder xs={3} />{' '}<br />
+                    <Placeholder xs={3} /> <Placeholder xs={3} /> <Placeholder xs={3} />{' '}
+                </Placeholder>
+            </Card>
+        );
     }
 
     const TimeAndPlaceComponent = () => {
@@ -76,14 +112,24 @@ const EventDetails: React.FC<{}> = () => {
             const formattedStartDate = getFormattedDate(event.start_date);
             const formattedEndDate = getFormattedDate(event.end_date);
             return (
-                <Card.Body>
-                    <Card.Text>{formattedStartDate + ((formattedEndDate == formattedStartDate) ? "" : " - " + formattedEndDate)}</Card.Text>
-                    <Card.Text>{getFormattedTime(event.start_date)} - {getFormattedTime(event.end_date)}</Card.Text>
-                    <Card.Text>{event.location}</Card.Text>
-                </Card.Body>
-            )
+                <Card className="event-block">
+                    <Card.Body>
+                        <Card.Text>{formattedStartDate + ((formattedEndDate == formattedStartDate) ? "" : " - " + formattedEndDate)}</Card.Text>
+                        <Card.Text>{getFormattedTime(event.start_date)} - {getFormattedTime(event.end_date)}</Card.Text>
+                        <Card.Text>{event.location}</Card.Text>
+                    </Card.Body>
+                </Card>
+            );
         }
-        return <Card.Body>Loading...</Card.Body>
+        return (
+            <Card className="event-block">
+                <Placeholder as={Card.Body} animation="glow">
+                    <Placeholder xs={2} /> <Placeholder xs={2} /> <Placeholder xs={4} />{' '}
+                    <Placeholder xs={4} /> <Placeholder xs={5} />{' '}
+                    <Placeholder xs={3} /> <Placeholder xs={4} /> <Placeholder xs={2} />{' '}
+                </Placeholder>
+            </Card>
+        );
     }
 
     const BuyTicketComponent: React.FC<{ name: string, price: number, amountLeft: number }> = ({ name, price, amountLeft }) => {
@@ -122,8 +168,11 @@ const EventDetails: React.FC<{}> = () => {
                     <Card.Title>Buy Tickets:</Card.Title>
                 </Card.Header>
                 <Card.Body className="direction-row">
-                    <BuyTicketComponent name={"Tickets Type 1"} price={50} amountLeft={500} />
-                    <BuyTicketComponent name={"Tickets Type 2"} price={75} amountLeft={500} />
+                    {tickets.map((ticket, index) => {
+                        return <BuyTicketComponent key={index} name={ticket.name} price={ticket.price} amountLeft={ticket.quantity} />
+                    })}
+                    {/* <BuyTicketComponent name={"Tickets Type 1"} price={50} amountLeft={500} />
+                    <BuyTicketComponent name={"Tickets Type 2"} price={75} amountLeft={500} /> */}
                 </Card.Body>
             </Card>
         )
@@ -136,14 +185,16 @@ const EventDetails: React.FC<{}> = () => {
                 <Card.Header>
                     <TitleComponent />
                 </Card.Header>
-                <Card className="event-info">
-                    <ImageComponent />
-                    <PricingAndAvailabilityComponent />
-                    <TimeAndPlaceComponent />
+                <Card >
+                    <Card.Body className="event-info">
+                        <ImageComponent />
+                        <PricingAndAvailabilityComponent />
+                        <TimeAndPlaceComponent />
+                    </Card.Body>
                 </Card>
                 <Card.Body>
                     <Card.Text>{event ? event.description : "Loading..."}</Card.Text>
-                    <Button onClick={() => { navigate("/") }}>Return to Catalog</Button>
+                    {/* <Button onClick={() => { navigate("/") }}>Return to Catalog</Button> */}
                 </Card.Body>
             </Card>
 

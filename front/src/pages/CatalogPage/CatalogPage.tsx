@@ -18,9 +18,9 @@ const CatalogPage: React.FC = () => {
   const Catalog = () => {
     let catalog;
     if (isLoading) {
-      catalog = Array.from({ length: LOADING_AMOUNT }, (_, i) => EventPlaceholder());
+      catalog = Array.from({ length: LOADING_AMOUNT }, (_, i) => <EventPlaceholder key={i} />);
     } else {
-      catalog = events.map(event => <EventDetails event={event} />);
+      catalog = events.map(event => <EventDetails key={event.id} event={event} />);
     }
 
     return <Container style={{ width: "100vw" }}>

@@ -16,3 +16,10 @@ export interface Comment {
     content: string;
     // TODO - MORE FIELDS!
 }
+
+export interface Ticket {
+    eventId: string;
+    name: string;
+    price: number;
+    quantity: number;
+}

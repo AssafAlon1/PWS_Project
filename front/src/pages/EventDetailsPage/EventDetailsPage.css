@@ -21,3 +21,8 @@
     width: 50px;
     margin-right: 10px;
 }
+
+.event-block {
+    margin-left: 10px;
+    min-width: 200px;
+}

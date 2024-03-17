@@ -1,4 +1,4 @@
-import { CSEvent } from "../types";
+import { CSEvent, Ticket } from "../types";
 
 // TODO - IMPLEMENT EVERYTHING WITH AXIOS
 const allEvents = [
@@ -25,6 +25,27 @@ const allEvents = [
     },
 ];
 
+const allTickets = [
+    {
+        eventId: "1",
+        name: "General Admission",
+        price: 50,
+        quantity: 1000,
+    },
+    {
+        eventId: "1",
+        name: "VIP",
+        price: 100,
+        quantity: 100,
+    },
+    {
+        eventId: "2",
+        name: "General Admission",
+        price: 20,
+        quantity: 500,
+    },
+];
+
 export async function fetchEvents(skip?: number, limit?: number): Promise<CSEvent[]> {
     // TODO - implement
     skip = skip ?? 0;
@@ -36,6 +57,13 @@ export async function fetchEvents(skip?: number, limit?: number): Promise<CSEven
 
 export async function fetchEvent(eventId: string): Promise<CSEvent | null> {
     // TODO - implement
+    await new Promise(resolve => setTimeout(resolve, 1000));
     return allEvents.find(event => event.id === eventId) ?? null;
 }
 
+export async function fetchTickets(eventId: string): Promise<Ticket[] | null> {
+    // TODO - implement
+    await new Promise(resolve => setTimeout(resolve, 1700));
+    return allTickets.filter(ticket => ticket.eventId === eventId);
+    return null;
+}

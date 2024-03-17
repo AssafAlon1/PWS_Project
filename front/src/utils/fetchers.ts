@@ -1,4 +1,4 @@
-import { CSEvent, Ticket } from "../types";
+import { CSEvent, Comment, Ticket } from "../types";
 
 // TODO - remove this function (only for testing)
 function getRandomInt(max: number) {
@@ -51,6 +51,38 @@ const allTickets = [
     },
 ];
 
+const allComments = [
+    {
+        id: "1",
+        eventId: "1",
+        content: "This event seems fun!",
+        createdAt: new Date("2024-03-17T11:32"),
+        author: "Alice",
+    },
+    {
+        id: "2",
+        eventId: "1",
+        content: "Jeffrey Epstein didn't kill himself",
+        createdAt: new Date("2024-03-17T11:54"),
+        author: "A person who knows...",
+    },
+    {
+        id: "3",
+        eventId: "1",
+        content: "Haha, I like fun events :)",
+        createdAt: new Date("2024-03-18T01:05"),
+        author: "Bob",
+    },
+    {
+        id: "4",
+        eventId: "2",
+        content: "Boooo-RING!",
+        createdAt: new Date("2024-03-18T01:07"),
+        author: "Bob"
+    },
+];
+
+
 export async function fetchEvents(skip?: number, limit?: number): Promise<CSEvent[]> {
     // TODO - implement
     skip = skip ?? 0;
@@ -74,5 +106,15 @@ export async function fetchTickets(eventId: string): Promise<Ticket[] | null> {
         throw new Error("Force error for testing purposes.");
     }
     return allTickets.filter(ticket => ticket.eventId === eventId);
-    return null;
+}
+
+
+export async function fetchComments(eventId: string): Promise<Comment[]> {
+    // TODO - implement
+    await new Promise(resolve => setTimeout(resolve, 2000));
+    if (getRandomInt(5) === 0) {
+        throw new Error("Force error for testing purposes.");
+    }
+
+    return allComments.filter(comment => comment.eventId === eventId).reverse();
 }

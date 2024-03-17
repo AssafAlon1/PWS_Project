@@ -1,18 +1,24 @@
 import './EventDetailsPage.css';
 
 import React, { useEffect, useState } from 'react';
-import { fetchEvent, fetchTickets } from '../../utils/fetchers';
+import { fetchComments, fetchEvent, fetchTickets } from '../../utils/fetchers';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Button, Card, Placeholder } from 'react-bootstrap';
 
 import MissingImage from "../../assets/MissingImage.png"
-import { CSEvent, Ticket } from '../../types';
-import { getFormattedDate, getFormattedTime } from '../../utils/formatting';
+import { CSEvent, Comment, Ticket } from '../../types';
+import { getFormattedDate, getFormattedDateTime, getFormattedTime } from '../../utils/formatting';
 
-
+// TODO - extract some components to other files?
 const EventDetails: React.FC<{}> = () => {
-    const [event, SetEvent] = useState<CSEvent | null>(null);
-    const [tickets, SetTickets] = useState<Ticket[] | null>(null);
+    const [event, setEvent] = useState<CSEvent | null>(null);
+    const [tickets, setTickets] = useState<Ticket[] | null>(null);
+    const [comments, setComments] = useState<Comment[] | null>(null);
+    const [failedFetchingComments, setFailedFetchingComments] = useState<boolean>(false);
+
+    // > Note about the failedFetchingComments state ^^^
+    // > The tickets don't have a similar state because we can tell that the fetch failed if we
+    // > receive back an empty array (since all events must have at least 1 ticket type).
 
     const { eventId } = useParams();
     const navigate = useNavigate();
@@ -33,7 +39,7 @@ const EventDetails: React.FC<{}> = () => {
         if (!fetchedEvent) {
             navigate("/notfound", { state: { errorMessage: `Event ${eventId} not found` } });
         }
-        SetEvent(fetchedEvent);
+        setEvent(fetchedEvent);
     }
 
     const updateTickets = async () => {
@@ -41,7 +47,7 @@ const EventDetails: React.FC<{}> = () => {
             // I believe it should be impossible to get here, but just in case...
             return navigate("/");
         }
-        SetTickets(null);
+        setTickets(null);
         let fetchedTickets: Ticket[];
         try {
             fetchedTickets = await fetchTickets(eventId) ?? [];
@@ -54,12 +60,37 @@ const EventDetails: React.FC<{}> = () => {
             // return navigate("/error", { state: { errorMessage: `Failed to fetch tickets for event ${eventId}` } });
             fetchedTickets = [];
         }
-        SetTickets(fetchedTickets);
+        setTickets(fetchedTickets);
+    }
+
+    const updateComments = async () => {
+        if (!eventId) {
+            // I believe it should be impossible to get here, but just in case...
+            return navigate("/");
+        }
+        setComments(null);
+        setFailedFetchingComments(false);
+        let fetchedComments: Comment[];
+        try {
+            fetchedComments = await fetchComments(eventId) ?? [];
+            if (!fetchedComments) {
+                throw new Error(`Failed to fetch comments for event ${eventId}`);
+            }
+        }
+        catch (err) {
+            // TODO - navigate? just display "error loading comments"? What's better?
+            // return navigate("/error", { state: { errorMessage: `Failed to fetch comments for event ${eventId}` } });
+            console.log(err)
+            setFailedFetchingComments(true);
+            fetchedComments = [];
+        }
+        setComments(fetchedComments);
     }
 
     useEffect(() => {
         updateEvent();
         updateTickets(); // TODO - separate this? How harsh do we want to be?
+        updateComments(); // TODO - separate this? How harsh do we want to be?
     }, [eventId]);
 
     const TitleComponent = () => {
@@ -167,7 +198,7 @@ const EventDetails: React.FC<{}> = () => {
         if (hasTicketsFetchFailed) {
             bodyContent = <Card.Body>
                 <Card.Text>Failed fetching tickets information</Card.Text>
-                <Button onClick={updateTickets}>Retry</Button>
+                <Button variant="light" onClick={updateTickets}>Retry</Button>
             </Card.Body>
         } else if (tickets === null) {
             bodyContent = <Card.Body>
@@ -177,8 +208,8 @@ const EventDetails: React.FC<{}> = () => {
             bodyContent = tickets.map((ticket, index) => {
                 return <BuyTicketComponent key={index} name={ticket.name} price={ticket.price} amountLeft={ticket.quantity} />
             });
-
         }
+
         return (
             <Card>
                 <Card.Header>
@@ -186,14 +217,48 @@ const EventDetails: React.FC<{}> = () => {
                 </Card.Header>
                 <Card.Body className="direction-row">
                     {bodyContent}
-                    {/* <BuyTicketComponent name={"Tickets Type 1"} price={50} amountLeft={500} />
-                    <BuyTicketComponent name={"Tickets Type 2"} price={75} amountLeft={500} /> */}
                 </Card.Body>
             </Card>
         );
     }
 
-    // TODO - Better Loading, error handling
+    const CommentsComponent = () => {
+        let body;
+        if (failedFetchingComments) {
+            body = <Card.Body>
+                <Card.Text>Failed fetching comments information</Card.Text>
+                <Button variant="light" onClick={updateComments}>Retry</Button>
+
+            </Card.Body>
+        } else if (comments === null) {
+            body = <Card.Body>
+                <Card.Text>Loading comments...</Card.Text>
+            </Card.Body>
+        } else {
+            body = <Card.Body>
+                {comments.map((comment, index) => {
+                    return <Card key={index}>
+                        <Card.Header>
+                            By {comment.author} | At {getFormattedDateTime(comment.createdAt)}
+                        </Card.Header>
+                        <Card.Body>
+                            <Card.Text>{comment.content}</Card.Text>
+                        </Card.Body>
+                    </Card>
+                })}
+            </Card.Body>;
+        }
+
+        return (
+            <Card>
+                <Card.Header>
+                    <Card.Title>Comments:</Card.Title>
+                </Card.Header>
+                {body}
+            </Card>
+        );
+    }
+
     return (
         <>
             <Card className="event-details">
@@ -214,6 +279,7 @@ const EventDetails: React.FC<{}> = () => {
             </Card>
 
             <BuyTicketsComponent />
+            <CommentsComponent />
         </>
 
     );

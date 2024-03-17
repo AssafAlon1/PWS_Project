@@ -9,3 +9,7 @@ export const getFormattedTime = (date: Date) => {
     const formattedTime = formatter.format(date);
     return formattedTime
 }
+
+export const getFormattedDateTime = (date: Date) => {
+    return `${getFormattedDate(date)}, ${getFormattedTime(date)}`
+}

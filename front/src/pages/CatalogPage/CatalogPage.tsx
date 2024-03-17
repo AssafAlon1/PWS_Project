@@ -13,7 +13,8 @@ const CatalogPage: React.FC = () => {
 
   const navigate = useNavigate();
 
-  const LOADING_AMOUNT = 6;
+  // Smaller screens will have less loading events
+  const LOADING_AMOUNT = window.innerWidth < 576 ? 2 : window.innerWidth < 992 ? 6 : 8;
 
   const Catalog = () => {
     let catalog;

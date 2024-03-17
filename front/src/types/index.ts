@@ -11,9 +11,10 @@ export interface CSEvent {
 }
 
 export interface Comment {
-    id: string;
     eventId: string;
     content: string;
+    createdAt: Date;
+    author: string;
     // TODO - MORE FIELDS!
 }
 

@@ -27,6 +27,7 @@ export interface Ticket {
 
 export interface PurchaseDetails {
     eventId: string;
+    eventName: string
     name: string;
     quantity: number;
     price: number;

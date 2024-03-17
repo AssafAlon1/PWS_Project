@@ -169,6 +169,7 @@ const EventDetails: React.FC<{}> = () => {
 
         const ticketPurchaseDetails: PurchaseDetails = {
             eventId: eventId ?? "0",
+            eventName: event?.name ?? "Unknown",
             name: name,
             quantity: ticketAmount,
             price: price

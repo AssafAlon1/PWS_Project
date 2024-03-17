@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { Form, useLocation, useNavigate } from 'react-router-dom';
 import { PurchaseDetails } from '../../types';
-import { Button } from 'react-bootstrap';
+import { Button, Card } from 'react-bootstrap';
 
 
 const CheckoutPage: React.FC = () => {
@@ -18,19 +18,31 @@ const CheckoutPage: React.FC = () => {
         }
     }, [purchaseDetails, navigate]);
 
-    const detailsDiv = <div>
-        <h1>Checkout Page</h1>
-        <h2>Product Information</h2>
-        <p>Event: {purchaseDetails?.eventId}</p>
-        <p>Tickets Type: {purchaseDetails?.name}</p>
-        <p>Number of tickets: {purchaseDetails?.quantity}</p>
-        <p>Total Price: ${(purchaseDetails?.price ?? 0) * (purchaseDetails?.quantity ?? 0)}</p>
-        <h2>Credit Card Information</h2>
-        <Button variant="primary">Submit</Button>
-    </div >
+
+
+    const OrderSummaryComponent = () => {
+        return (
+            <Card>
+                <Card.Header>
+                    <Card.Title>Order Summary</Card.Title>
+                </Card.Header>
+                <Card.Body>
+                    <Card.Text>{purchaseDetails?.eventName}</Card.Text>
+                    <Card.Text>Tickets: {purchaseDetails?.quantity} x {purchaseDetails?.name}</Card.Text>
+                    <Card.Text>Total: ${(purchaseDetails?.price ?? 0) * (purchaseDetails?.quantity ?? 0)}</Card.Text>
+                    <hr />
+                    <Button variant="primary">Buy Now! :)</Button>
+                </Card.Body>
+            </Card>
+        );
+    }
+
 
     return (
-        areDetailsProvided ? detailsDiv : <div>Loading...</div>
+        <>
+            <h1>Checkout</h1>
+            <OrderSummaryComponent />
+        </>
     );
 };
 

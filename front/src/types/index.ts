@@ -24,3 +24,10 @@ export interface Ticket {
     price: number;
     quantity: number;
 }
+
+export interface PurchaseDetails {
+    eventId: string;
+    name: string;
+    quantity: number;
+    price: number;
+}

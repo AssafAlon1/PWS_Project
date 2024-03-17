@@ -41,7 +41,7 @@ const CatalogPage: React.FC = () => {
         SetEvents(await fetchEvents());
       }
       catch {
-        navigate("/error", { state: { errorMessage: "Failed to fetch events" } });
+        navigate("/error", { state: { message: "Failed to fetch events" } });
       }
       finally {
         setLoading(false);

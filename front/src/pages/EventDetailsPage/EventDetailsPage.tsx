@@ -6,8 +6,9 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Button, Card, Placeholder } from 'react-bootstrap';
 
 import MissingImage from "../../assets/MissingImage.png"
-import { CSEvent, Comment, Ticket } from '../../types';
+import { CSEvent, Comment, PurchaseDetails, Ticket } from '../../types';
 import { getFormattedDate, getFormattedDateTime, getFormattedTime } from '../../utils/formatting';
+import ButtonWithTooltip from '../../components/ButtonWithTooltip/ButtonWithTooltip';
 
 // TODO - extract some components to other files?
 const EventDetails: React.FC<{}> = () => {
@@ -34,10 +35,10 @@ const EventDetails: React.FC<{}> = () => {
             fetchedEvent = await fetchEvent(eventId);
         }
         catch {
-            return navigate("/error", { state: { errorMessage: `Failed to fetch event ${eventId}` } });
+            return navigate("/error", { state: { message: `Failed to fetch event ${eventId}` } });
         }
         if (!fetchedEvent) {
-            navigate("/notfound", { state: { errorMessage: `Event ${eventId} not found` } });
+            navigate("/notfound", { state: { message: `Event ${eventId} not found` } });
         }
         setEvent(fetchedEvent);
     }
@@ -57,7 +58,7 @@ const EventDetails: React.FC<{}> = () => {
         }
         catch {
             // TODO - navigate? just display "error loading tickets"? What's better?
-            // return navigate("/error", { state: { errorMessage: `Failed to fetch tickets for event ${eventId}` } });
+            // return navigate("/error", { state: { message: `Failed to fetch tickets for event ${eventId}` } });
             fetchedTickets = [];
         }
         setTickets(fetchedTickets);
@@ -79,7 +80,7 @@ const EventDetails: React.FC<{}> = () => {
         }
         catch (err) {
             // TODO - navigate? just display "error loading comments"? What's better?
-            // return navigate("/error", { state: { errorMessage: `Failed to fetch comments for event ${eventId}` } });
+            // return navigate("/error", { state: { message: `Failed to fetch comments for event ${eventId}` } });
             console.log(err)
             setFailedFetchingComments(true);
             fetchedComments = [];
@@ -166,13 +167,12 @@ const EventDetails: React.FC<{}> = () => {
     const BuyTicketComponent: React.FC<{ name: string, price: number, amountLeft: number }> = ({ name, price, amountLeft }) => {
         const [ticketAmount, setTicketAmount] = useState<number>(0);
 
-        const handleBuyNow = () => {
-            if (ticketAmount <= 0) {
-                alert("Invalid amount.. :/");
-                return;
-            }
-            alert(`Sold! ${ticketAmount} of type ${name} for a total of $${ticketAmount * price}!`);
-        };
+        const ticketPurchaseDetails: PurchaseDetails = {
+            eventId: eventId ?? "0",
+            name: name,
+            quantity: ticketAmount,
+            price: price
+        }
 
         return (
             <Card className="ticket-card">
@@ -185,7 +185,13 @@ const EventDetails: React.FC<{}> = () => {
                     <Card.Text>Choose amount of tickets:</Card.Text>
                     <div className="direction-row">
                         <input className="tickets-amount" type="number" value={ticketAmount} onChange={(event) => setTicketAmount(Number(event.target.value))} />
-                        <Button onClick={handleBuyNow}>Buy now</Button>
+                        <ButtonWithTooltip
+                            buttonContent="Buy Now!"
+                            tooltipContent="Cannot buy less than 1 ticket"
+                            isDisabled={ticketAmount <= 0}
+                            buttonOnClick={() => { navigate("/checkout", { state: { purchaseDetails: ticketPurchaseDetails } }) }}
+                        />
+
                     </div>
                 </Card.Body>
             </Card>

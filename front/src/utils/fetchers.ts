@@ -95,7 +95,9 @@ export async function fetchEvents(skip?: number, limit?: number): Promise<CSEven
 export async function fetchEvent(eventId: string): Promise<CSEvent | null> {
     // TODO - implement
     await new Promise(resolve => setTimeout(resolve, 1000));
-    // throw new Error("Force error for testing purposes.");
+    // if (getRandomInt(5) === 0) {
+    //     throw new Error("Force error for testing purposes.");
+    // }
     return allEvents.find(event => event.id === eventId) ?? null;
 }
 

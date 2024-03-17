@@ -15,3 +15,7 @@
     /* Was 5px */
     margin: 0.3125rem;
 }
+
+.invisible {
+    visibility: hidden;
+}

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Outlet, Link } from "react-router-dom";
+import { Outlet, useNavigate } from "react-router-dom";
 import { CSEvent } from '../../types';
 import { fetchEvents } from '../../utils/fetchers';
 import EventDetails, { EventPlaceholder } from "../../components/CatalogEventDetails/CatalogEventDetails";
@@ -10,6 +10,8 @@ const CatalogPage: React.FC = () => {
 
   const [events, SetEvents] = useState<CSEvent[]>([]);
   const [isLoading, setLoading] = useState<boolean>(true);
+
+  const navigate = useNavigate();
 
   const LOADING_AMOUNT = 6;
 
@@ -38,8 +40,7 @@ const CatalogPage: React.FC = () => {
         SetEvents(await fetchEvents());
       }
       catch {
-        alert("Error fetching events");
-        // TODO - do the la
+        navigate("/error", { state: { errorMessage: "Failed to fetch events" } });
       }
       finally {
         setLoading(false);

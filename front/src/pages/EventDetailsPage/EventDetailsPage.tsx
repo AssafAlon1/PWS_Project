@@ -21,11 +21,15 @@ const EventDetails: React.FC<{}> = () => {
             // I believe it should be impossible to get here, but just in case...
             return navigate("/");
         }
-        const fetchedEvent = await fetchEvent(eventId);
-        console.log(fetchedEvent);
+        let fetchedEvent;
+        try {
+            fetchedEvent = await fetchEvent(eventId);
+        }
+        catch {
+            return navigate("/error", { state: { errorMessage: `Failed to fetch event ${eventId}` } });
+        }
         if (!fetchedEvent) {
-            alert(`Event ${eventId} not found`); // TODO - redirect to home? 404? never show in the first place?
-            navigate("/")
+            navigate("/notfound", { state: { errorMessage: `Event ${eventId} not found` } });
         }
         SetEvent(fetchedEvent);
     }
@@ -86,11 +90,11 @@ const EventDetails: React.FC<{}> = () => {
         const [ticketAmount, setTicketAmount] = useState<number>(0);
 
         const handleBuyNow = () => {
-            if (ticketAmount == 0) {
-                alert("No tickets.. :/");
+            if (ticketAmount <= 0) {
+                alert("Invalid amount.. :/");
                 return;
             }
-            alert(`Sold! ${ticketAmount}`);
+            alert(`Sold! ${ticketAmount} of type ${name} for a total of $${ticketAmount * price}!`);
         };
 
         return (

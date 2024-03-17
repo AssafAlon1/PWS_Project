@@ -12,7 +12,7 @@ import { getFormattedDate, getFormattedTime } from '../../utils/formatting';
 
 const EventDetails: React.FC<{}> = () => {
     const [event, SetEvent] = useState<CSEvent | null>(null);
-    const [tickets, SetTickets] = useState<Ticket[]>([]);
+    const [tickets, SetTickets] = useState<Ticket[] | null>(null);
 
     const { eventId } = useParams();
     const navigate = useNavigate();
@@ -41,19 +41,19 @@ const EventDetails: React.FC<{}> = () => {
             // I believe it should be impossible to get here, but just in case...
             return navigate("/");
         }
-
-        let fetchedTickets;
+        SetTickets(null);
+        let fetchedTickets: Ticket[];
         try {
-            fetchedTickets = await fetchTickets(eventId);
+            fetchedTickets = await fetchTickets(eventId) ?? [];
             if (!fetchedTickets) {
                 throw new Error(`Failed to fetch tickets for event ${eventId}`);
             }
         }
         catch {
-            // TODO - Don't navigate, just display "error loading tickets"
-            return navigate("/error", { state: { errorMessage: `Failed to fetch tickets for event ${eventId}` } });
+            // TODO - navigate? just display "error loading tickets"? What's better?
+            // return navigate("/error", { state: { errorMessage: `Failed to fetch tickets for event ${eventId}` } });
+            fetchedTickets = [];
         }
-        console.log("There are " + fetchedTickets.length + " tickets for event " + eventId)
         SetTickets(fetchedTickets);
     }
 
@@ -162,20 +162,35 @@ const EventDetails: React.FC<{}> = () => {
     }
 
     const BuyTicketsComponent = () => {
+        const hasTicketsFetchFailed = Array.isArray(tickets) && tickets.length === 0;
+        let bodyContent;
+        if (hasTicketsFetchFailed) {
+            bodyContent = <Card.Body>
+                <Card.Text>Failed fetching tickets information</Card.Text>
+                <Button onClick={updateTickets}>Retry</Button>
+            </Card.Body>
+        } else if (tickets === null) {
+            bodyContent = <Card.Body>
+                <Card.Text>Loading tickets...</Card.Text>
+            </Card.Body>
+        } else {
+            bodyContent = tickets.map((ticket, index) => {
+                return <BuyTicketComponent key={index} name={ticket.name} price={ticket.price} amountLeft={ticket.quantity} />
+            });
+
+        }
         return (
             <Card>
                 <Card.Header>
                     <Card.Title>Buy Tickets:</Card.Title>
                 </Card.Header>
                 <Card.Body className="direction-row">
-                    {tickets.map((ticket, index) => {
-                        return <BuyTicketComponent key={index} name={ticket.name} price={ticket.price} amountLeft={ticket.quantity} />
-                    })}
+                    {bodyContent}
                     {/* <BuyTicketComponent name={"Tickets Type 1"} price={50} amountLeft={500} />
                     <BuyTicketComponent name={"Tickets Type 2"} price={75} amountLeft={500} /> */}
                 </Card.Body>
             </Card>
-        )
+        );
     }
 
     // TODO - Better Loading, error handling

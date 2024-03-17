@@ -1,5 +1,10 @@
 import { CSEvent, Ticket } from "../types";
 
+// TODO - remove this function (only for testing)
+function getRandomInt(max: number) {
+    return Math.floor(Math.random() * max);
+}
+
 // TODO - IMPLEMENT EVERYTHING WITH AXIOS
 const allEvents = [
     {
@@ -58,12 +63,16 @@ export async function fetchEvents(skip?: number, limit?: number): Promise<CSEven
 export async function fetchEvent(eventId: string): Promise<CSEvent | null> {
     // TODO - implement
     await new Promise(resolve => setTimeout(resolve, 1000));
+    // throw new Error("Force error for testing purposes.");
     return allEvents.find(event => event.id === eventId) ?? null;
 }
 
 export async function fetchTickets(eventId: string): Promise<Ticket[] | null> {
     // TODO - implement
     await new Promise(resolve => setTimeout(resolve, 1700));
+    if (getRandomInt(5) === 0) {
+        throw new Error("Force error for testing purposes.");
+    }
     return allTickets.filter(ticket => ticket.eventId === eventId);
     return null;
 }

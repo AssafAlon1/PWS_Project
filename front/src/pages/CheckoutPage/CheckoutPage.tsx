@@ -1,7 +1,8 @@
 import React, { useEffect } from 'react';
-import { Form, useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { PurchaseDetails } from '../../types';
-import { Button, Card } from 'react-bootstrap';
+import { Button, Card, Col, Row } from 'react-bootstrap';
+import PaymentForm from '../../components/PaymentForm/PaymentForm';
 
 
 const CheckoutPage: React.FC = () => {
@@ -41,7 +42,14 @@ const CheckoutPage: React.FC = () => {
     return (
         <>
             <h1>Checkout</h1>
-            <OrderSummaryComponent />
+            <Row>
+                <Col>
+                    <PaymentForm />
+                </Col>
+                <Col>
+                    <OrderSummaryComponent />
+                </Col>
+            </Row>
         </>
     );
 };

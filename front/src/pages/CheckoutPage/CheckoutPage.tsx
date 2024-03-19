@@ -42,8 +42,6 @@ const CheckoutPage: React.FC = () => {
                     <Card.Text>{purchaseDetails?.eventName}</Card.Text>
                     <Card.Text>Tickets: {purchaseDetails?.quantity} x {purchaseDetails?.name}</Card.Text>
                     <Card.Text>Total: ${(purchaseDetails?.price ?? 0) * (purchaseDetails?.quantity ?? 0)}</Card.Text>
-                    <hr />
-                    <Button variant="primary">Buy Now! :)</Button>
                 </Card.Body>
             </Card>
         );

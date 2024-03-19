@@ -115,7 +115,7 @@ const PaymentForm: React.FC<{ onSuccessfulPurchase: () => void }> = ({ onSuccess
                     </Form.Group>
                     <hr />
                     <Button variant="primary" type="submit">
-                        Submit
+                        Buy Now! :)
                     </Button>
                 </Form>
             </Card.Body>

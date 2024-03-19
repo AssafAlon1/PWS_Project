@@ -5,6 +5,7 @@ import NavbarComponent from '../../components/Navbar/Navbar'
 import NotFound from '../../pages/NotFound'
 import ErrorPage from '../../pages/ErrorPage'
 import CheckoutPage from '../../pages/CheckoutPage/CheckoutPage'
+import SuccessPage from '../../pages/SuccessPage'
 
 function CSRouter() {
 
@@ -16,6 +17,7 @@ function CSRouter() {
                     <Route path="/" element={<CatalogPage />} />
                     <Route path="/events/:eventId" element={<EventDetails />} />
                     <Route path="/checkout" element={<CheckoutPage />} />
+                    <Route path="/success" element={<SuccessPage />} />
                     <Route path="/error" element={<ErrorPage />} />
                     <Route path="*" element={<NotFound />} />
                 </Routes>

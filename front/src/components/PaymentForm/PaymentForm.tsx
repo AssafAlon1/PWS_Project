@@ -1,13 +1,10 @@
-import React, { useEffect, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
-import { PurchaseDetails } from '../../types';
+import React, { useState } from 'react';
 import { Button, Card, Col, FloatingLabel, Form, Row } from 'react-bootstrap';
 
 
-const PaymentForm: React.FC = () => {
+const PaymentForm: React.FC<{ onSuccessfulPurchase: () => void }> = ({ onSuccessfulPurchase }) => {
 
     const [isFormValidated, setFormValidated] = useState<boolean>(false);
-    const [isDateValidated, setDateValidated] = useState<boolean>(false);
     const [year, setYear] = useState<number>(0);
     const [month, setMonth] = useState<number>(0);
 
@@ -16,8 +13,11 @@ const PaymentForm: React.FC = () => {
         if (form.checkValidity() === false) {
             event.preventDefault();
             event.stopPropagation();
+            setFormValidated(true);
+            return;
         }
-        setFormValidated(true);
+
+        onSuccessfulPurchase();
     }
 
     const YearOptions = () => {
@@ -28,7 +28,7 @@ const PaymentForm: React.FC = () => {
 
     const MonthOptions = () => {
         const months = Array.from(new Array(12), (val, index) => index + 1);
-        return months.map((month, index) => <option key={index}>{month < 10 ? "0" : ""}{month}</option>);
+        return months.map((month, index) => <option key={index} value={month}>{month < 10 ? "0" : ""}{month}</option>);
     }
 
     const isFutureDate = (year: number, month: number) => {
@@ -58,6 +58,7 @@ const PaymentForm: React.FC = () => {
                     <Form.Group controlId="creditCardNumber">
                         <FloatingLabel label="Credit Card Number">
                             <Form.Control
+                                required
                                 type="text"
                                 placeholder="**** **** **** ****"
                                 pattern="^[0-9]{16}$"
@@ -71,16 +72,31 @@ const PaymentForm: React.FC = () => {
                         <Row>
                             <Col>
                                 <FloatingLabel label="Year">
-                                    <Form.Select isValid={isFutureDate(year, month)}>
+                                    <Form.Select
+                                        value={year}
+                                        // isValid={isFutureDate(year, month)}
+                                        isInvalid={!isFutureDate(year, month)}
+                                        onChange={(event) => setYear(parseInt(event.target.value))}
+                                    >
                                         <YearOptions />
                                     </Form.Select>
                                 </FloatingLabel>
                             </Col>
                             <Col>
                                 <FloatingLabel label="Month">
-                                    <Form.Select>
+                                    <Form.Select
+                                        value={month}
+                                        // isValid={isFutureDate(year, month)}
+                                        isInvalid={!isFutureDate(year, month)}
+                                        onChange={(event) => {
+                                            console.log("Old Month: " + month);
+                                            console.log("New Month: " + event.target.value);
+                                            setMonth(parseInt(event.target.value))
+                                        }}
+                                    >
                                         <MonthOptions />
                                     </Form.Select>
+                                    <Form.Control.Feedback type="invalid">Month must be in the future</Form.Control.Feedback>
                                 </FloatingLabel>
                             </Col>
                         </Row>
@@ -89,10 +105,12 @@ const PaymentForm: React.FC = () => {
                     <Form.Group>
                         <FloatingLabel label="Security Code">
                             <Form.Control
+                                required
                                 type="text"
                                 placeholder="***"
                                 pattern="^[0-9]{3}$"
                                 maxLength={3} />
+                            <Form.Control.Feedback type="invalid">Security Code must be 3 digits</Form.Control.Feedback>
                         </FloatingLabel>
                     </Form.Group>
                     <hr />
@@ -101,7 +119,7 @@ const PaymentForm: React.FC = () => {
                     </Button>
                 </Form>
             </Card.Body>
-        </Card>
+        </Card >
     )
 
 };

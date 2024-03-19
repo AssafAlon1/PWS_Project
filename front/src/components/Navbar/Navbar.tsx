@@ -7,7 +7,7 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 
 const shouldDisplayGoBackButton = (path: string) => {
-    return path !== "/" && path !== "/error" && path !== "/invalidurl";
+    return path !== "/" && path !== "/error" && path !== "/invalidurl" && path !== "/success";
 }
 
 const NavbarComponent: React.FC = () => {

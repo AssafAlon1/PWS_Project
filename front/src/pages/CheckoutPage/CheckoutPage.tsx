@@ -11,15 +11,26 @@ const CheckoutPage: React.FC = () => {
     const purchaseDetails: PurchaseDetails | undefined = location.state?.purchaseDetails;
     const navigate = useNavigate();
 
+    // TODO - validate purchaseDetails with JOI or something?
     const areDetailsProvided = purchaseDetails && purchaseDetails.eventId && purchaseDetails.name && purchaseDetails.quantity && purchaseDetails.price;
 
     useEffect(() => {
-        if (!purchaseDetails || !purchaseDetails.eventId || !purchaseDetails.name || !purchaseDetails.quantity || !purchaseDetails.price) {
+        if (!areDetailsProvided) {
             navigate("/error", { state: { message: "No purchase details found" } });
         }
     }, [purchaseDetails, navigate]);
 
-
+    const onPurchase = () => {
+        navigate("/success", {
+            state: {
+                eventName: purchaseDetails?.eventName,
+                quantity: purchaseDetails?.quantity,
+                name: purchaseDetails?.name,
+                price: purchaseDetails?.price,
+                orderId: 1234 // TODO - get from server
+            }
+        });
+    }
 
     const OrderSummaryComponent = () => {
         return (
@@ -44,7 +55,7 @@ const CheckoutPage: React.FC = () => {
             <h1>Checkout</h1>
             <Row>
                 <Col>
-                    <PaymentForm />
+                    <PaymentForm onSuccessfulPurchase={onPurchase} />
                 </Col>
                 <Col>
                     <OrderSummaryComponent />

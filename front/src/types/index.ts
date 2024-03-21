@@ -32,3 +32,14 @@ export interface PurchaseDetails {
     quantity: number;
     price: number;
 }
+
+export interface UserAction {
+    username: string;
+    actionType: "purchase" | "refund"; // TODO - Maybe comment as well if we're feeling funky?
+    eventId: string;
+    purchaseId: string;
+    ticketName: string;
+    amount: number;
+    timestamp: Date;
+    // TODO - MORE FIELDS!
+}

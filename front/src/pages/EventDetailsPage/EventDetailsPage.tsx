@@ -1,7 +1,6 @@
 import './EventDetailsPage.css';
 
 import React, { useEffect, useState } from 'react';
-import { fetchEvent, fetchTickets } from '../../utils/fetchers';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Button, Card, Placeholder } from 'react-bootstrap';
 
@@ -13,6 +12,8 @@ import { usePurchaseDetails } from '../../components/PurchaseDetailsContext/Purc
 import AddCommentForm from '../../components/AddCommentForm/AddCommentForm';
 import { fetchComments } from '../../api/comment';
 import CommentComponent from '../../components/CommentComponent/CommentComponent';
+import { fetchEvent } from '../../api/event';
+import { fetchTickets } from '../../api/ticket';
 
 // TODO - extract some components to other files?
 const EventDetails: React.FC<{}> = () => {

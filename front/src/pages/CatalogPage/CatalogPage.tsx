@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { Outlet, useNavigate } from "react-router-dom";
 import { CSEvent } from '../../types';
-import { fetchEvents } from '../../utils/fetchers';
 import EventDetails, { EventPlaceholder } from "../../components/CatalogEventDetails/CatalogEventDetails";
 import { Col, Container, Row } from 'react-bootstrap';
+import { fetchEvents } from '../../api/event';
 
 
 const CatalogPage: React.FC = () => {

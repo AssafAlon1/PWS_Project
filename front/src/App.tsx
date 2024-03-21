@@ -1,9 +1,9 @@
 import { useState, createContext, useEffect } from 'react';
 import './App.css'
 import CSRouter from './components/Router/Router'
-import { getClosestEvent } from './utils/fetchers';
 import { getFormattedDateTime } from './utils/formatting';
 import { PurchaseDetailsProvider } from './components/PurchaseDetailsContext/PurchaseDetailsContext';
+import { getUserClosestEvent } from './api/event';
 
 interface AppContextProps {
   user: string | null;
@@ -30,7 +30,7 @@ function App() {
       console.log("No user found, can't update next event");
       return;
     }
-    const closestEvent = await getClosestEvent(user);
+    const closestEvent = await getUserClosestEvent(user);
     if (closestEvent) {
       setNextEvent(`${closestEvent.name} (${getFormattedDateTime(closestEvent.start_date)})`);
     }

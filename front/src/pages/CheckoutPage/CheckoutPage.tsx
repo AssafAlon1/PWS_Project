@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Card, Col, Row } from 'react-bootstrap';
+import { Alert, Card, Col, Row } from 'react-bootstrap';
 import PaymentForm from '../../components/PaymentForm/PaymentForm';
 import { AppContext } from '../../App';
 import { usePurchaseDetails } from '../../components/PurchaseDetailsContext/PurchaseDetailsContext';
@@ -8,6 +8,7 @@ import { purchaseTickets } from '../../api/ticket';
 
 const CheckoutPage: React.FC = () => {
     const [isLoading, setIsLoading] = useState<boolean>(false);
+    const [displayError, setDisplayError] = useState<boolean>(false);
     const { purchaseDetails, setPurchaseDetails } = usePurchaseDetails();
     const navigate = useNavigate();
     const context = useContext(AppContext);
@@ -46,7 +47,14 @@ const CheckoutPage: React.FC = () => {
         }
         console.log("About to purchase tickets");
         setIsLoading(true);
-        await purchaseTickets(purchaseDetails.eventId, purchaseDetails.name, purchaseDetails.quantity, username);
+        try {
+            await purchaseTickets(purchaseDetails.eventId, purchaseDetails.name, purchaseDetails.quantity, username);
+        }
+        catch (err) {
+            setIsLoading(false);
+            setDisplayError(true);
+            throw err;
+        }
         setIsLoading(false);
         console.log("Completed purchase");
     }
@@ -99,6 +107,12 @@ const CheckoutPage: React.FC = () => {
                     <OrderSummaryComponent />
                 </Col>
             </Row>
+            <Alert show={displayError} variant="danger" onClose={() => setDisplayError(false)} dismissible>
+                <Alert.Heading>Failed to purchase tickets</Alert.Heading>
+                <p>
+                    Something went wrong while trying to purchase your tickets. Please try again.
+                </p>
+            </Alert>
         </>
     );
 };

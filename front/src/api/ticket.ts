@@ -47,9 +47,9 @@ export async function purchaseTickets(eventId: string, ticketName: string, amoun
     console.log("PURCHASING TICKETS FOR " + username);
     await new Promise(resolve => setTimeout(resolve, 1000));
     // TODO - check this
-    // if (getRandomInt(10) === 0) {
-    //     throw new Error("Force error for testing purposes.");
-    // }
+    if (getRandomInt(3) === 0) {
+        throw new Error("Force error for testing purposes.");
+    }
 
     const purchaseId = "1"; // TODO - DO THE ACTUAL PURCHASE AGAINST THE HAMMER HEAD API
 

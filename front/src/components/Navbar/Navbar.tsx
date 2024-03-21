@@ -4,7 +4,7 @@ import "./Navbar.css";
 import logoutIcon from "/src/assets/logout.svg";
 import backIcon from "/src/assets/back.svg";
 import React, { useContext } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { AppContext } from "../../App";
 
 const shouldDisplayGoBackButton = (path: string) => {
@@ -40,10 +40,10 @@ const NavbarComponent: React.FC = () => {
         <>
             <Navbar bg="light" variant="light" fixed="top">
                 <Container>
-                    <Navbar.Brand href="/">CS Events</Navbar.Brand>
+                    <Navbar.Brand as={Link} to="/">CS Events</Navbar.Brand>
                     <Nav className="me-auto">
-                        <Nav.Link href="/invalidurl">404</Nav.Link>
-                        <Nav.Link href="/error">error</Nav.Link>
+                        <Nav.Link as={Link} to="/invalidurl">404</Nav.Link>
+                        <Nav.Link as={Link} to="/error">error</Nav.Link>
                     </Nav>
                     <NextEvent />
                     <div className="vr" />
@@ -52,7 +52,7 @@ const NavbarComponent: React.FC = () => {
                     <div className="vr" />
                     <div>
                         <Button variant="light">
-                            <Nav.Link href="/logout">
+                            <Nav.Link as={Link} to="/logout">
                                 <div className="horizontal-layout">
                                     <img src={logoutIcon} alt="Logout" />
                                     <p className="nav-element">Logout</p>

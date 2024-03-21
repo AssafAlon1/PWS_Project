@@ -30,7 +30,7 @@ export async function fetchEvents(skip?: number, limit?: number): Promise<CSEven
     // TODO - implement
     skip = skip ?? 0;
     limit = limit ?? 50; // TODO - magic number
-    await new Promise(resolve => setTimeout(resolve,));
+    await new Promise(resolve => setTimeout(resolve, 500));
     // throw new Error("Force error for testing purposes.");
     return allEvents.slice(skip, skip + limit);
 }

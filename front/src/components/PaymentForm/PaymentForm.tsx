@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Button, Card, Col, FloatingLabel, Form, Row, Spinner } from 'react-bootstrap';
+import { Button, Card, Col, FloatingLabel, Form, Row } from 'react-bootstrap';
+import SpanningSpinnner from '../SpinnerComponent/SpinnerComponent';
 
 
 interface PaymentFormProps {
@@ -51,13 +52,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({ purchaseTickets, afterSuccess
 
     const BuyNowButton = () => {
         return <Button disabled={isLoading} variant="primary" type="submit">
-            {isLoading ? <Spinner
-                as="span"
-                animation="grow"
-                size="sm"
-                role="status"
-                aria-hidden="true"
-            /> : "Buy Now!"}
+            {isLoading ? <SpanningSpinnner /> : "Buy Now!"}
         </Button>
     }
 

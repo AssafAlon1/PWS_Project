@@ -14,6 +14,7 @@ import { fetchComments } from '../../api/comment';
 import CommentComponent from '../../components/CommentComponent/CommentComponent';
 import { fetchEvent } from '../../api/event';
 import { fetchTickets } from '../../api/ticket';
+import SpanningSpinnner from '../../components/SpinnerComponent/SpinnerComponent';
 
 // TODO - extract some components to other files?
 const EventDetails: React.FC<{}> = () => {
@@ -197,6 +198,7 @@ const EventDetails: React.FC<{}> = () => {
         </Card>
     }
 
+    // TODO - Consider extracting BuyTicketComponent, BuyTicketsComponent to a separate file
     const BuyTicketComponent: React.FC<{ name: string, price: number, amountLeft: number }> = ({ name, price, amountLeft }) => {
         const [ticketAmount, setTicketAmount] = useState<number>(0);
 
@@ -247,7 +249,7 @@ const EventDetails: React.FC<{}> = () => {
             </Card.Body>
         } else if (tickets === null) {
             bodyContent = <Card.Body>
-                <Card.Text>Loading tickets...</Card.Text>
+                <Card.Text><SpanningSpinnner /><SpanningSpinnner /><SpanningSpinnner /></Card.Text>
             </Card.Body>
         } else {
             bodyContent = tickets.map((ticket, index) => {
@@ -277,8 +279,7 @@ const EventDetails: React.FC<{}> = () => {
             </Card.Body>
         } else if (comments === null) {
             body = <Card.Body>
-                <Card.Text>Loading comments...</Card.Text>
-                {/* TODO - Better load */}
+                <Card.Text><SpanningSpinnner /><SpanningSpinnner /><SpanningSpinnner /></Card.Text>
             </Card.Body>
         } else {
             body = <Card.Body>

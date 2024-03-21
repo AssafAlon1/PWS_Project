@@ -1,7 +1,8 @@
 import React, { useContext, useState } from 'react';
-import { Form, Button, Spinner, Alert } from 'react-bootstrap';
+import { Form, Button, Alert } from 'react-bootstrap';
 import { postComment } from '../../api/comment';
 import { AppContext } from '../../App';
+import SpanningSpinnner from '../SpinnerComponent/SpinnerComponent';
 
 interface AddCommentProps {
     eventId: string;
@@ -53,13 +54,7 @@ const AddCommentForm: React.FC<AddCommentProps> = ({ eventId, updateComments }) 
             </Form.Group>
 
             <Button disabled={postStatus == "loading"} variant="primary" type="submit" className="mb-4">
-                {postStatus == PostStatus["LOADING"] ? <Spinner
-                    as="span"
-                    animation="grow"
-                    size="sm"
-                    role="status"
-                    aria-hidden="true"
-                /> : "Submit"}
+                {postStatus == PostStatus["LOADING"] ? <SpanningSpinnner /> : "Submit"}
             </Button>
             <Alert show={postStatus == PostStatus["SUCCESS"]} variant="success">
                 <p>Comment posted successfully!</p>

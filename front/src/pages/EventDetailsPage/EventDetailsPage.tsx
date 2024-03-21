@@ -7,7 +7,7 @@ import { Button, Card, Placeholder } from 'react-bootstrap';
 
 import MissingImage from "../../assets/MissingImage.png"
 import { CSEvent, Comment, PurchaseDetails, Ticket } from '../../types';
-import { getFormattedDate } from '../../utils/formatting';
+import { getFormattedDate, getFormattedTime } from '../../utils/formatting';
 import ButtonWithTooltip from '../../components/ButtonWithTooltip/ButtonWithTooltip';
 import { usePurchaseDetails } from '../../components/PurchaseDetailsContext/PurchaseDetailsContext';
 import AddCommentForm from '../../components/AddCommentForm/AddCommentForm';

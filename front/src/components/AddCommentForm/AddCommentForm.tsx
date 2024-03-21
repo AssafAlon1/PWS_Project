@@ -8,11 +8,17 @@ interface AddCommentProps {
     updateComments: () => Promise<void>;
 }
 
+enum PostStatus {
+    IDLE = "idle",
+    LOADING = "loading",
+    SUCCESS = "success",
+    ERROR = "error"
+}
+
 const AddCommentForm: React.FC<AddCommentProps> = ({ eventId, updateComments }) => {
 
     const context = useContext(AppContext);
-    const [isLoading, setLoading] = useState<boolean>(false);
-    const [displayCommentPosted, setDisplayCommentPosted] = useState<boolean>(false);
+    const [postStatus, setPostStatus] = useState<PostStatus>(PostStatus["IDLE"]);
 
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
@@ -23,14 +29,13 @@ const AddCommentForm: React.FC<AddCommentProps> = ({ eventId, updateComments }) 
         }
         try {
             // TODO - Sanitize input?
-            setLoading(true);
+            setPostStatus(PostStatus["LOADING"]);
             await postComment(context.user, eventId, event.currentTarget.comment.value);
-            setLoading(false);
-            setDisplayCommentPosted(true);
+            setPostStatus(PostStatus["SUCCESS"]);
         }
         catch (error) {
             console.error(error);
-            alert("Failed to post comment. Please try again."); // TODO - error?
+            setPostStatus(PostStatus["ERROR"]);
         }
 
     };
@@ -41,14 +46,14 @@ const AddCommentForm: React.FC<AddCommentProps> = ({ eventId, updateComments }) 
                 <Form.Label>Add a new comment</Form.Label>
                 <Form.Control
                     required
-                    disabled={isLoading}
+                    disabled={postStatus == "loading"}
                     as="textarea"
                     rows={3}
                     placeholder="Enter your comment" />
             </Form.Group>
 
-            <Button disabled={isLoading} variant="primary" type="submit" className="mb-4">
-                {isLoading ? <Spinner
+            <Button disabled={postStatus == "loading"} variant="primary" type="submit" className="mb-4">
+                {postStatus == PostStatus["LOADING"] ? <Spinner
                     as="span"
                     animation="grow"
                     size="sm"
@@ -56,12 +61,17 @@ const AddCommentForm: React.FC<AddCommentProps> = ({ eventId, updateComments }) 
                     aria-hidden="true"
                 /> : "Submit"}
             </Button>
-            <Alert show={displayCommentPosted} variant="success">
+            <Alert show={postStatus == PostStatus["SUCCESS"]} variant="success">
                 <p>Comment posted successfully!</p>
                 <div className="d-flex justify-content-end">
                     <Button onClick={updateComments} variant="outline-success">
                         Reload comments
                     </Button>
+                </div>
+            </Alert>
+            <Alert show={postStatus == PostStatus["ERROR"]} variant="danger">
+                <p>Failed to post comment! Please try again.</p>
+                <div className="d-flex justify-content-end">
                 </div>
             </Alert>
         </Form>

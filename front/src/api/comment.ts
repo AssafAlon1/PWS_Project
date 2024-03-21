@@ -37,7 +37,7 @@ const allComments = [
 export const postComment = async (username: string, eventId: string, comment: string) => {
     // TODO - implement this
     await new Promise(resolve => setTimeout(resolve, 500));
-    if (getRandomInt(10) === 0) {
+    if (getRandomInt(2) === 0) {
         throw new Error("Force error for testing purposes.");
     }
     const newComment: Comment = {

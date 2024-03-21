@@ -3,8 +3,9 @@ import "./Navbar.css";
 
 import logoutIcon from "/src/assets/logout.svg";
 import backIcon from "/src/assets/back.svg";
-import React from "react";
+import React, { useContext } from "react";
 import { useNavigate } from "react-router-dom";
+import { AppContext } from "../../App";
 
 const shouldDisplayGoBackButton = (path: string) => {
     return path !== "/" && path !== "/error" && path !== "/invalidurl" && path !== "/success";
@@ -12,6 +13,7 @@ const shouldDisplayGoBackButton = (path: string) => {
 
 const NavbarComponent: React.FC = () => {
     const navigate = useNavigate();
+    const context = useContext(AppContext);
 
     const GoBackButton = () => {
         return (
@@ -24,6 +26,15 @@ const NavbarComponent: React.FC = () => {
         );
     }
 
+    const NextEvent = () => {
+        if (context.nextEvent) {
+            return (
+                <Button variant="success" disabled={true}>Next event: {context.nextEvent}</Button>
+            );
+        }
+        return <></>
+    }
+
 
     return (
         <>
@@ -34,8 +45,10 @@ const NavbarComponent: React.FC = () => {
                         <Nav.Link href="/invalidurl">404</Nav.Link>
                         <Nav.Link href="/error">error</Nav.Link>
                     </Nav>
+                    <NextEvent />
+                    <div className="vr" />
                     <GoBackButton />
-                    <p className="nav-element"><b>DrawBow</b></p>
+                    <p className="nav-element"><b>{context.user}</b></p>
                     <div className="vr" />
                     <div>
                         <Button variant="light">

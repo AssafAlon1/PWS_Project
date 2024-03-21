@@ -2,13 +2,13 @@ import React, { useState } from 'react';
 import { Button, Card, Col, FloatingLabel, Form, Row } from 'react-bootstrap';
 
 
-const PaymentForm: React.FC<{ onSuccessfulPurchase: () => void }> = ({ onSuccessfulPurchase }) => {
+const PaymentForm: React.FC<{ purchaseTickets: () => Promise<void>, afterSuccessfulPurchase: () => void }> = ({ purchaseTickets, afterSuccessfulPurchase }) => {
 
     const [isFormValidated, setFormValidated] = useState<boolean>(false);
     const [year, setYear] = useState<number>(0);
     const [month, setMonth] = useState<number>(0);
 
-    const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         const form = event.currentTarget;
         if (form.checkValidity() === false) {
             event.preventDefault();
@@ -16,8 +16,14 @@ const PaymentForm: React.FC<{ onSuccessfulPurchase: () => void }> = ({ onSuccess
             setFormValidated(true);
             return;
         }
-
-        onSuccessfulPurchase();
+        try {
+            await purchaseTickets();
+            afterSuccessfulPurchase();
+        }
+        catch {
+            // TODO - HANDLE THIS RIGHT (show an error in the page probably. Maybe a toast?)
+            setFormValidated(true);
+        }
     }
 
     const YearOptions = () => {
@@ -54,7 +60,7 @@ const PaymentForm: React.FC<{ onSuccessfulPurchase: () => void }> = ({ onSuccess
                             <Form.Control.Feedback type="invalid">Cardholder name must be non-empty and in English</Form.Control.Feedback>
                         </FloatingLabel>
                     </Form.Group>
-                    <hr />
+                    {/* <hr />
                     <Form.Group controlId="creditCardNumber">
                         <FloatingLabel label="Credit Card Number">
                             <Form.Control
@@ -112,7 +118,7 @@ const PaymentForm: React.FC<{ onSuccessfulPurchase: () => void }> = ({ onSuccess
                                 maxLength={3} />
                             <Form.Control.Feedback type="invalid">Security Code must be 3 digits</Form.Control.Feedback>
                         </FloatingLabel>
-                    </Form.Group>
+                    </Form.Group> */}
                     <hr />
                     <Button variant="primary" type="submit">
                         Buy Now! :)

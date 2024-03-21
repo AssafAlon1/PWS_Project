@@ -10,22 +10,33 @@ const SuccessPage: React.FC = () => {
     const ticketName = location.state?.name;
     const ticketPrice = location.state?.price;
     const orderId = location.state?.orderId;
-    // TODO - validate message, eventName, ticketQuantity, ticketName, ticketPrice, orderId
+
+    const CardBody = () => {
+        if (!eventName || !ticketQuantity || !ticketName || !ticketPrice || !orderId) {
+            return <Card.Body>
+                <Card.Text>{message}</Card.Text>
+                <Link to="/"><Button variant="primary">Return to Catalog</Button></Link>
+            </Card.Body>
+        }
+        else {
+            return <Card.Body>
+                <Card.Text>Order ID: {orderId}</Card.Text>
+                <Card.Text>Tickets: {ticketQuantity} x {ticketName}</Card.Text>
+                <Card.Text>Total: ${ticketPrice * ticketQuantity}</Card.Text>
+                <Card.Text>{message}</Card.Text>
+                <Link to="/"><Button variant="primary">Return to Catalog</Button></Link>
+            </Card.Body>
+        }
+    }
 
     return (
         <>
             <Card border="success">
                 <Card.Header>
                     <Card.Title>Purchase Successful!</Card.Title>
-                    <Card.Subtitle>{eventName}</Card.Subtitle>
                 </Card.Header>
-                <Card.Body>
-                    <Card.Text>Order ID: {orderId}</Card.Text>
-                    <Card.Text>Tickets: {ticketQuantity} x {ticketName}</Card.Text>
-                    <Card.Text>Total: ${ticketPrice * ticketQuantity}</Card.Text>
-                    <Card.Text>{message}</Card.Text>
-                    <Link to="/"><Button variant="primary">Return to Catalog</Button></Link>
-                </Card.Body>
+                <CardBody />
+
             </Card>
         </>
     );

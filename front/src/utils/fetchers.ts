@@ -35,7 +35,7 @@ const allTickets = [
         eventId: "1",
         name: "General Admission",
         price: 50,
-        quantity: 1000,
+        quantity: 997,
     },
     {
         eventId: "1",
@@ -82,20 +82,32 @@ const allComments = [
     },
 ];
 
+const userActions = [
+    {
+        username: "Alice",
+        actionType: "purchase", // TODO - enum
+        eventId: "1",
+        purchaseId: "1",
+        ticketName: "General Admission",
+        amount: 3,
+        timestamp: new Date("2024-03-17T11:32"),
+    },
+
+];
 
 export async function fetchEvents(skip?: number, limit?: number): Promise<CSEvent[]> {
     // TODO - implement
     skip = skip ?? 0;
     limit = limit ?? 50; // TODO - magic number
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    await new Promise(resolve => setTimeout(resolve, 500));
     // throw new Error("Force error for testing purposes.");
     return allEvents.slice(skip, skip + limit);
 }
 
 export async function fetchEvent(eventId: string): Promise<CSEvent | null> {
     // TODO - implement
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    // if (getRandomInt(5) === 0) {
+    await new Promise(resolve => setTimeout(resolve, 500));
+    // if (getRandomInt(10) === 0) {
     //     throw new Error("Force error for testing purposes.");
     // }
     return allEvents.find(event => event.id === eventId) ?? null;
@@ -103,8 +115,8 @@ export async function fetchEvent(eventId: string): Promise<CSEvent | null> {
 
 export async function fetchTickets(eventId: string): Promise<Ticket[] | null> {
     // TODO - implement
-    await new Promise(resolve => setTimeout(resolve, 1700));
-    if (getRandomInt(5) === 0) {
+    await new Promise(resolve => setTimeout(resolve, 500));
+    if (getRandomInt(10) === 0) {
         throw new Error("Force error for testing purposes.");
     }
     return allTickets.filter(ticket => ticket.eventId === eventId);
@@ -113,10 +125,53 @@ export async function fetchTickets(eventId: string): Promise<Ticket[] | null> {
 
 export async function fetchComments(eventId: string): Promise<Comment[]> {
     // TODO - implement
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    if (getRandomInt(5) === 0) {
+    await new Promise(resolve => setTimeout(resolve, 500));
+    if (getRandomInt(10) === 0) {
         throw new Error("Force error for testing purposes.");
     }
 
     return allComments.filter(comment => comment.eventId === eventId).reverse();
+}
+
+// TODO - move to different file?
+export async function purchaseTickets(eventId: string, ticketName: string, amount: number, username: string): Promise<string> {
+    // TODO - implement
+    await new Promise(resolve => setTimeout(resolve, 3000));
+    if (getRandomInt(10) === 0) {
+        throw new Error("Force error for testing purposes.");
+    }
+    userActions.push({
+        username,
+        actionType: "purchase",
+        eventId,
+        purchaseId: "1", // TODO - get from server
+        ticketName,
+        amount,
+        timestamp: new Date(),
+    });
+    console.log("PURCHASED TICKETS FOR " + username)
+    console.log(userActions)
+    return "1"; // TODO - get from server
+}
+
+export async function getClosestEvent(username: string): Promise<CSEvent | null> {
+    // TODO - implement
+    console.log(" > Getting closest event for " + username);
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    const userEvents = userActions.filter(purchase => purchase.username === username);
+    if (userEvents.length === 0) {
+        console.log(" > No events found for " + username);
+        return null;
+    }
+
+    // Note: this logic is false (but will be replaced)
+    const nextEvent = allEvents.find(event => event.id === userEvents[0].eventId);
+
+    if (nextEvent) {
+        console.log(" > Next event found for " + username + ": " + nextEvent.name);
+        return nextEvent;
+    }
+
+    console.log(" > Mismatch between event Ids... Is there no event " + userEvents[0].eventId + "?");
+    return null;
 }

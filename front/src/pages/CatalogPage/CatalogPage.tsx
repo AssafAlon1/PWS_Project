@@ -52,9 +52,11 @@ const CatalogPage: React.FC = () => {
 
   return (
     <>
-      <h1>Catalog</h1>
-      <Catalog />
-      <Outlet />
+      <h1 style={{ position: 'fixed', top: 100, width: '100%', zIndex: 1000 }}>Catalog</h1>
+      <Container style={{ paddingTop: '100px' }}>
+        <Catalog />
+        <Outlet />
+      </Container>
     </>
   )
 };

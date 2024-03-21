@@ -1,15 +1,18 @@
 import './EventDetailsPage.css';
 
 import React, { useEffect, useState } from 'react';
-import { fetchComments, fetchEvent, fetchTickets } from '../../utils/fetchers';
+import { fetchEvent, fetchTickets } from '../../utils/fetchers';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Button, Card, Placeholder } from 'react-bootstrap';
 
 import MissingImage from "../../assets/MissingImage.png"
 import { CSEvent, Comment, PurchaseDetails, Ticket } from '../../types';
-import { getFormattedDate, getFormattedDateTime, getFormattedTime } from '../../utils/formatting';
+import { getFormattedDate } from '../../utils/formatting';
 import ButtonWithTooltip from '../../components/ButtonWithTooltip/ButtonWithTooltip';
 import { usePurchaseDetails } from '../../components/PurchaseDetailsContext/PurchaseDetailsContext';
+import AddCommentForm from '../../components/AddCommentForm/AddCommentForm';
+import { fetchComments } from '../../api/comment';
+import CommentComponent from '../../components/CommentComponent/CommentComponent';
 
 // TODO - extract some components to other files?
 const EventDetails: React.FC<{}> = () => {
@@ -173,6 +176,26 @@ const EventDetails: React.FC<{}> = () => {
         );
     }
 
+    const MainInformationComponent = () => {
+        return <Card className="event-details mb-4">
+            <Card.Header>
+                <TitleComponent />
+            </Card.Header>
+            <Card >
+                <Card.Body className="event-info">
+                    <ImageComponent />
+                    <PricingAndAvailabilityComponent />
+                    <TimeAndPlaceComponent />
+                </Card.Body>
+            </Card>
+            <Card.Body>
+                {/* TODO - better loading */}
+                <Card.Text>{event ? event.description : "Loading..."}</Card.Text>
+                {/* <Button onClick={() => { navigate("/") }}>Return to Catalog</Button> */}
+            </Card.Body>
+        </Card>
+    }
+
     const BuyTicketComponent: React.FC<{ name: string, price: number, amountLeft: number }> = ({ name, price, amountLeft }) => {
         const [ticketAmount, setTicketAmount] = useState<number>(0);
 
@@ -192,18 +215,18 @@ const EventDetails: React.FC<{}> = () => {
         return (
             <Card className="ticket-card">
                 <Card.Header>
-                    {name}
+                    <b>{name}</b>
                 </Card.Header>
                 <Card.Body>
-                    <Card.Text>Price: ${price}</Card.Text>
-                    <Card.Text>{amountLeft} tickets left!</Card.Text>
+                    <Card.Text>Price: <b>${price}</b></Card.Text>
+                    <Card.Text><b>{amountLeft}</b> tickets left!</Card.Text>
                     <Card.Text>Choose amount of tickets:</Card.Text>
                     <div className="direction-row">
                         <input className="tickets-amount" type="number" value={ticketAmount} onChange={(event) => setTicketAmount(Number(event.target.value))} />
                         <ButtonWithTooltip
                             buttonContent="Buy Now!"
-                            tooltipContent="Cannot buy less than 1 ticket"
-                            isDisabled={ticketAmount <= 0}
+                            tooltipContent={ticketAmount <= 0 ? "Cannot buy less than 1 ticket" : "Not enough tickets left"}
+                            isDisabled={ticketAmount <= 0 || ticketAmount > amountLeft}
                             buttonOnClick={onClickBuyNow}
                         />
 
@@ -232,7 +255,7 @@ const EventDetails: React.FC<{}> = () => {
         }
 
         return (
-            <Card>
+            <Card className="mb-4">
                 <Card.Header>
                     <Card.Title>Buy Tickets:</Card.Title>
                 </Card.Header>
@@ -254,18 +277,14 @@ const EventDetails: React.FC<{}> = () => {
         } else if (comments === null) {
             body = <Card.Body>
                 <Card.Text>Loading comments...</Card.Text>
+                {/* TODO - Better load */}
             </Card.Body>
         } else {
             body = <Card.Body>
+                <AddCommentForm eventId={eventId ?? ""} updateComments={updateComments} />
+                <hr />
                 {comments.map((comment, index) => {
-                    return <Card key={index}>
-                        <Card.Header>
-                            By {comment.author} | At {getFormattedDateTime(comment.createdAt)}
-                        </Card.Header>
-                        <Card.Body>
-                            <Card.Text>{comment.content}</Card.Text>
-                        </Card.Body>
-                    </Card>
+                    return <CommentComponent key={index} comment={comment} />
                 })}
             </Card.Body>;
         }
@@ -273,7 +292,9 @@ const EventDetails: React.FC<{}> = () => {
         return (
             <Card>
                 <Card.Header>
-                    <Card.Title>Comments:</Card.Title>
+                    <Card.Title>
+                        Comments:
+                    </Card.Title>
                 </Card.Header>
                 {body}
             </Card>
@@ -282,24 +303,7 @@ const EventDetails: React.FC<{}> = () => {
 
     return (
         <>
-            <Card className="event-details">
-                <Card.Header>
-                    <TitleComponent />
-                </Card.Header>
-                <Card >
-                    <Card.Body className="event-info">
-                        <ImageComponent />
-                        <PricingAndAvailabilityComponent />
-                        <TimeAndPlaceComponent />
-                    </Card.Body>
-                </Card>
-                <Card.Body>
-                    {/* TODO - better loading */}
-                    <Card.Text>{event ? event.description : "Loading..."}</Card.Text>
-                    {/* <Button onClick={() => { navigate("/") }}>Return to Catalog</Button> */}
-                </Card.Body>
-            </Card>
-
+            <MainInformationComponent />
             <BuyTicketsComponent />
             <CommentsComponent />
         </>

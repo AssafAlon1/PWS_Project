@@ -1,4 +1,4 @@
-import { CSEvent, Comment, Ticket } from "../types";
+import { CSEvent, Ticket } from "../types";
 
 // TODO - remove this function (only for testing)
 function getRandomInt(max: number) {
@@ -51,36 +51,6 @@ const allTickets = [
     },
 ];
 
-const allComments = [
-    {
-        id: "1",
-        eventId: "1",
-        content: "This event seems fun!",
-        createdAt: new Date("2024-03-17T11:32"),
-        author: "Alice",
-    },
-    {
-        id: "2",
-        eventId: "1",
-        content: "Jeffrey Epstein didn't kill himself",
-        createdAt: new Date("2024-03-17T11:54"),
-        author: "A person who knows...",
-    },
-    {
-        id: "3",
-        eventId: "1",
-        content: "Haha, I like fun events :)",
-        createdAt: new Date("2024-03-18T01:05"),
-        author: "Bob",
-    },
-    {
-        id: "4",
-        eventId: "2",
-        content: "Boooo-RING!",
-        createdAt: new Date("2024-03-18T01:07"),
-        author: "Bob"
-    },
-];
 
 const userActions = [
     {
@@ -123,15 +93,6 @@ export async function fetchTickets(eventId: string): Promise<Ticket[] | null> {
 }
 
 
-export async function fetchComments(eventId: string): Promise<Comment[]> {
-    // TODO - implement
-    await new Promise(resolve => setTimeout(resolve, 500));
-    if (getRandomInt(10) === 0) {
-        throw new Error("Force error for testing purposes.");
-    }
-
-    return allComments.filter(comment => comment.eventId === eventId).reverse();
-}
 
 // TODO - move to different file?
 export async function purchaseTickets(eventId: string, ticketName: string, amount: number, username: string): Promise<string> {

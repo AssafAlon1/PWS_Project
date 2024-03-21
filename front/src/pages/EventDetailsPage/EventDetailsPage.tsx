@@ -9,6 +9,7 @@ import MissingImage from "../../assets/MissingImage.png"
 import { CSEvent, Comment, PurchaseDetails, Ticket } from '../../types';
 import { getFormattedDate, getFormattedDateTime, getFormattedTime } from '../../utils/formatting';
 import ButtonWithTooltip from '../../components/ButtonWithTooltip/ButtonWithTooltip';
+import { usePurchaseDetails } from '../../components/PurchaseDetailsContext/PurchaseDetailsContext';
 
 // TODO - extract some components to other files?
 const EventDetails: React.FC<{}> = () => {
@@ -23,6 +24,14 @@ const EventDetails: React.FC<{}> = () => {
 
     const { eventId } = useParams();
     const navigate = useNavigate();
+    const { purchaseDetails, setPurchaseDetails } = usePurchaseDetails();
+
+    // Reset purchase details when the component is loaded
+    useEffect(() => {
+        if (purchaseDetails) {
+            setPurchaseDetails(null);
+        }
+    }, []);
 
     const updateEvent = async () => {
 
@@ -175,6 +184,11 @@ const EventDetails: React.FC<{}> = () => {
             price: price
         }
 
+        const onClickBuyNow = () => {
+            setPurchaseDetails(ticketPurchaseDetails);
+            navigate("/checkout");
+        }
+
         return (
             <Card className="ticket-card">
                 <Card.Header>
@@ -190,7 +204,7 @@ const EventDetails: React.FC<{}> = () => {
                             buttonContent="Buy Now!"
                             tooltipContent="Cannot buy less than 1 ticket"
                             isDisabled={ticketAmount <= 0}
-                            buttonOnClick={() => { navigate("/checkout", { state: { purchaseDetails: ticketPurchaseDetails } }) }}
+                            buttonOnClick={onClickBuyNow}
                         />
 
                     </div>
@@ -280,6 +294,7 @@ const EventDetails: React.FC<{}> = () => {
                     </Card.Body>
                 </Card>
                 <Card.Body>
+                    {/* TODO - better loading */}
                     <Card.Text>{event ? event.description : "Loading..."}</Card.Text>
                     {/* <Button onClick={() => { navigate("/") }}>Return to Catalog</Button> */}
                 </Card.Body>

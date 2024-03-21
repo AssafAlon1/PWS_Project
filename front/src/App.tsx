@@ -3,6 +3,7 @@ import './App.css'
 import CSRouter from './components/Router/Router'
 import { getClosestEvent } from './utils/fetchers';
 import { getFormattedDateTime } from './utils/formatting';
+import { PurchaseDetailsProvider } from './components/PurchaseDetailsContext/PurchaseDetailsContext';
 
 interface AppContextProps {
   user: string | null;
@@ -49,7 +50,9 @@ function App() {
 
   return (
     <AppContext.Provider value={{ user, setUser, nextEvent, updateNextEvent }}>
-      <CSRouter />
+      <PurchaseDetailsProvider>
+        <CSRouter />
+      </PurchaseDetailsProvider>
     </AppContext.Provider>
   );
 }

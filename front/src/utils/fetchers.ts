@@ -136,10 +136,12 @@ export async function fetchComments(eventId: string): Promise<Comment[]> {
 // TODO - move to different file?
 export async function purchaseTickets(eventId: string, ticketName: string, amount: number, username: string): Promise<string> {
     // TODO - implement
-    await new Promise(resolve => setTimeout(resolve, 3000));
-    if (getRandomInt(10) === 0) {
-        throw new Error("Force error for testing purposes.");
-    }
+    console.log("PURCHASING TICKETS FOR " + username);
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    // TODO - check this
+    // if (getRandomInt(10) === 0) {
+    //     throw new Error("Force error for testing purposes.");
+    // }
     userActions.push({
         username,
         actionType: "purchase",

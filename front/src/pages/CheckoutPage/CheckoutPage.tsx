@@ -1,19 +1,17 @@
-import React, { useContext, useEffect } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
-import { PurchaseDetails } from '../../types';
-import { Button, Card, Col, Row } from 'react-bootstrap';
+import React, { useContext, useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Card, Col, Row } from 'react-bootstrap';
 import PaymentForm from '../../components/PaymentForm/PaymentForm';
-import { getClosestEvent, purchaseTickets } from '../../utils/fetchers';
+import { purchaseTickets } from '../../utils/fetchers';
 import { AppContext } from '../../App';
-import { getFormattedDateTime } from '../../utils/formatting';
-
+import { usePurchaseDetails } from '../../components/PurchaseDetailsContext/PurchaseDetailsContext';
 
 const CheckoutPage: React.FC = () => {
-
-    const location = useLocation();
-    const purchaseDetails: PurchaseDetails | undefined = location.state?.purchaseDetails;
+    const [isLoading, setIsLoading] = useState<boolean>(false);
+    const { purchaseDetails, setPurchaseDetails } = usePurchaseDetails();
     const navigate = useNavigate();
     const context = useContext(AppContext);
+
     // TODO - validate purchaseDetails with JOI or something?
     const areDetailsProvided = purchaseDetails && purchaseDetails.eventId && purchaseDetails.name && purchaseDetails.quantity && purchaseDetails.price;
 
@@ -47,7 +45,9 @@ const CheckoutPage: React.FC = () => {
             return;
         }
         console.log("About to purchase tickets");
+        setIsLoading(true);
         await purchaseTickets(purchaseDetails.eventId, purchaseDetails.name, purchaseDetails.quantity, username);
+        setIsLoading(false);
         console.log("Completed purchase");
     }
 
@@ -57,13 +57,16 @@ const CheckoutPage: React.FC = () => {
             context.updateNextEvent();
         }
 
+        const detailsForSuccess = { ...purchaseDetails };
+        setPurchaseDetails(null);
+
         console.log("Redirecting after purchase");
         navigate("/success", {
             state: {
-                eventName: purchaseDetails?.eventName,
-                quantity: purchaseDetails?.quantity,
-                name: purchaseDetails?.name,
-                price: purchaseDetails?.price,
+                eventName: detailsForSuccess.eventName,
+                quantity: detailsForSuccess.quantity,
+                name: detailsForSuccess.name,
+                price: detailsForSuccess.price,
                 orderId: 1234 // TODO - get from server
             }
         });
@@ -90,7 +93,7 @@ const CheckoutPage: React.FC = () => {
             <h1>Checkout</h1>
             <Row>
                 <Col>
-                    <PaymentForm purchaseTickets={performPurchase} afterSuccessfulPurchase={afterPurchaseRedirect} />
+                    <PaymentForm purchaseTickets={performPurchase} afterSuccessfulPurchase={afterPurchaseRedirect} isLoading={isLoading} />
                 </Col>
                 <Col>
                     <OrderSummaryComponent />

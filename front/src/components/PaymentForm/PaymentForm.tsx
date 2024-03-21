@@ -1,17 +1,23 @@
 import React, { useState } from 'react';
-import { Button, Card, Col, FloatingLabel, Form, Row } from 'react-bootstrap';
+import { Button, Card, Col, FloatingLabel, Form, Row, Spinner } from 'react-bootstrap';
 
 
-const PaymentForm: React.FC<{ purchaseTickets: () => Promise<void>, afterSuccessfulPurchase: () => void }> = ({ purchaseTickets, afterSuccessfulPurchase }) => {
+interface PaymentFormProps {
+    purchaseTickets: () => Promise<void>;
+    afterSuccessfulPurchase: () => void;
+    isLoading: boolean;
+}
+
+const PaymentForm: React.FC<PaymentFormProps> = ({ purchaseTickets, afterSuccessfulPurchase, isLoading }) => {
 
     const [isFormValidated, setFormValidated] = useState<boolean>(false);
     const [year, setYear] = useState<number>(0);
     const [month, setMonth] = useState<number>(0);
 
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
         const form = event.currentTarget;
         if (form.checkValidity() === false) {
-            event.preventDefault();
             event.stopPropagation();
             setFormValidated(true);
             return;
@@ -42,6 +48,19 @@ const PaymentForm: React.FC<{ purchaseTickets: () => Promise<void>, afterSuccess
         const currentMonth = new Date().getMonth() + 1;
         return year > currentYear || month >= currentMonth; // No need to make sure year == currentYear since the year dropdown only shows future years
     }
+
+    const BuyNowButton = () => {
+        return <Button disabled={isLoading} variant="primary" type="submit">
+            {isLoading ? <Spinner
+                as="span"
+                animation="grow"
+                size="sm"
+                role="status"
+                aria-hidden="true"
+            /> : "Buy Now!"}
+        </Button>
+    }
+
 
     return (
         <Card>
@@ -120,9 +139,7 @@ const PaymentForm: React.FC<{ purchaseTickets: () => Promise<void>, afterSuccess
                         </FloatingLabel>
                     </Form.Group> */}
                     <hr />
-                    <Button variant="primary" type="submit">
-                        Buy Now! :)
-                    </Button>
+                    <BuyNowButton />
                 </Form>
             </Card.Body>
         </Card >

@@ -44,7 +44,6 @@ export async function fetchTickets(eventId: string): Promise<Ticket[] | null> {
 // TODO - move to different file?
 export async function purchaseTickets(eventId: string, ticketName: string, amount: number, username: string): Promise<string> {
     // TODO - implement
-    console.log("PURCHASING TICKETS FOR " + username);
     await new Promise(resolve => setTimeout(resolve, 1000));
     // TODO - check this
     if (getRandomInt(3) === 0) {

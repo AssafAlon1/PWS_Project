@@ -14,3 +14,5 @@ export const VALID_CATEGORIES = [
     "Product%20Launch",
     "Sports%20Event"
 ]
+
+export const EVENT_PATH = "/api/event";

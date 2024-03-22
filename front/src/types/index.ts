@@ -1,6 +1,6 @@
 export interface CSEvent {
-    id: string;
-    name: string;
+    _id: string;
+    title: string;
     description: string;
     start_date: Date; // TODO - string?
     end_date: Date; // TODO - string?

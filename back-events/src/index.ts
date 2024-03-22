@@ -1,51 +1,54 @@
-import { createServer, IncomingMessage, ServerResponse } from "http";
-import { URL } from "url";
-import * as dotenv from "dotenv";
 
-// import with .js, and not ts.
-// for more info: https://devblogs.microsoft.com/typescript/announcing-typescript-4-7/#type-in-package-json-and-new-extensions
-import { createRoute, getEventById, notFoundRoute, createEvent, deleteEvent, updateEvent } from "./routes.js";
-import { Routes } from "./types.js";
+import express from 'express';
+import mongoose from 'mongoose';
+import dotenv from 'dotenv';
+import cookieParser from 'cookie-parser';
+import cors from 'cors';
+
+import {
+  getEventById,
+  createEvent,
+  deleteEvent,
+  updateEvent,
+  getUpcomingEvents
+} from "./routes.js";
+
+import {
+  EVENT_PATH
+} from './const.js';
 
 dotenv.config();
-
+const dbUri = process.env.DB_CONNECTION_STRING;
 const port = process.env.PORT || 3000;
 
-const serverHandler = (req: IncomingMessage, res: ServerResponse): void => {
-  if (!req.url || !req.method) {
-    console.error("Received request without URL or method");
-    return;
-  }
-  const route = createRoute(req.url, `http://${req.headers.host}`, req.method);
-  console.log(route);
-  switch (route) {
-    // Handle event requests
-    case Routes["GET_EVENT"]:
-      const url = new URL(req.url, `http://${req.headers.host}`);
+if (!dbUri) {
+  console.error('Missing MongoDB URI');
+  process.exit(1);
+}
+/* ========== */
+await mongoose.connect(dbUri);
 
-      getEventById(req, res);
-      break;
+const app = express();
 
-    case Routes["POST_EVENT"]:
-      createEvent(req, res);
-      break;
+app.use(express.json());
+app.use(cookieParser());
 
-    case Routes["UPDATE_EVENT"]:
-      updateEvent(req, res);
-      break;
+let origin = process.env.ORIGIN;
+console.log("ORIGIN: " + origin);
+app.use(cors({
+  origin: origin,
+  methods: ['GET', 'POST'],
+  credentials: true,  // Frontend needs to send cookies with requests
+}));
 
-    case Routes["DELETE_EVENT"]:
-      deleteEvent(req, res);
-      break;
 
-    // Default is not found
-    default:
-      notFoundRoute(req, res);
-      break;
-  }
-};
+app.get(EVENT_PATH, getUpcomingEvents);
+app.get(`${EVENT_PATH}/:eventId`, getEventById);
 
-const server = createServer(serverHandler);
+app.post(`${EVENT_PATH}`, createEvent);
 
-server.listen(port);
-console.log(`Server running! port ${port}`);
+// TODO - Update event? Delete event (I think this is not required?)
+
+app.listen(port, () => {
+  console.log(`Server running! port ${port}`);
+});

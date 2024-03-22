@@ -36,6 +36,13 @@ export const queryEventByID = async (id: string): Promise<ICSEvent | null> => {
   return event ? event.toJSON() as ICSEvent : null;
 }
 
+// TODO - queryUpcomingAvailableEvents ??
+export const queryUpcomingEvents = async (skip: number, limit: number): Promise<ICSEvent[]> => {
+  const currentDate = new Date();
+  const events = await CSEvent.find({ start_date: { $gt: currentDate } }).skip(skip).limit(limit).exec();
+  return events.map(event => event.toJSON() as ICSEvent);
+}
+
 export const deleteEventByID = async (id: string): Promise<void> => {
   await CSEvent.findByIdAndDelete(id).exec();
 }

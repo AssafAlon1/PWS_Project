@@ -110,7 +110,7 @@ const EventDetails: React.FC<{}> = () => {
 
     const TitleComponent = () => {
         if (event) {
-            return <Card.Title>{event.name}</Card.Title>
+            return <Card.Title>{event.title}</Card.Title>
         }
         return <Placeholder as={Card.Title} animation="glow"><Placeholder xs={6} /></Placeholder>
 
@@ -204,7 +204,7 @@ const EventDetails: React.FC<{}> = () => {
 
         const ticketPurchaseDetails: PurchaseDetails = {
             eventId: eventId ?? "0",
-            eventName: event?.name ?? "Unknown",
+            eventName: event?.title ?? "Unknown",
             name: name,
             quantity: ticketAmount,
             price: price

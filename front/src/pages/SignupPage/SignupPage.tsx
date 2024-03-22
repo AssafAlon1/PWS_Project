@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import './SignupPage.css';
 import { AuthApi } from '../../api/auth';
 import { APIStatus } from '../../types';
 import { ErrorMessage } from '../../components/error/error';
 import { Loader } from '../../components/loader/loader';
 import { useNavigate } from "react-router-dom";
+import { AuthContext } from '../../components/AuthProvider/AuthProvider';
 
 export const SignUpPage: React.FC = () => {
   const [username, setUsername] = useState<string>('');
@@ -13,6 +14,7 @@ export const SignUpPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const navigate = useNavigate();
+  const auth = useContext(AuthContext);
 
   const handleUsernameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setUsername(e.target.value);
@@ -23,10 +25,10 @@ export const SignUpPage: React.FC = () => {
   };
 
   const handleSignUp = async () => {
-    if(password.length === 0 || username.length === 0) {
-        setErrorMessage(SignUpErrorMessages.required);
-        return;
-      }
+    if (password.length === 0 || username.length === 0) {
+      setErrorMessage(SignUpErrorMessages.required);
+      return;
+    }
     setIsLoading(true);
     const res = await AuthApi.signUp({ username, password });
     setIsLoading(false);
@@ -40,7 +42,7 @@ export const SignUpPage: React.FC = () => {
       setErrorMessage(SignUpErrorMessages.exists);
       return;
     }
-    
+
     else { //res === APIStatus.ServerError 
       setErrorMessage(SignUpErrorMessages.failed);
       return;
@@ -50,6 +52,12 @@ export const SignUpPage: React.FC = () => {
   const handleLogin = () => {
     navigate("/login");
   };
+
+  useEffect(() => {
+    if (auth.user) {
+      navigate("/");
+    }
+  }, []);
 
   return (
     <div className="signup-container">
@@ -75,7 +83,7 @@ export const SignUpPage: React.FC = () => {
             onChange={handlePasswordChange}
           />
         </div>
-        {errorMessage && <ErrorMessage message={errorMessage}/>}
+        {errorMessage && <ErrorMessage message={errorMessage} />}
         {isLoading ? <Loader /> : <button type="button" className="signup-btn" onClick={handleSignUp}>Sign Up</button>}
       </form>
       <p className="login-link">Already have an account? <button type="button" onClick={handleLogin}>Login</button></p>
@@ -84,8 +92,8 @@ export const SignUpPage: React.FC = () => {
 };
 
 const SignUpErrorMessages = {
-    required: 'Username and password are required',
-    exists: 'Username already exists',
-    failed: 'Sign Up failed, please try again'
+  required: 'Username and password are required',
+  exists: 'Username already exists',
+  failed: 'Sign Up failed, please try again'
 };
 // TODO - change the file name (To match other's format)

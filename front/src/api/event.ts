@@ -133,7 +133,7 @@ const EventApi = {
     }
 };
 
-for (let i = 100; i < 120; i++) {
+for (let i = 100; i < 170; i++) {
     EventApi.allEvents.push({
         _id: (i).toString(),
         title: "Event " + i,

@@ -96,4 +96,3 @@ const SignUpErrorMessages = {
   exists: 'Username already exists',
   failed: 'Sign Up failed, please try again'
 };
-// TODO - change the file name (To match other's format)

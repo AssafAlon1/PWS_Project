@@ -1,4 +1,3 @@
-// TODO - Delete this file or consider moving it to a different location
 import mongoose, { Types } from "mongoose";
 import * as bcrypt from "bcrypt";
 import * as dotenv from "dotenv";
@@ -20,7 +19,6 @@ const UserSchema = new mongoose.Schema({
 
 const UserModel = mongoose.model("users", UserSchema);
 
-// TODO - move to db.ts? Do we want it?
 export const registerAdmin = async () => {
   try {
     
@@ -31,7 +29,6 @@ export const registerAdmin = async () => {
   }
   catch (err) {
     console.error(err);
-    // TODO - proper handling?
     return false;
   }
 }

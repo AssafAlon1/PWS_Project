@@ -13,7 +13,7 @@ import AddCommentForm from '../../components/AddCommentForm/AddCommentForm';
 import { fetchComments } from '../../api/comment';
 import CommentComponent from '../../components/CommentComponent/CommentComponent';
 import EventApi from '../../api/event';
-import { fetchTickets } from '../../api/ticket';
+import TicketApi from '../../api/ticket';
 import SpanningSpinnner from '../../components/SpinnerComponent/SpinnerComponent';
 
 // TODO - extract some components to other files?
@@ -65,14 +65,12 @@ const EventDetails: React.FC<{}> = () => {
         setTickets(null);
         let fetchedTickets: Ticket[];
         try {
-            fetchedTickets = await fetchTickets(eventId) ?? [];
+            fetchedTickets = await TicketApi.fetchTickets(eventId) ?? [];
             if (!fetchedTickets) {
                 throw new Error(`Failed to fetch tickets for event ${eventId}`);
             }
         }
         catch {
-            // TODO - navigate? just display "error loading tickets"? What's better?
-            // return navigate("/error", { state: { message: `Failed to fetch tickets for event ${eventId}` } });
             fetchedTickets = [];
         }
         setTickets(fetchedTickets);
@@ -93,8 +91,6 @@ const EventDetails: React.FC<{}> = () => {
             }
         }
         catch (err) {
-            // TODO - navigate? just display "error loading comments"? What's better?
-            // return navigate("/error", { state: { message: `Failed to fetch comments for event ${eventId}` } });
             console.log(err)
             setFailedFetchingComments(true);
             fetchedComments = [];

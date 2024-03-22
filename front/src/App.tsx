@@ -25,6 +25,7 @@ function App() {
   const [user, setUser] = useState<string | null>(null);
   const [nextEvent, setNextEvent] = useState<string | null>(null); // TODO - CSEvent
 
+  
   const updateNextEvent = async () => {
     if (!user) {
       console.log("No user found, can't update next event");
@@ -35,10 +36,6 @@ function App() {
       setNextEvent(`${closestEvent.name} (${getFormattedDateTime(closestEvent.start_date)})`);
     }
   }
-
-  useEffect(() => {
-    setUser("DrawBow");
-  }, []);
 
   useEffect(() => {
     if (!user) {

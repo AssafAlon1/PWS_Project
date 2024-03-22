@@ -1,10 +1,12 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import './LoginPage.css';
 import { APIStatus } from '../../types';
 import { AuthApi } from '../../api/auth';
 import { ErrorMessage } from '../../components/error/error';
 import { Loader } from '../../components/loader/loader';
 import { useNavigate } from "react-router-dom";
+import { AuthContext } from '../../components/AuthProvider/AuthProvider';
+
 export const LoginPage: React.FC = () => {
   const [username, setUsername] = useState<string>('');
   const [password, setPassword] = useState<string>('' );
@@ -12,7 +14,8 @@ export const LoginPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const navigate = useNavigate();
-
+  const auth = useContext(AuthContext);
+  
   const handleUsernameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setUsername(e.target.value);
   };
@@ -27,12 +30,14 @@ export const LoginPage: React.FC = () => {
       return;
     }
     setIsLoading(true);
-    const res = await AuthApi.login({ username, password });
+    const providedUsername = username; // To make sure we use the same username for login and the one we approve
+    const res = await AuthApi.login({ username: providedUsername, password });
     setIsLoading(false);
     
     if (res === APIStatus.Success) {
+      auth.setUser(providedUsername);
+      console.log("Logged in as: ", auth.user);
       navigate("/");
-
       return;
     }
     // Handle other APIStatus - set proper error message (see LoginErrorMessages)
@@ -61,6 +66,7 @@ export const LoginPage: React.FC = () => {
         <div className="input-group">
           <label htmlFor="username">Username:</label>
           <input
+            disabled={isLoading}
             type="text"
             id="username"
             name="username"
@@ -71,6 +77,7 @@ export const LoginPage: React.FC = () => {
         <div className="input-group">
           <label htmlFor="password">Password:</label>
           <input
+            disabled={isLoading}
             type="password"
             id="password"
             name="password"

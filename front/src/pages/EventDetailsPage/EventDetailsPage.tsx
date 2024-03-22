@@ -10,7 +10,7 @@ import { getFormattedDate, getFormattedTime } from '../../utils/formatting';
 import ButtonWithTooltip from '../../components/ButtonWithTooltip/ButtonWithTooltip';
 import { usePurchaseDetails } from '../../components/PurchaseDetailsContext/PurchaseDetailsContext';
 import AddCommentForm from '../../components/AddCommentForm/AddCommentForm';
-import { fetchComments } from '../../api/comment';
+import CommentApi from '../../api/comment';
 import CommentComponent from '../../components/CommentComponent/CommentComponent';
 import EventApi from '../../api/event';
 import TicketApi from '../../api/ticket';
@@ -85,7 +85,7 @@ const EventDetails: React.FC<{}> = () => {
         setFailedFetchingComments(false);
         let fetchedComments: Comment[];
         try {
-            fetchedComments = await fetchComments(eventId) ?? [];
+            fetchedComments = await CommentApi.fetchComments(eventId) ?? [];
             if (!fetchedComments) {
                 throw new Error(`Failed to fetch comments for event ${eventId}`);
             }

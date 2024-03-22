@@ -1,7 +1,6 @@
 import React, { useContext, useState } from 'react';
 import { Form, Button, Alert } from 'react-bootstrap';
-import { postComment } from '../../api/comment';
-import { AuthContext } from '../AuthProvider/AuthProvider';
+import CommentApi from '../../api/comment'; import { AuthContext } from '../AuthProvider/AuthProvider';
 import SpanningSpinnner from '../SpinnerComponent/SpinnerComponent';
 
 interface AddCommentProps {
@@ -31,7 +30,7 @@ const AddCommentForm: React.FC<AddCommentProps> = ({ eventId, updateComments }) 
         try {
             // TODO - Sanitize input?
             setPostStatus(PostStatus["LOADING"]);
-            await postComment(context.user, eventId, event.currentTarget.comment.value);
+            await CommentApi.postComment(context.user, eventId, event.currentTarget.comment.value);
             setPostStatus(PostStatus["SUCCESS"]);
         }
         catch (error) {

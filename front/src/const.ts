@@ -10,3 +10,6 @@ export const VALID_CATEGORIES = [
     "Product%20Launch",
     "Sports%20Event"
 ]
+
+export const EVENT_API_URL = "http://localhost:3001";
+export const COMMENT_API_URL = "http://localhost:3002";

@@ -2,7 +2,7 @@ import { createContext, useState } from "react";
 import { AuthApi } from '../../api/auth';
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
-import { getUserClosestEvent } from "../../api/event";
+import EventApi from "../../api/event";
 import { getFormattedDateTime } from "../../utils/formatting";
 
 interface AuthContextProps {
@@ -46,7 +46,7 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             console.log("No user found, can't update next event");
             return;
         }
-        const closestEvent = await getUserClosestEvent(user);
+        const closestEvent = await EventApi.getUserClosestEvent(user);
         if (closestEvent) {
             setNextEvent(`${closestEvent.name} (${getFormattedDateTime(closestEvent.start_date)})`);
         }

@@ -12,7 +12,7 @@ import { usePurchaseDetails } from '../../components/PurchaseDetailsContext/Purc
 import AddCommentForm from '../../components/AddCommentForm/AddCommentForm';
 import { fetchComments } from '../../api/comment';
 import CommentComponent from '../../components/CommentComponent/CommentComponent';
-import { fetchEvent } from '../../api/event';
+import EventApi from '../../api/event';
 import { fetchTickets } from '../../api/ticket';
 import SpanningSpinnner from '../../components/SpinnerComponent/SpinnerComponent';
 
@@ -46,7 +46,7 @@ const EventDetails: React.FC<{}> = () => {
         }
         let fetchedEvent;
         try {
-            fetchedEvent = await fetchEvent(eventId);
+            fetchedEvent = await EventApi.fetchEvent(eventId);
         }
         catch {
             return navigate("/error", { state: { message: `Failed to fetch event ${eventId}` } });

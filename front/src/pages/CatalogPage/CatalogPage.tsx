@@ -3,7 +3,7 @@ import { Outlet, useNavigate } from "react-router-dom";
 import { CSEvent } from '../../types';
 import EventDetails, { EventPlaceholder } from "../../components/CatalogEventDetails/CatalogEventDetails";
 import { Col, Container, Row } from 'react-bootstrap';
-import { fetchEvents } from '../../api/event';
+import EventApi from '../../api/event';
 
 
 const CatalogPage: React.FC = () => {
@@ -38,7 +38,7 @@ const CatalogPage: React.FC = () => {
   useEffect(() => {
     const updateEvents = async () => {
       try {
-        SetEvents(await fetchEvents());
+        SetEvents(await EventApi.fetchEvents());
         // TODO - Maybe 401 handling?
       }
       catch {

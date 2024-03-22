@@ -51,13 +51,14 @@ export const AuthApi = {
     },
 };
 
+// TODO - Move to shared utils
 const handleError = async (e: unknown): Promise<APIStatus> => {
     // Handle errors here, check status code and return the appropriate APIStatus
-    if(axios.isAxiosError(e) && e.response) {
-        if(e.response.status === 400) {
+    if (axios.isAxiosError(e) && e.response) {
+        if (e.response.status === 400) {
             return APIStatus.BadRequest;
         }
-        if(e.response.status === 401) {
+        if (e.response.status === 401) {
             return APIStatus.Unauthorized;
         }
     }

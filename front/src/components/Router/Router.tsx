@@ -15,31 +15,29 @@ import PrivateRoute from '../PrivateRoute/PrivateRoute'
 function CSRouter() {
 
     return (
-        <>
-            <BrowserRouter>
-                <AuthProvider>
-                    <NavbarComponent />
-                    <Routes>
-                        <Route element={<PrivateRoute />}>
-                            <Route path="/" element={<CatalogPage />} />
-                        </Route>
-                        <Route element={<PrivateRoute />}>
-                            <Route path="/events/:eventId" element={<EventDetails />} />
-                        </Route>
-                        <Route element={<PrivateRoute />}>
-                            <Route path="/checkout" element={<CheckoutPage />} />
-                        </Route>
-                        <Route element={<PrivateRoute />}>
-                            <Route path="/success" element={<SuccessPage />} />
-                        </Route>
-                        <Route path="/login" element={<LoginPage />} />
-                        <Route path="/signup" element={<SignUpPage />} />
-                        <Route path="/error" element={<ErrorPage />} />
-                        <Route path="*" element={<NotFound />} />
-                    </Routes>
-                </AuthProvider>
-            </BrowserRouter>
-        </>
+        <BrowserRouter>
+            <AuthProvider>
+                <NavbarComponent />
+                <Routes>
+                    <Route element={<PrivateRoute />}>
+                        <Route path="/" element={<CatalogPage />} />
+                    </Route>
+                    <Route element={<PrivateRoute />}>
+                        <Route path="/events/:eventId" element={<EventDetails />} />
+                    </Route>
+                    <Route element={<PrivateRoute />}>
+                        <Route path="/checkout" element={<CheckoutPage />} />
+                    </Route>
+                    <Route element={<PrivateRoute />}>
+                        <Route path="/success" element={<SuccessPage />} />
+                    </Route>
+                    <Route path="/login" element={<LoginPage />} />
+                    <Route path="/signup" element={<SignUpPage />} />
+                    <Route path="/error" element={<ErrorPage />} />
+                    <Route path="*" element={<NotFound />} />
+                </Routes>
+            </AuthProvider>
+        </BrowserRouter>
     )
 }
 export default CSRouter

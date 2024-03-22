@@ -133,6 +133,18 @@ const EventApi = {
     }
 };
 
+for (let i = 100; i < 120; i++) {
+    EventApi.allEvents.push({
+        _id: (i).toString(),
+        title: "Event " + i,
+        description: "This is a boring event",
+        start_date: new Date("2024-03-28T16:30"),
+        end_date: new Date("2024-03-29T01:00"),
+        category: "Conference",
+        location: "Some Conference Center idk",
+    });
+}
+
 // TODO - Move to shared utils
 const handleError = async (e: unknown): Promise<APIStatus> => {
     // Handle errors here, check status code and return the appropriate APIStatus

@@ -18,13 +18,15 @@ const EventDetails: React.FC<{ event: CSEvent }> = ({ event }) => {
 
     return (
         <Card>
-            <img src={event.image ?? MissingImage} className="card-img" />
             {/* <Card.Img
                 variant="top"
                 src={event.image ?? MissingImage}
             /> */}
-            <Card.Body>
+            <Card.Header>
                 <Card.Title>{event.title}</Card.Title>
+            </Card.Header>
+            <Card.Body>
+                <img src={event.image ?? MissingImage} className="card-img" />
                 <Card.Text>{formattedDate}</Card.Text>
                 <Card.Text>{event.category}</Card.Text>
                 <Card.Text>From 50$</Card.Text>

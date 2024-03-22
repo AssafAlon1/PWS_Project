@@ -48,7 +48,7 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         }
         const closestEvent = await EventApi.getUserClosestEvent(user);
         if (closestEvent) {
-            setNextEvent(`${closestEvent.name} (${getFormattedDateTime(closestEvent.start_date)})`);
+            setNextEvent(`${closestEvent.title} (${getFormattedDateTime(closestEvent.start_date)})`);
         }
     }
 

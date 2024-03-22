@@ -14,7 +14,7 @@ import CommentApi from '../../api/comment';
 import CommentComponent from '../../components/CommentComponent/CommentComponent';
 import EventApi from '../../api/event';
 import TicketApi from '../../api/ticket';
-import SpanningSpinnner from '../../components/SpinnerComponent/SpinnerComponent';
+import { ThreeSpanningSpinners } from '../../components/SpinnerComponent/SpinnerComponent';
 
 // TODO - extract some components to other files?
 const EventDetails: React.FC<{}> = () => {
@@ -245,7 +245,7 @@ const EventDetails: React.FC<{}> = () => {
             </Card.Body>
         } else if (tickets === null) {
             bodyContent = <Card.Body>
-                <Card.Text><SpanningSpinnner /><SpanningSpinnner /><SpanningSpinnner /></Card.Text>
+                <Card.Text><ThreeSpanningSpinners /></Card.Text>
             </Card.Body>
         } else {
             bodyContent = tickets.map((ticket, index) => {
@@ -275,7 +275,7 @@ const EventDetails: React.FC<{}> = () => {
             </Card.Body>
         } else if (comments === null) {
             body = <Card.Body>
-                <Card.Text><SpanningSpinnner /><SpanningSpinnner /><SpanningSpinnner /></Card.Text>
+                <Card.Text><ThreeSpanningSpinners /></Card.Text>
             </Card.Body>
         } else {
             body = <Card.Body>

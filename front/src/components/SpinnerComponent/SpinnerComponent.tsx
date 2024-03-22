@@ -1,7 +1,7 @@
 import React from 'react';
 import Spinner from 'react-bootstrap/Spinner';
 
-const SpanningSpinnner: React.FC = () => {
+export const SpanningSpinnner: React.FC = () => {
     return (
         <Spinner
             className="me-2"
@@ -14,4 +14,12 @@ const SpanningSpinnner: React.FC = () => {
     );
 };
 
-export default SpanningSpinnner;
+export const ThreeSpanningSpinners: React.FC = () => {
+    return (
+        <>
+            <SpanningSpinnner />
+            <SpanningSpinnner />
+            <SpanningSpinnner />
+        </>
+    );
+}

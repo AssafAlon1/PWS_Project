@@ -1,7 +1,7 @@
 import React, { useContext, useState } from 'react';
 import { Form, Button, Alert } from 'react-bootstrap';
 import CommentApi from '../../api/comment'; import { AuthContext } from '../AuthProvider/AuthProvider';
-import SpanningSpinnner from '../SpinnerComponent/SpinnerComponent';
+import { SpanningSpinnner } from '../SpinnerComponent/SpinnerComponent';
 
 interface AddCommentProps {
     eventId: string;

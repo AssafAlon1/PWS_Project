@@ -1,7 +1,7 @@
 import { useContext, useState, useEffect } from 'react';
 import { Navigate, Outlet } from 'react-router';
 import { AuthContext } from '../AuthProvider/AuthProvider';
-import SpanningSpinnner from '../SpinnerComponent/SpinnerComponent';
+import { ThreeSpanningSpinners } from '../SpinnerComponent/SpinnerComponent';
 
 const PrivateRoute = () => {
     const auth = useContext(AuthContext);
@@ -20,9 +20,7 @@ const PrivateRoute = () => {
         console.log(" ### Loading...");
         return <div>
             <h1>Loading...</h1>
-            <SpanningSpinnner/>
-            <SpanningSpinnner/>
-            <SpanningSpinnner/>
+            <ThreeSpanningSpinners />
         </div>;
     }
 

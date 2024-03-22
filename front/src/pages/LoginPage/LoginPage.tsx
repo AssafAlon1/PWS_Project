@@ -6,6 +6,8 @@ import { ErrorMessage } from '../../components/error/error';
 import { Loader } from '../../components/loader/loader';
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from '../../components/AuthProvider/AuthProvider';
+import { useEffect } from 'react';
+
 
 export const LoginPage: React.FC = () => {
   const [username, setUsername] = useState<string>('');
@@ -58,6 +60,12 @@ export const LoginPage: React.FC = () => {
   const handleSignUp = () => {
     navigate("/signup");
   };
+
+  useEffect(() => {
+    if(auth.user) {
+      navigate("/");
+    }
+  }, []);
 
   return (
     <div className="login-container">

@@ -1,13 +1,31 @@
-import { useContext } from 'react';
+import { useContext, useState, useEffect } from 'react';
 import { Navigate, Outlet } from 'react-router';
 import { AuthContext } from '../AuthProvider/AuthProvider';
+import SpanningSpinnner from '../SpinnerComponent/SpinnerComponent';
 
 const PrivateRoute = () => {
     const auth = useContext(AuthContext);
-    console.log(" ### PrivateRoute called");
-    console.log(" ### auth: ", auth);
-    console.log(" ### auth.user: ", auth.user);
-    auth.updateLoggedIn(); // trigger the login check to see if token expired
+    const [isLoading, setIsLoading] = useState<boolean>(true);
+
+    useEffect(() => {
+        const updateLoggedIn = async () => {
+            setIsLoading(true);
+            await auth.updateLoggedIn();
+            setIsLoading(false);
+        }
+        updateLoggedIn();
+    }, []);
+
+    if (isLoading) {
+        console.log(" ### Loading...");
+        return <div>
+            <h1>Loading...</h1>
+            <SpanningSpinnner/>
+            <SpanningSpinnner/>
+            <SpanningSpinnner/>
+        </div>;
+    }
+
     if (!auth.user) {
         console.log(" ### NOT LOGGED IN :/");
         return <Navigate to="/login" />; // TODO - add some parameter saying "session expired"

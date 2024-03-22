@@ -36,6 +36,7 @@ function App() {
       setNextEvent(`${closestEvent.name} (${getFormattedDateTime(closestEvent.start_date)})`);
     }
   }
+  
 
   useEffect(() => {
     if (!user) {

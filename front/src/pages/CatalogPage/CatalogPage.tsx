@@ -39,6 +39,7 @@ const CatalogPage: React.FC = () => {
     const updateEvents = async () => {
       try {
         SetEvents(await fetchEvents());
+        // TODO - Maybe 401 handling?
       }
       catch {
         navigate("/error", { state: { message: "Failed to fetch events" } });

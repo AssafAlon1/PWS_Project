@@ -4,7 +4,7 @@ import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
-
+import { createProxyMiddleware } from 'http-proxy-middleware';
 import {
     loginRoute,
     logoutRoute,
@@ -13,6 +13,7 @@ import {
 } from './routes.js';
 
 import {
+    EVENT_API_URL,
     LOGIN_PATH,
     LOGOUT_PATH,
     SIGNUP_PATH,
@@ -41,8 +42,8 @@ app.use(cookieParser());
 /* Set CORS headers appropriately using the cors middleware */
 let origin = process.env.ORIGIN;
 app.use(cors({
-    origin: origin, 
-    methods: ['GET', 'POST'], 
+    origin: origin,
+    methods: ['GET', 'POST'],
     credentials: true,  // Frontend needs to send cookies with requests
 }));
 /* ========== */
@@ -53,6 +54,14 @@ app.post(SIGNUP_PATH, signupRoute);
 
 app.get(USERNAME_PATH, usernameRoute);
 
+// PROXIES
+const eventProxy = createProxyMiddleware({
+    target: EVENT_API_URL,
+    changeOrigin: true, // TODO - What is this?
+});
+app.use('/api/event', eventProxy);
+
 app.listen(port, () => {
     console.log(`Server running! port ${port}`);
+    console.log("ORIGIN: " + origin);
 });

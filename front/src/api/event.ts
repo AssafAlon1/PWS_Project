@@ -2,15 +2,15 @@ import axios, { isAxiosError } from "axios";
 import { APIStatus } from "../types";
 import { CSEvent } from "../types";
 import { getUserEventIds } from "./userAction";
-import { EVENT_API_URL } from "../const";
+import { API_GATEWAY_URL } from "../const";
 
-const axiosInst = axios.create({ withCredentials: true, baseURL: EVENT_API_URL }); // TODO - withCredentials?
+const axiosInstance = axios.create({ withCredentials: true, baseURL: API_GATEWAY_URL }); // TODO - withCredentials?
 
 // TODO - Paths (/api/event) to consts?
 // const EventApi = {
 //     fetchEvents: async (skip?: number, limit?: number): Promise<CSEvent[]> => {
 //         try {
-//             const response = await axiosInst.get("/api/event", {
+//             const response = await axiosInstance.get("/api/event", {
 //                 params: {
 //                     skip,
 //                     limit
@@ -26,7 +26,8 @@ const axiosInst = axios.create({ withCredentials: true, baseURL: EVENT_API_URL }
 //     },
 //     fetchEvent: async (eventId: string): Promise<CSEvent | null> => {
 //         try {
-//             const response = await axios.get(`$/api/event/${eventId}`);
+//             const response = await axiosInstance.get(`/api/event/${eventId}`);
+//             console.log(" > Event fetched: " + response.data)
 //             return response.data;
 //         } catch (error) {
 //             throw new Error("Failed to fetch event "); // TODO - Better handling?

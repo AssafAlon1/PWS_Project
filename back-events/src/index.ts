@@ -34,7 +34,6 @@ app.use(express.json());
 app.use(cookieParser());
 
 let origin = process.env.ORIGIN;
-console.log("ORIGIN: " + origin);
 app.use(cors({
   origin: origin,
   methods: ['GET', 'POST'],
@@ -51,4 +50,5 @@ app.post(`${EVENT_PATH}`, createEvent);
 
 app.listen(port, () => {
   console.log(`Server running! port ${port}`);
+  console.log("ORIGIN: " + origin);
 });

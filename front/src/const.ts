@@ -11,5 +11,4 @@ export const VALID_CATEGORIES = [
     "Sports%20Event"
 ]
 
-export const EVENT_API_URL = "http://localhost:3001";
-export const COMMENT_API_URL = "http://localhost:3002";
+export const API_GATEWAY_URL = "http://localhost:3000";

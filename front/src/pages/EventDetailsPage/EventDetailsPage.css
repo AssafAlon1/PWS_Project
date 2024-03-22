@@ -1,0 +1,28 @@
+.event-info {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin-top: 20px;
+}
+
+.direction-row {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 10px;
+    /* margin: 10px; */
+}
+
+.ticket-card {
+    margin-right: 20px;
+}
+
+.tickets-amount {
+    width: 50px;
+    margin-right: 10px;
+}
+
+.event-block {
+    margin-left: 10px;
+    min-width: 200px;
+}

@@ -4,10 +4,8 @@ import * as dotenv from "dotenv";
 
 // import with .js, and not ts.
 // for more info: https://devblogs.microsoft.com/typescript/announcing-typescript-4-7/#type-in-package-json-and-new-extensions
-import { mainRoute, createRoute, getEventById, getEventByOrganizer, getEventByCategory, notFoundRoute, createEvent, deleteEvent, updateEvent } from "./routes.js";
+import { createRoute, getEventById, notFoundRoute, createEvent, deleteEvent, updateEvent } from "./routes.js";
 import { Routes } from "./types.js";
-import { loginRoute, signupRoute, updatePrivilegesRoute } from "./auth.js";
-import { isCategoryValid } from "./utils.js";
 
 dotenv.config();
 
@@ -24,17 +22,8 @@ const serverHandler = (req: IncomingMessage, res: ServerResponse): void => {
     // Handle event requests
     case Routes["GET_EVENT"]:
       const url = new URL(req.url, `http://${req.headers.host}`);
-      const urlLastPart = url.pathname.split("/").pop();
 
-      if (isCategoryValid(urlLastPart)) {
-        getEventByCategory(req, res);
-      } else {
-        getEventById(req, res);
-      }
-      break;
-
-    case Routes["GET_EVENT_ORG"]:
-      getEventByOrganizer(req, res);
+      getEventById(req, res);
       break;
 
     case Routes["POST_EVENT"]:
@@ -47,25 +36,6 @@ const serverHandler = (req: IncomingMessage, res: ServerResponse): void => {
 
     case Routes["DELETE_EVENT"]:
       deleteEvent(req, res);
-      break;
-
-
-    // Handle user requests
-    case Routes["LOGIN"]:
-      loginRoute(req, res);
-      break;
-
-    case Routes["SIGNUP"]:
-      signupRoute(req, res);
-      break;
-
-    case Routes["UPDATE_PRIVILEGES"]:
-      updatePrivilegesRoute(req, res);
-      break;
-
-    // Handle home request
-    case Routes["GET_HOME"]:
-      mainRoute(req, res);
       break;
 
     // Default is not found

@@ -1,5 +1,4 @@
 import { VALID_CATEGORIES, MAX_QUERY_LIMIT } from "./const.js";
-import { HTTPError, TokenData } from "./types.js";
 
 export const isCategoryValid = (category: string): boolean => {
   return VALID_CATEGORIES.includes(category);
@@ -9,7 +8,7 @@ export const parseURL = (urlPath: string, urlBase: string): { pathName: string, 
   const url = new URL(urlPath, urlBase);
   let skip = Number(url.searchParams.get("skip") ?? "0");
   let limit = Math.min(Number(url.searchParams.get("limit") ?? MAX_QUERY_LIMIT), MAX_QUERY_LIMIT);
-  
+
   // Piazza @105 - invalid params should be ignored
   if (isNaN(skip) || skip < 0) {
     skip = 0;
@@ -18,8 +17,4 @@ export const parseURL = (urlPath: string, urlBase: string): { pathName: string, 
     limit = MAX_QUERY_LIMIT;
   }
   return { pathName: url.pathname, skip: skip, limit: limit };
-}
-
-export const isHTTPError = (value: string | number | TokenData) => {
-  return Object.values(HTTPError).includes(value as HTTPError);
 }

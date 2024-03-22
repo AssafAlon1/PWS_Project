@@ -1,7 +1,7 @@
 import React, { useContext, useState } from 'react';
 import { Form, Button, Alert } from 'react-bootstrap';
 import { postComment } from '../../api/comment';
-import { AppContext } from '../../App';
+import { AuthContext } from '../AuthProvider/AuthProvider';
 import SpanningSpinnner from '../SpinnerComponent/SpinnerComponent';
 
 interface AddCommentProps {
@@ -18,7 +18,7 @@ enum PostStatus {
 
 const AddCommentForm: React.FC<AddCommentProps> = ({ eventId, updateComments }) => {
 
-    const context = useContext(AppContext);
+    const context = useContext(AuthContext);
     const [postStatus, setPostStatus] = useState<PostStatus>(PostStatus["IDLE"]);
 
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {

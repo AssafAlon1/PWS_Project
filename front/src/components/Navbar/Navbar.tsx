@@ -5,7 +5,8 @@ import logoutIcon from "/src/assets/logout.svg";
 import backIcon from "/src/assets/back.svg";
 import React, { useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { AppContext } from "../../App";
+import { AuthContext } from "../AuthProvider/AuthProvider";
+import { AuthApi } from "../../api/auth";
 
 const shouldDisplayGoBackButton = (path: string) => {
     return path === "/checkout" || path === "/error" || path.startsWith("/event"); // TODO - This!!!
@@ -13,7 +14,7 @@ const shouldDisplayGoBackButton = (path: string) => {
 
 const NavbarComponent: React.FC = () => {
     const navigate = useNavigate();
-    const context = useContext(AppContext);
+    const context = useContext(AuthContext);
 
     const GoBackButton = () => {
         return (
@@ -36,6 +37,24 @@ const NavbarComponent: React.FC = () => {
     }
 
 
+    const onLogoutClick = async () => {
+        await AuthApi.logout();
+        context.setUser("");
+        navigate("/login");
+    }
+
+    const LogoutButton = () => {
+        return <Button variant="light"
+            onClick={onLogoutClick}>
+            <div className="horizontal-layout">
+                <img src={logoutIcon} alt="Logout" />
+                <p className="nav-element">Logout</p>
+            </div>
+        </Button>
+    }
+
+
+
     return (
         <>
             <Navbar bg="light" variant="light" fixed="top">
@@ -47,21 +66,15 @@ const NavbarComponent: React.FC = () => {
                         <Nav.Link as={Link} to="/signup">signup</Nav.Link>
                         <Nav.Link as={Link} to="/login">login</Nav.Link>
                     </Nav>
-                    <NextEvent />
-                    <div className="vr" />
-                    <GoBackButton />
-                    <p className="nav-element"><b>{context.user}</b></p>
-                    <div className="vr" />
-                    <div>
-                        <Button variant="light">
-                            <Nav.Link as={Link} to="/logout">
-                                <div className="horizontal-layout">
-                                    <img src={logoutIcon} alt="Logout" />
-                                    <p className="nav-element">Logout</p>
-                                </div>
-                            </Nav.Link>
-                        </Button>
-                    </div>
+
+                    {context.user ? <>
+                        <GoBackButton />
+                        <NextEvent />
+                        <div className="vr" />
+                        <p className="nav-element"><b>{context.user}</b></p>
+                        <div className="vr" />
+                        <LogoutButton />
+                    </> : <></>}
                 </Container>
             </Navbar>
         </>

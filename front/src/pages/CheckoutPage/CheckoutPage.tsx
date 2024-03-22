@@ -2,16 +2,16 @@ import React, { useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Alert, Card, Col, Row } from 'react-bootstrap';
 import PaymentForm from '../../components/PaymentForm/PaymentForm';
-import { AppContext } from '../../App';
 import { usePurchaseDetails } from '../../components/PurchaseDetailsContext/PurchaseDetailsContext';
 import { purchaseTickets } from '../../api/ticket';
+import { AuthContext } from '../../components/AuthProvider/AuthProvider';
 
 const CheckoutPage: React.FC = () => {
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [displayError, setDisplayError] = useState<boolean>(false);
     const { purchaseDetails, setPurchaseDetails } = usePurchaseDetails();
     const navigate = useNavigate();
-    const context = useContext(AppContext);
+    const context = useContext(AuthContext);
 
     // TODO - validate purchaseDetails with JOI or something?
     const areDetailsProvided = purchaseDetails && purchaseDetails.eventId && purchaseDetails.name && purchaseDetails.quantity && purchaseDetails.price;

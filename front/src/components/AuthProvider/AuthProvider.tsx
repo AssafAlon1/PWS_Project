@@ -2,23 +2,30 @@ import { createContext, useState } from "react";
 import { AuthApi } from '../../api/auth';
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
+import { getUserClosestEvent } from "../../api/event";
+import { getFormattedDateTime } from "../../utils/formatting";
 
 interface AuthContextProps {
     user: string | null;
     setUser: (user: string | null) => void;
+    nextEvent: string | null;
+    updateNextEvent: () => void; // TODO - CSEvent?
     updateLoggedIn: () => Promise<boolean>;
 }
 
 export const AuthContext = createContext<AuthContextProps>({
     user: null,
     setUser: () => { },
+    nextEvent: null,
+    updateNextEvent: () => { },
     updateLoggedIn: async () => false,
 });
 
 const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const [user, setUser] = useState<string | null>(null);
+    const [nextEvent, setNextEvent] = useState<string | null>(null); // TODO - CSEvent
     const navigate = useNavigate();
-    
+
     const updateLoggedIn = async (): Promise<boolean> => {
         const result = await AuthApi.getUserName();
         console.log("updateLoggedIn result: ", result);
@@ -34,23 +41,29 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         }
     }
 
+    const updateNextEvent = async () => {
+        if (!user) {
+            console.log("No user found, can't update next event");
+            return;
+        }
+        const closestEvent = await getUserClosestEvent(user);
+        if (closestEvent) {
+            setNextEvent(`${closestEvent.name} (${getFormattedDateTime(closestEvent.start_date)})`);
+        }
+    }
+
     useEffect(() => {
-        console.log("THE USER HAS CHANGED! ", user);
+        if (!user) {
+            return;
+        }
+        updateNextEvent();
     }, [user]);
 
     return (
-        <AuthContext.Provider value={{ user, setUser, updateLoggedIn }}>
+        <AuthContext.Provider value={{ user, setUser, nextEvent, updateNextEvent, updateLoggedIn }}>
             {children}
         </AuthContext.Provider>
     );
 };
 
-
-//   return (
-//     <AppContext.Provider value={{ user, setUser, nextEvent, updateNextEvent }}>
-//       <PurchaseDetailsProvider>
-//         <CSRouter />
-//       </PurchaseDetailsProvider>
-//     </AppContext.Provider>
-//   );
 export default AuthProvider;

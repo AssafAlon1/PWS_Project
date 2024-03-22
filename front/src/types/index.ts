@@ -43,3 +43,17 @@ export interface UserAction {
     timestamp: Date;
     // TODO - MORE FIELDS!
 }
+
+export enum APIStatus {
+    Success,
+    BadRequest,
+    Unauthorized,
+    ServerError
+}
+
+// TODO - this is from the workshop. is it relevant to us?
+export interface PageProps {
+    navigateToMainPage(): void;
+    navigateToSignUpPage(): void;
+    navigateToLoginPage(): void;
+}

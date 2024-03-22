@@ -16,13 +16,15 @@ import {
     LOGIN_PATH,
     LOGOUT_PATH,
     SIGNUP_PATH,
-    USERNAME_PATH,
+    USERNAME_PATH, // TODO - remove?
 } from './const.js';
 
 dotenv.config();
 
 /* Set the dbUri variable to your atlas connection string */
 const dbUri = process.env.DB_CONNECTION_STRING;
+const port = process.env.PORT || 3000;
+
 if (!dbUri) {
     console.error('Missing MongoDB URI');
     process.exit(1);
@@ -30,7 +32,6 @@ if (!dbUri) {
 /* ========== */
 await mongoose.connect(dbUri);
 
-const port = process.env.PORT || 3000;
 
 const app = express();
 

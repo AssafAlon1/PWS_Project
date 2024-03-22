@@ -29,24 +29,21 @@ export async function loginRoute(req: Request, res: Response) {
     return;
   }
 
-  /* set JWT_SECRET using .env file */
   const token = jwt.sign({ username: user.username }, process.env.JWT_SECRET, { expiresIn: '2d' })
 
   const secure = process.env.NODE_ENV === 'production';
-  /* set the cookie in the response */
+  const sameSite = process.env.NODE_ENV === 'production' ? 'none' : 'strict';
   // We are Deployed - must use secure cookies with sameSite none
-  res.cookie('token', token, { httpOnly: true, sameSite:'none', secure, maxAge: 172800000 }); 
-  /* ========== */
+  res.cookie('token', token, { httpOnly: true, sameSite:sameSite, secure, maxAge: 172800000 }); 
   res.send('Logged in');
 }
 
 export async function logoutRoute(req: Request, res: Response) {
   const secure = process.env.NODE_ENV === 'production';
-  /* clear the token cookie */
+  const sameSite = process.env.NODE_ENV === 'production' ? 'none' : 'strict';
   // We are Deployed - must use secure cookies with sameSite none
-  res.clearCookie('token', { httpOnly: true, sameSite:'none', secure }); 
+  res.clearCookie('token', { httpOnly: true, sameSite: sameSite, secure }); 
   res.status(200).send('Logged out');
-  /* ========== */
 }
 
 export async function signupRoute(req: Request, res: Response) {
@@ -55,20 +52,23 @@ export async function signupRoute(req: Request, res: Response) {
     const error = await user.validate();
   }
   catch (e) {
+    console.log("Invalid creds");
     res.status(400).send('Invalid credentials');
     return;
   }
   if (await User.exists({ username: user.username })) {
+    console.log("exists");
     res.status(400).send('Username already exists');
     return;
   }
-
+  
   user.password = await bcrypt.hash(user.password, 10);
-
+  
   try {
     await user.save();
   }
   catch (e) {
+    console.log("internal erro");
     res.status(500).send('Error creating user');
     return;
   }

@@ -44,6 +44,8 @@ const NavbarComponent: React.FC = () => {
                     <Nav className="me-auto">
                         <Nav.Link as={Link} to="/invalidurl">404</Nav.Link>
                         <Nav.Link as={Link} to="/error">error</Nav.Link>
+                        <Nav.Link as={Link} to="/signup">signup</Nav.Link>
+                        <Nav.Link as={Link} to="/login">login</Nav.Link>
                     </Nav>
                     <NextEvent />
                     <div className="vr" />

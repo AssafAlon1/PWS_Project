@@ -279,6 +279,12 @@ const EventDetails: React.FC = () => {
             body = <Card.Body>
                 <Card.Text><ThreeSpanningSpinners /></Card.Text>
             </Card.Body>
+        } else if (comments.length === 0) {
+            return <Card.Body>
+                <AddCommentForm eventId={eventId ?? ""} updateComments={updateComments} />
+                <hr />
+                <Card.Subtitle>Be the first to comment!</Card.Subtitle>
+            </Card.Body>
         } else {
             body = <Card.Body>
                 <AddCommentForm eventId={eventId ?? ""} updateComments={updateComments} />

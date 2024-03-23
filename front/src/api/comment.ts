@@ -26,7 +26,6 @@ const CommentApi = {
     },
 
     fetchComments: async (eventId: string, skip?: number, limit?: number): Promise<Comment[]> => {
-        console.log("Fetching comments for event: " + eventId);
         try {
             const response = await axiosInstance.get(`/api/comment/${eventId}`, {
                 params: {

@@ -6,11 +6,11 @@ import { StatusCodes } from "http-status-codes";
 
 
 export const getComment = async (req: Request, res: Response) => {
-  console.log("GET /comments/:eventId");
+  console.log("GET /api/comments/:eventId");
   const event_id = req.params.eventId;
-  
+
   let dbRes;
-  
+
   /* Implemented pagination with skip and limit query params */
   let skip;
   let limit;
@@ -25,13 +25,13 @@ export const getComment = async (req: Request, res: Response) => {
     skip = 0;
     limit = Number(MAX_COMMENTS);
   }
-  
+
   try {
     dbRes = await queryCommentsByEventId(event_id, skip, limit);
   }
 
   catch (err) {
-    res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({message: "Internal Server Error"});
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({ message: "Internal Server Error" });
     return;
   }
 

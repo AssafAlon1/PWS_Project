@@ -1,4 +1,3 @@
-
 import express from 'express';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
@@ -7,18 +6,19 @@ import cors from 'cors';
 
 import { createComment, getComment } from "./routes.js";
 import { COMMENT_PATH } from "./const.js";
+import { PublisherChannel } from './publisher-channel.js';
+import { Request, Response, NextFunction } from 'express';
 
 dotenv.config();
 const dbUri = process.env.DB_CONNECTION_STRING;
 const port = process.env.PORT || 3000;
 
-
+const publisherChannel = new PublisherChannel();
 
 if (!dbUri) {
   console.error('Missing MongoDB URI');
   process.exit(1);
 }
-/* ========== */
 mongoose.set('strictQuery', true);
 await mongoose.connect(dbUri);
 
@@ -34,10 +34,15 @@ app.use(cors({
   credentials: true,  // Frontend needs to send cookies with requests
 }));
 
-
 app.get(`${COMMENT_PATH}/:eventId`, getComment);
 
-app.post(COMMENT_PATH, createComment);
+
+// Middleware to attach publisherChannel to the request
+function attachPublisherChannel(req: Request, res: Response, next: NextFunction) {
+  req.publisherChannel = publisherChannel;
+  next();
+}
+app.post(COMMENT_PATH, attachPublisherChannel, createComment);
 
 app.listen(port, () => {
   console.log(`Server running! port ${port}`);

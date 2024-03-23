@@ -14,6 +14,7 @@ import {
 import {
   EVENT_PATH
 } from './const.js';
+import { consumeMessages } from './consume-messages.js';
 
 dotenv.config();
 const dbUri = process.env.DB_CONNECTION_STRING;
@@ -24,6 +25,9 @@ if (!dbUri) {
   process.exit(1);
 }
 /* ========== */
+
+consumeMessages();
+
 mongoose.set('strictQuery', true);
 await mongoose.connect(dbUri);
 const app = express();

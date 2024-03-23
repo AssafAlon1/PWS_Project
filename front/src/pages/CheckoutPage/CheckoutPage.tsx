@@ -17,7 +17,6 @@ const CheckoutPage: React.FC = () => {
 
     useEffect(() => {
         if (!areDetailsProvided) {
-            console.log("Failed on initial areDetailsProvided")
             navigate("/error", { state: { message: "No purchase details found" } });
         }
     }, [areDetailsProvided, purchaseDetails, navigate]);

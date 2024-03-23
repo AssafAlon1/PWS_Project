@@ -52,12 +52,10 @@ export async function signupRoute(req: Request, res: Response) {
     const error = await user.validate();
   }
   catch (e) {
-    console.log("Invalid creds");
     res.status(400).send('Invalid credentials');
     return;
   }
   if (await User.exists({ username: user.username })) {
-    console.log("exists");
     res.status(400).send('Username already exists');
     return;
   }
@@ -68,7 +66,6 @@ export async function signupRoute(req: Request, res: Response) {
     await user.save();
   }
   catch (e) {
-    console.log("internal error");
     res.status(500).send('Error creating user');
     return;
   }

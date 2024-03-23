@@ -49,9 +49,7 @@ const getTokenFromCookie = (req: Request, res: Response) => {
 
 export const isAuthorized = async (req: Request, res: Response, next: NextFunction): Promise<TokenData | HTTPError> => {
     // Token existence handled here
-    console.log("Checking token");
     const token = getTokenFromCookie(req, res);
-    console.log("Token", token);
   
     if (isHTTPError(token)) {
       // res was already handled in getTokenFromAuthHeader
@@ -59,7 +57,6 @@ export const isAuthorized = async (req: Request, res: Response, next: NextFuncti
     }
   
     const user = verifyJWT(token);
-    console.log("user", user);
   
     // Invalid token
     if (!user) {

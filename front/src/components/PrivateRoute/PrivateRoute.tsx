@@ -17,7 +17,6 @@ const PrivateRoute = () => {
     }, []);
 
     if (isLoading) {
-        console.log(" ### Loading...");
         return <div>
             <h1>Loading...</h1>
             <ThreeSpanningSpinners />
@@ -25,7 +24,6 @@ const PrivateRoute = () => {
     }
 
     if (!auth.user) {
-        console.log(" ### NOT LOGGED IN :/");
         return <Navigate to="/login" />; // TODO - add some parameter saying "session expired"
     }
     console.log(" ### PrivateRoute approved :)");

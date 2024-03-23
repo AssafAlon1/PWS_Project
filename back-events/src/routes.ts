@@ -4,45 +4,6 @@ import { deleteEventByID, insertEvent, queryEventByID, queryUpcomingEvents, upda
 import { ICSEvent, eventSchema } from "./models/CSEvent.js";
 import mongoose from "mongoose";
 
-
-// TODO - DELETE THIS
-export const createRoute = (baseUrl: string, host: string, method: string): Routes => {
-  if (!baseUrl) {
-    console.log("No base url...");
-    return Routes["NOT_FOUND"];
-  }
-
-  // Strip searchParams from URL
-  const pathName = new URL(baseUrl, `http://${host}`).pathname;
-
-  if (method === 'GET' && pathName.match(/^\/api\/event$/)) {
-    return Routes["GET_EVENT"];
-  }
-
-  if (method === 'GET' && pathName.match(/^\/api\/event\/[^/]+$/)) {
-    return Routes["GET_EVENT"];
-  }
-
-  else if (method == 'POST' && pathName.match(/^\/api\/event$/)) {
-    return Routes["POST_EVENT"];
-  }
-
-  else if (method == 'DELETE' && pathName.match(/^\/api\/event\/[^/]+$/)) {
-    return Routes["DELETE_EVENT"];
-  }
-
-  else if (method == 'PUT' && pathName.match(/^\/api\/event\/[^/]+$/)) {
-    return Routes["UPDATE_EVENT"];
-  }
-
-  console.log("No match for route " + pathName + " with method " + method);
-  return Routes["NOT_FOUND"];
-};
-
-export const notFoundRoute = (req: Request, res: Response) => {
-  res.status(404).send({ message: "404 - Page not found" });
-}
-
 export const getUpcomingEvents = async (req: Request, res: Response) => {
   console.log("GET /api/event");
   const skip = parseInt(req.query.skip as string) || 0;

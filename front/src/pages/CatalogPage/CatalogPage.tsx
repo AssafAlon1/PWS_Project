@@ -24,9 +24,8 @@ const CatalogPage: React.FC = () => {
 
   const fetchMoreData = async () => {
     try {
-      await new Promise(resolve => setTimeout(resolve, 2000)); // TODO - Remove
-      throw new Error("TODO - test");
-      const newEvents = await EventApi.fetchEvents(events.length);
+      await new Promise(resolve => setTimeout(resolve, 1000)); // TODO - Remove
+      const newEvents = await EventApi.fetchEvents(events.length, MAX_EVENTS_IN_PAGE);
       if (newEvents.length < MAX_EVENTS_IN_PAGE) {
         setHasMore(false);
       }
@@ -71,7 +70,7 @@ const CatalogPage: React.FC = () => {
   useEffect(() => {
     const updateEvents = async () => {
       try {
-        const fetchedEvents = await EventApi.fetchEvents();
+        const fetchedEvents = await EventApi.fetchEvents(0, MAX_EVENTS_IN_PAGE);
         SetEvents(fetchedEvents);
         if (fetchedEvents.length < MAX_EVENTS_IN_PAGE) {
           setHasMore(false);
@@ -93,12 +92,12 @@ const CatalogPage: React.FC = () => {
       <h1 style={{ position: 'relative' }}>Catalog</h1>
       <Container style={{ paddingTop: '100px' }}>
         <Catalog />
-        {displayError && <Alert show={displayError} variant="danger" onClose={() => setDisplayError(false)} dismissible>
-          <Alert.Heading>Failed to events</Alert.Heading>
+        <Alert show={displayError} variant="danger" onClose={() => setDisplayError(false)} dismissible>
+          <Alert.Heading>Failed to event :(</Alert.Heading>
           <p>
             Something went wrong while trying to load more events. Please try refreshing the page.
           </p>
-        </Alert>}
+        </Alert>
       </Container>
     </Container>
   )

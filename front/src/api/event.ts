@@ -1,7 +1,9 @@
 import axios, { isAxiosError } from "axios";
-// import { APIStatus } from "../types";
+import { APIStatus } from "../types";
+import { MAX_EVENTS_IN_PAGE } from "../const";
 import { CSEvent } from "../types";
 import { API_GATEWAY_URL } from "../const";
+// import { getUserEventIds } from "./userAction";
 
 const axiosInstance = axios.create({ withCredentials: true, baseURL: API_GATEWAY_URL }); // TODO - withCredentials?
 
@@ -83,7 +85,7 @@ const EventApi = {
 
 //     fetchEvents: async (skip?: number, limit?: number): Promise<CSEvent[]> => {
 //         skip = skip ?? 0;
-//         limit = limit ?? 50;
+//         limit = limit ?? MAX_EVENTS_IN_PAGE;
 //         await new Promise(resolve => setTimeout(resolve, 500));
 //         // throw new Error("Force error for testing purposes.");
 //         return EventApi.allEvents.slice(skip, skip + limit);

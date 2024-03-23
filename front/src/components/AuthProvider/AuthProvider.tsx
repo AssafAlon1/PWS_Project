@@ -28,9 +28,7 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
     const updateLoggedIn = async (): Promise<boolean> => {
         const result = await AuthApi.getUserName();
-        console.log("updateLoggedIn result: ", result);
         if (typeof result === "string") {
-            console.log("User is logged in as: ", result);
             setUser(result);
             return true;
         }
@@ -43,7 +41,6 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
     const updateNextEvent = async () => {
         if (!user) {
-            console.log("No user found, can't update next event");
             return;
         }
         const closestEvent = await EventApi.getUserClosestEvent(user);

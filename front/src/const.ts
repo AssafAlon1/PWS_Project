@@ -1,4 +1,4 @@
-export const MAX_EVENTS_IN_PAGE = 50;
+export const MAX_EVENTS_IN_PAGE = 12;
 
 export const VALID_CATEGORIES = [
     "Charity%20Event",

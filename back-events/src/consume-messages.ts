@@ -1,9 +1,14 @@
 import * as amqp from 'amqplib';
+import dotenv from 'dotenv';
+
+dotenv.config();
+
+const RABBITMQ_URL = process.env.RABBITMQ_URL || "amqp://localhost";
 
 export const consumeMessages = async () => {
     try {
         // connect to RabbitMQ
-        const connection = await amqp.connect('amqp://localhost');
+        const connection = await amqp.connect(RABBITMQ_URL);
 
         const channel = await connection.createChannel();
 

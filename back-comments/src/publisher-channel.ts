@@ -1,11 +1,16 @@
 import * as amqp from 'amqplib';
+import dotenv from 'dotenv';
+
+dotenv.config();
+
+const RABBITMQ_URL = process.env.RABBITMQ_URL || "amqp://localhost";
 
 export class PublisherChannel {
     channel: amqp.Channel;
 
     // Method to create a channel on the RabbitMQ connection
     async createChannel() {
-        const connection = await amqp.connect('amqp://localhost');
+        const connection = await amqp.connect(RABBITMQ_URL);
         // Create a channel on this connection
         this.channel = await connection.createChannel();
     }

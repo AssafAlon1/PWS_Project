@@ -4,7 +4,7 @@ import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
-import { createProxyMiddleware } from 'http-proxy-middleware';
+import { createProxyMiddleware, fixRequestBody } from 'http-proxy-middleware';
 import {
     loginRoute,
     logoutRoute,
@@ -13,6 +13,7 @@ import {
 } from './routes.js';
 
 import {
+    COMMENT_API_URL,
     EVENT_API_URL,
     LOGIN_PATH,
     LOGOUT_PATH,
@@ -49,18 +50,30 @@ app.use(cors({
 }));
 /* ========== */
 
+// Events Microservice
+const eventProxy = createProxyMiddleware({
+    target: EVENT_API_URL,
+    onProxyReq: fixRequestBody,
+    changeOrigin: true, // TODO - What is this?
+});
+app.use('/api/event', isAuthorized, eventProxy);
+
+// Comments Microservice
+const commentProxy = createProxyMiddleware({
+    target: COMMENT_API_URL,
+    onProxyReq: fixRequestBody,
+    changeOrigin: true, // TODO - What is this?
+});
+app.use('/api/comment', isAuthorized, commentProxy);
+
+
+
 app.post(LOGIN_PATH, loginRoute);
 app.post(LOGOUT_PATH, logoutRoute);
 app.post(SIGNUP_PATH, signupRoute);
 
 app.get(USERNAME_PATH, usernameRoute);
 
-// PROXIES
-const eventProxy = createProxyMiddleware({
-    target: EVENT_API_URL,
-    changeOrigin: true, // TODO - What is this?
-});
-app.use('/api/event', isAuthorized, eventProxy);
 
 app.listen(port, () => {
     console.log(`Server running! port ${port}`);

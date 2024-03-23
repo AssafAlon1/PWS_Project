@@ -1,25 +1,15 @@
-import mongoose from "mongoose";
-import * as bcrypt from "bcrypt";
-import * as dotenv from "dotenv";
 import { DEFAULT_ROLE } from "./const.js";
 import CSEvent, { ICSEvent } from "./models/CSEvent.js";
-import CSUser, { ICSUser } from "./models/CSUser.js";
-import { HTTPError, UserRole } from "./types.js";
+import { StatusCodes } from 'http-status-codes';
+// import { UserRole } from "./types.js";
 
-dotenv.config();
-const DB_CONNECTION_STRING = process.env.DB_CONNECTION_STRING;
-
-mongoose.set('strictQuery', true);
-
-mongoose.connect(DB_CONNECTION_STRING);
-
-export const insertEvent = async (eventData: ICSEvent): Promise<HTTPError | string> => {
+export const insertEvent = async (eventData: ICSEvent): Promise<string | number> => {
   const newEvent = new CSEvent(eventData);
   try {
     await newEvent.validate();
   }
   catch (err) {
-    return HTTPError["ERROR_400"];
+    return StatusCodes.BAD_REQUEST;
   }
 
   try {
@@ -27,7 +17,7 @@ export const insertEvent = async (eventData: ICSEvent): Promise<HTTPError | stri
     return newEvent._id.toString();
   }
   catch (err) {
-    return HTTPError["ERROR_500"];
+    return StatusCodes.INTERNAL_SERVER_ERROR;
   }
 }
 

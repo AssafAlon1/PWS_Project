@@ -17,7 +17,7 @@ import TicketApi from '../../api/ticket';
 import { ThreeSpanningSpinners } from '../../components/SpinnerComponent/SpinnerComponent';
 
 // TODO - extract some components to other files?
-const EventDetails: React.FC<{}> = () => {
+const EventDetails: React.FC = () => {
     const [event, setEvent] = useState<CSEvent | null>(null);
     const [tickets, setTickets] = useState<Ticket[] | null>(null);
     const [comments, setComments] = useState<Comment[] | null>(null);
@@ -91,7 +91,9 @@ const EventDetails: React.FC<{}> = () => {
             }
         }
         catch (err) {
-            console.log(err)
+            // TODO - Tone it down with all the try,catch,throw (just handle it in fetchComments and check for response value)
+            console.error(err);
+            console.error(`Failed to fetch comments for event ${eventId}`);
             setFailedFetchingComments(true);
             fetchedComments = [];
         }

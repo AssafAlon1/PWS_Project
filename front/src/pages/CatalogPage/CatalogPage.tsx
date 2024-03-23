@@ -12,7 +12,7 @@ import { MAX_EVENTS_IN_PAGE } from '../../const';
 
 const CatalogPage: React.FC = () => {
 
-  const [events, SetEvents] = useState<CSEvent[]>([]);
+  const [events, setEvents] = useState<CSEvent[]>([]);
   const [isLoading, setLoading] = useState<boolean>(true);
   const [hasMore, setHasMore] = useState<boolean>(true);
   const [displayError, setDisplayError] = useState<boolean>(false);
@@ -29,7 +29,7 @@ const CatalogPage: React.FC = () => {
       if (newEvents.length < MAX_EVENTS_IN_PAGE) {
         setHasMore(false);
       }
-      SetEvents(prevEvents => [...prevEvents, ...newEvents]);
+      setEvents(prevEvents => [...prevEvents, ...newEvents]);
     } catch {
       // TODO - Display alert instead of redirecting
       setDisplayError(true);
@@ -81,7 +81,7 @@ const CatalogPage: React.FC = () => {
     const updateEvents = async () => {
       try {
         const fetchedEvents = await EventApi.fetchEvents(0, MAX_EVENTS_IN_PAGE);
-        SetEvents(fetchedEvents);
+        setEvents(fetchedEvents);
         if (fetchedEvents.length < MAX_EVENTS_IN_PAGE) {
           setHasMore(false);
         }

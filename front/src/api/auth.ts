@@ -25,7 +25,6 @@ export const AuthApi = {
             await axiosInst.post('/api/signup', { username, password });
             return APIStatus.Success;
         } catch (e) {
-            console.log("ERROR!!!!");
             console.error(e);
             return handleError(e);
         }

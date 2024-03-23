@@ -28,7 +28,6 @@ const EventApi = {
     fetchEvent: async (eventId: string): Promise<CSEvent | null> => {
         try {
             const response = await axiosInstance.get(`/api/event/${eventId}`);
-            console.log(" > Event fetched: " + response.data)
             return response.data;
         } catch (error) {
             throw new Error("Failed to fetch event "); // TODO - Better handling?

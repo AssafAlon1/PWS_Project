@@ -44,7 +44,7 @@ app.use(cors({
 app.get(EVENT_PATH, getUpcomingEvents);
 app.get(`${EVENT_PATH}/:eventId`, getEventById);
 
-app.post(`${EVENT_PATH}`, createEvent);
+app.post(EVENT_PATH, createEvent);
 
 // TODO - Update event? Delete event (I think this is not required?)
 

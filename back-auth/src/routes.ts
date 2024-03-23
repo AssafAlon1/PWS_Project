@@ -68,7 +68,7 @@ export async function signupRoute(req: Request, res: Response) {
     await user.save();
   }
   catch (e) {
-    console.log("internal erro");
+    console.log("internal error");
     res.status(500).send('Error creating user');
     return;
   }

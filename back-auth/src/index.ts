@@ -19,6 +19,7 @@ import {
     SIGNUP_PATH,
     USERNAME_PATH, // TODO - remove?
 } from './const.js';
+import { isAuthorized } from './auths.js';
 
 dotenv.config();
 
@@ -59,7 +60,7 @@ const eventProxy = createProxyMiddleware({
     target: EVENT_API_URL,
     changeOrigin: true, // TODO - What is this?
 });
-app.use('/api/event', eventProxy);
+app.use('/api/event', isAuthorized, eventProxy);
 
 app.listen(port, () => {
     console.log(`Server running! port ${port}`);

@@ -1,11 +1,11 @@
 import { Request, Response } from 'express';
-import { IncomingMessage, ServerResponse } from "http";
 import { HTTPError, Routes } from "./types.js";
 import { deleteEventByID, insertEvent, queryEventByID, queryUpcomingEvents, updateEventByID } from "./db.js";
 import { ICSEvent, eventSchema } from "./models/CSEvent.js";
 import mongoose from "mongoose";
 
 
+// TODO - DELETE THIS
 export const createRoute = (baseUrl: string, host: string, method: string): Routes => {
   if (!baseUrl) {
     console.log("No base url...");
@@ -44,6 +44,7 @@ export const notFoundRoute = (req: Request, res: Response) => {
 }
 
 export const getUpcomingEvents = async (req: Request, res: Response) => {
+  console.log("GET /api/event");
   const skip = parseInt(req.query.skip as string) || 0;
   const limit = parseInt(req.query.limit as string) || 50;
   let data;
@@ -54,7 +55,8 @@ export const getUpcomingEvents = async (req: Request, res: Response) => {
     res.status(500).send({ message: "Internal Server Error" });
     return;
   }
-
+  
+  console.log("About to return 200! So exciting!");
   res.status(200).send(data);
 }
 
@@ -81,7 +83,6 @@ export const getEventById = async (req: Request, res: Response) => {
     res.status(404).send({ message: "Event not found." });
   }
 };
-
 
 export const createEvent = async (req: Request, res: Response) => {
   try {

@@ -5,7 +5,7 @@ import { Comment } from "../types";
 
 const axiosInstance = axios.create({ withCredentials: true, baseURL: API_GATEWAY_URL }); // TODO - withCredentials?
 
-const CommentApi = {
+const RealCommentApi = {
     postComment: async (username: string, eventId: string, comment: string) => {
         try {
             const actualComment = {
@@ -46,60 +46,9 @@ const CommentApi = {
     }
 }
 
-// // Mock API
-// const CommentApi = {
-//     allComments: [
-//         {
-//             eventId: "1",
-//             content: "This event seems fun!",
-//             createdAt: new Date("2024-03-17T11:32"),
-//             author: "Alice",
-//         },
-//         {
-//             eventId: "1",
-//             content: "Jeffrey Epstein didn't kill himself",
-//             createdAt: new Date("2024-03-17T11:54"),
-//             author: "A person who knows...",
-//         },
-//         {
-//             eventId: "1",
-//             content: "Haha, I like fun events :)",
-//             createdAt: new Date("2024-03-18T01:05"),
-//             author: "Bob",
-//         },
-//         {
-//             eventId: "2",
-//             content: "Boooo-RING!",
-//             createdAt: new Date("2024-03-18T01:07"),
-//             author: "Bob"
-//         },
-//     ],
+// import { MockCommentApi } from "./mock";
+// const CommentApi = MockCommentApi;
+const CommentApi = RealCommentApi;
 
-//     postComment: async (username: string, eventId: string, comment: string) => {
-//         // TODO - implement this
-//         await new Promise(resolve => setTimeout(resolve, 500));
-//         if (getRandomInt(2) === 0) {
-//             throw new Error("Force error for testing purposes.");
-//         }
-//         const newComment: Comment = {
-//             eventId,
-//             content: comment,
-//             createdAt: new Date(),
-//             author: username,
-//         };
-//         CommentApi.allComments.push(newComment);
-//         return newComment;
-//     },
-
-//     fetchComments: async (eventId: string): Promise<Comment[]> => {
-//         // TODO - implement
-//         await new Promise(resolve => setTimeout(resolve, 500));
-//         if (getRandomInt(10) === 0) {
-//             throw new Error("Force error for testing purposes.");
-//         }
-
-//         return CommentApi.allComments.filter(comment => comment.eventId === eventId).reverse();
-//     }
-// }
 
 export default CommentApi;

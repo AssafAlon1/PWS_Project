@@ -214,23 +214,22 @@ const EventDetails: React.FC = () => {
         }
 
         return (
-            <Card className="ticket-card">
+            <Card className={`ticket-card ${amountLeft <= 0 ? "gray" : ""}`}>
                 <Card.Header>
                     <b>{name}</b>
                 </Card.Header>
                 <Card.Body>
                     <Card.Text>Price: <b>${price}</b></Card.Text>
                     <Card.Text><b>{amountLeft}</b> tickets left!</Card.Text>
-                    <Card.Text>Choose amount of tickets:</Card.Text>
+                    <Card.Text>{amountLeft <= 0 ? "SOLD OUT!" : "Choose amount of tickets:"}</Card.Text>
                     <div className="direction-row">
-                        <input className="tickets-amount" type="number" value={ticketAmount} onChange={(event) => setTicketAmount(Number(event.target.value))} />
+                        <input disabled={amountLeft <= 0} className="tickets-amount" type="number" value={ticketAmount} onChange={(event) => setTicketAmount(Number(event.target.value))} />
                         <ButtonWithTooltip
                             buttonContent="Buy Now!"
                             tooltipContent={ticketAmount <= 0 ? "Cannot buy less than 1 ticket" : "Not enough tickets left"}
                             isDisabled={ticketAmount <= 0 || ticketAmount > amountLeft}
                             buttonOnClick={onClickBuyNow}
                         />
-
                     </div>
                 </Card.Body>
             </Card>
@@ -278,6 +277,12 @@ const EventDetails: React.FC = () => {
         } else if (comments === null) {
             body = <Card.Body>
                 <Card.Text><ThreeSpanningSpinners /></Card.Text>
+            </Card.Body>
+        } else if (comments.length === 0) {
+            return <Card.Body>
+                <AddCommentForm eventId={eventId ?? ""} updateComments={updateComments} />
+                <hr />
+                <Card.Subtitle>Be the first to comment!</Card.Subtitle>
             </Card.Body>
         } else {
             body = <Card.Body>

@@ -7,7 +7,6 @@ import cors from 'cors';
 import {
   getEventById,
   createEvent,
-  deleteEvent,
   updateEvent,
   getUpcomingEvents
 } from "./routes.js";

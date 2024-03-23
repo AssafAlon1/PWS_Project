@@ -1,8 +1,8 @@
 import { Request, Response } from 'express';
-import { HTTPError, Routes } from "./types.js";
 import { deleteEventByID, insertEvent, queryEventByID, queryUpcomingEvents, updateEventByID } from "./db.js";
 import { ICSEvent, eventSchema } from "./models/CSEvent.js";
 import mongoose from "mongoose";
+import { StatusCodes } from 'http-status-codes';
 
 export const getUpcomingEvents = async (req: Request, res: Response) => {
   console.log("GET /api/event");
@@ -13,19 +13,18 @@ export const getUpcomingEvents = async (req: Request, res: Response) => {
     data = await queryUpcomingEvents(skip, limit);
   }
   catch (error) {
-    res.status(500).send({ message: "Internal Server Error" });
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({ message: "Internal Server Error" });
     return;
   }
   
-  console.log("About to return 200! So exciting!");
-  res.status(200).send(data);
+  res.status(StatusCodes.OK).send(data);
 }
 
 export const getEventById = async (req: Request, res: Response) => {
   const id = req.params.eventId;
   // If the provided ID is not a valid mongoDB identifier, it cannot be in the DB (saves a query).
   if (!mongoose.Types.ObjectId.isValid(id)) {
-    res.status(404).send({ message: "Event not found." });
+    res.status(StatusCodes.NOT_FOUND).send({ message: "Event not found." });
     return;
   }
 
@@ -34,14 +33,14 @@ export const getEventById = async (req: Request, res: Response) => {
     data = await queryEventByID(id);
   }
   catch (error) {
-    res.status(500).send({ message: "Internal Server Error" });
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({ message: "Internal Server Error" });
     return;
   }
 
   if (data) {
-    res.status(200).send(data);
+    res.status(StatusCodes.OK).send(data);
   } else {
-    res.status(404).send({ message: "Event not found." });
+    res.status(StatusCodes.NOT_FOUND).send({ message: "Event not found." });
   }
 };
 
@@ -62,19 +61,19 @@ export const createEvent = async (req: Request, res: Response) => {
 
     const insertResult = await insertEvent(value);
 
-    if (insertResult == HTTPError["ERROR_400"]) {
+    if (insertResult == StatusCodes.BAD_REQUEST) {
       throw Error("Bad Request.")
     }
 
-    if (insertResult == HTTPError["ERROR_500"]) {
-      res.status(500).send("Internal server error");
+    if (insertResult == StatusCodes.INTERNAL_SERVER_ERROR) {
+      res.status(StatusCodes.INTERNAL_SERVER_ERROR).send("Internal server error");
       return;
     }
 
-    res.status(201).send({ _id: insertResult });
+    res.status(StatusCodes.CREATED).send({ _id: insertResult });
   }
   catch (error) {
-    res.status(400).send("Bad Request");
+    res.status(StatusCodes.BAD_REQUEST).send("Bad Request");
     return;
   }
 };
@@ -102,7 +101,7 @@ export const updateEvent = async (req: Request, res: Response) => {
     }
   }
   catch (error) {
-    res.status(400).send({ message: "Bad Request." });
+    res.status(StatusCodes.BAD_REQUEST).send({ message: "Bad Request." });
     console.error(error);
     return;
   }
@@ -114,7 +113,7 @@ export const updateEvent = async (req: Request, res: Response) => {
       throw Error("Event not found.");
     }
   } catch (error) {
-    res.status(404).send({ message: "Event not found." });
+    res.status(StatusCodes.NOT_FOUND).send({ message: "Event not found." });
     return;
   }
 
@@ -132,32 +131,31 @@ export const updateEvent = async (req: Request, res: Response) => {
     }
 
     updateEventByID(eventID, value);
-    res.status(200).send({ _id: eventID });
+    res.status(StatusCodes.OK).send({ _id: eventID });
   }
 
   catch (error) {
-    res.status(400).send({ message: "Bad Request." });
+    res.status(StatusCodes.BAD_REQUEST).send({ message: "Bad Request." });
     return;
   }
 };
 
-export const deleteEvent = async (req: Request, res: Response) => {
+// export const deleteEvent = async (req: Request, res: Response) => {
 
-  // By Piazza @61 - additional body is ignored
-  const eventID = new URL(req.url, `http://${req.headers.host}`).pathname.split("/").pop();
+//   const eventID = new URL(req.url, `http://${req.headers.host}`).pathname.split("/").pop();
 
-  // If the provided ID is not a valid mongoDB identifier, it cannot be in the DB (saves a query)
-  if (!mongoose.Types.ObjectId.isValid(eventID)) {
-    res.status(200).send();
-    return;
-  }
+//   // If the provided ID is not a valid mongoDB identifier, it cannot be in the DB (saves a query)
+//   if (!mongoose.Types.ObjectId.isValid(eventID)) {
+//     res.status(StatusCodes.OK).send();
+//     return;
+//   }
 
-  try {
-    // if an event does not exist - Mongo will treat the deletion as a success
-    deleteEventByID(eventID);
-    res.send();
-  }
-  catch {
-    res.status(500).send({ message: "Internal Server Error" });
-  }
-};
+//   try {
+//     // if an event does not exist - Mongo will treat the deletion as a success
+//     deleteEventByID(eventID);
+//     res.send();
+//   }
+//   catch {
+//     res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({ message: "Internal Server Error" });
+//   }
+// };

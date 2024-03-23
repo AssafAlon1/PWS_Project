@@ -3,6 +3,8 @@ import { Request, Response } from 'express';
 import jwt, { JwtPayload } from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 import User from './models/user.js';
+import { StatusCodes } from "http-status-codes";
+
 
 export async function loginRoute(req: Request, res: Response) {
   const credentials = req.body;
@@ -10,7 +12,7 @@ export async function loginRoute(req: Request, res: Response) {
     await User.validate(credentials);
   }
   catch (e) {
-    res.status(400).send('Invalid credentials');
+    res.status(StatusCodes.BAD_REQUEST).send('Invalid credentials');
     return;
   }
 
@@ -20,12 +22,12 @@ export async function loginRoute(req: Request, res: Response) {
     user = await User.findOne({ username: credentials.username });
   }
   catch (e) {
-    res.status(500).send('Internal server error');
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).send('Internal server error');
     return;
   }
 
   if (!user || !await bcrypt.compare(credentials.password, user.password)) {
-    res.status(401).send('Invalid credentials');
+    res.status(StatusCodes.UNAUTHORIZED).send('Invalid credentials');
     return;
   }
 
@@ -43,7 +45,7 @@ export async function logoutRoute(req: Request, res: Response) {
   const sameSite = process.env.NODE_ENV === 'production' ? 'none' : 'strict';
   // We are Deployed - must use secure cookies with sameSite none
   res.clearCookie('token', { httpOnly: true, sameSite: sameSite, secure }); 
-  res.status(200).send('Logged out');
+  res.status(StatusCodes.OK).send('Logged out');
 }
 
 export async function signupRoute(req: Request, res: Response) {
@@ -52,11 +54,11 @@ export async function signupRoute(req: Request, res: Response) {
     const error = await user.validate();
   }
   catch (e) {
-    res.status(400).send('Invalid credentials');
+    res.status(StatusCodes.BAD_REQUEST).send('Invalid credentials');
     return;
   }
   if (await User.exists({ username: user.username })) {
-    res.status(400).send('Username already exists');
+    res.status(StatusCodes.BAD_REQUEST).send('Username already exists');
     return;
   }
   
@@ -66,17 +68,17 @@ export async function signupRoute(req: Request, res: Response) {
     await user.save();
   }
   catch (e) {
-    res.status(500).send('Error creating user');
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).send('Error creating user');
     return;
   }
 
-  res.status(201).send('User created');
+  res.status(StatusCodes.CREATED).send('User created');
 }
 
 export async function usernameRoute(req: Request, res: Response) {
   const token = req.cookies.token;
   if (!token) {
-    res.status(401).send('Not logged in');
+    res.status(StatusCodes.UNAUTHORIZED).send('Not logged in');
     return;
   }
 
@@ -86,9 +88,9 @@ export async function usernameRoute(req: Request, res: Response) {
     username = (payload as JwtPayload).username;
   }
   catch (e) {
-    res.status(401).send('Invalid token');
+    res.status(StatusCodes.UNAUTHORIZED).send('Invalid token');
     return;
   }
 
-  res.status(200).send({username});
+  res.status(StatusCodes.OK).send({username});
 }

@@ -45,6 +45,16 @@ const CatalogPage: React.FC = () => {
       catalog = events.map(event => <EventDetails key={event._id} event={event} />);
     }
 
+    if (catalog.length === 0) {
+      return (
+        <Container>
+          <h2>Looks like all the events are taking a break.</h2>
+          <h3>Maybe they're off having a party somewhere!</h3>
+          <img style={{ borderRadius: "20px" }} src="https://booksparks.com/wp-content/uploads/2018/04/dance-party-dancing-GIF-downsized-1.gif" alt="Party GIF" />
+        </Container>
+      );
+    }
+
 
     return (
       <Container style={{ width: "100vw" }}>

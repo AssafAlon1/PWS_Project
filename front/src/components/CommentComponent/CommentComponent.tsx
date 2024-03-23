@@ -1,3 +1,4 @@
+import './CommentComponent.css';
 import React from 'react';
 import { Comment } from '../../types';
 import { Card } from 'react-bootstrap';

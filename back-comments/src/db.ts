@@ -6,7 +6,7 @@ import { StatusCodes } from "http-status-codes";
 dotenv.config();
 
 export const queryCommentsByEventId = async (eventId: string, skip: number, limit: number): Promise<ICSComment> => {
-    const comments = await Comment.find({ eventId: eventId }).sort({ createdAt: 1 }).skip(skip).limit(limit).exec();
+    const comments = await Comment.find({ eventId: eventId }).sort({ createdAt: -1 }).skip(skip).limit(limit).exec();
     return comments.map(comment => comment.toJSON() as ICSComment);
 }
 

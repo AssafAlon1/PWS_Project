@@ -2,44 +2,38 @@ import React, { useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Alert, Card, Col, Row } from 'react-bootstrap';
 import PaymentForm from '../../components/PaymentForm/PaymentForm';
-import { AppContext } from '../../App';
 import { usePurchaseDetails } from '../../components/PurchaseDetailsContext/PurchaseDetailsContext';
-import { purchaseTickets } from '../../api/ticket';
+import TicketApi from '../../api/ticket';
+import { AuthContext } from '../../components/AuthProvider/AuthProvider';
 
 const CheckoutPage: React.FC = () => {
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [displayError, setDisplayError] = useState<boolean>(false);
     const { purchaseDetails, setPurchaseDetails } = usePurchaseDetails();
     const navigate = useNavigate();
-    const context = useContext(AppContext);
+    const context = useContext(AuthContext);
 
-    // TODO - validate purchaseDetails with JOI or something?
-    const areDetailsProvided = purchaseDetails && purchaseDetails.eventId && purchaseDetails.name && purchaseDetails.quantity && purchaseDetails.price;
+    const areDetailsProvided = purchaseDetails !== null && purchaseDetails !== undefined;
 
     useEffect(() => {
         if (!areDetailsProvided) {
-            console.log("Failed on initial areDetailsProvided")
             navigate("/error", { state: { message: "No purchase details found" } });
         }
-    }, [purchaseDetails, navigate]);
+    }, [areDetailsProvided, purchaseDetails, navigate]);
 
     const performPurchase = async () => {
         if (!areDetailsProvided) {
-            console.log("Failed on purchase areDetailsProvided")
             navigate("/error", { state: { message: "No purchase details found" } });
             return;
         }
-        console.log("Purchasing when details are provided");
         let username;
         try {
-            console.log("Context: " + context);
             username = context.user;
         }
         catch (err) {
             console.error(err);
             return;
         }
-        console.log("ONCE AGAIN")
         // TODO - Take an additional look at this
         if (!username) {
             navigate("/error", { state: { message: "No user found" } });
@@ -48,7 +42,7 @@ const CheckoutPage: React.FC = () => {
         console.log("About to purchase tickets");
         setIsLoading(true);
         try {
-            await purchaseTickets(purchaseDetails.eventId, purchaseDetails.name, purchaseDetails.quantity, username);
+            await TicketApi.purchaseTickets(purchaseDetails.eventId, purchaseDetails.name, purchaseDetails.quantity, username);
         }
         catch (err) {
             setIsLoading(false);

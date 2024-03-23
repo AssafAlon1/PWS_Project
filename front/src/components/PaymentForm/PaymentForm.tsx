@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Button, Card, Col, FloatingLabel, Form, Row } from 'react-bootstrap';
-import SpanningSpinnner from '../SpinnerComponent/SpinnerComponent';
+import { SpanningSpinnner } from '../SpinnerComponent/SpinnerComponent';
 
 
 interface PaymentFormProps {

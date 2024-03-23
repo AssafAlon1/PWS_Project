@@ -1,0 +1,13 @@
+.error-container {
+    margin-top: 10px;
+    margin-bottom: 10px;
+    padding: 10px;
+    background-color: #f8d7da;
+    border: 1px solid #f5c6cb;
+    border-radius: 5px;
+}
+
+.error-message {
+    color: #721c24;
+    margin: 0;
+}

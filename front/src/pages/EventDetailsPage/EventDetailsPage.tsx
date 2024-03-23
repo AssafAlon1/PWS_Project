@@ -10,11 +10,11 @@ import { getFormattedDate, getFormattedTime } from '../../utils/formatting';
 import ButtonWithTooltip from '../../components/ButtonWithTooltip/ButtonWithTooltip';
 import { usePurchaseDetails } from '../../components/PurchaseDetailsContext/PurchaseDetailsContext';
 import AddCommentForm from '../../components/AddCommentForm/AddCommentForm';
-import { fetchComments } from '../../api/comment';
+import CommentApi from '../../api/comment';
 import CommentComponent from '../../components/CommentComponent/CommentComponent';
-import { fetchEvent } from '../../api/event';
-import { fetchTickets } from '../../api/ticket';
-import SpanningSpinnner from '../../components/SpinnerComponent/SpinnerComponent';
+import EventApi from '../../api/event';
+import TicketApi from '../../api/ticket';
+import { ThreeSpanningSpinners } from '../../components/SpinnerComponent/SpinnerComponent';
 
 // TODO - extract some components to other files?
 const EventDetails: React.FC<{}> = () => {
@@ -46,7 +46,7 @@ const EventDetails: React.FC<{}> = () => {
         }
         let fetchedEvent;
         try {
-            fetchedEvent = await fetchEvent(eventId);
+            fetchedEvent = await EventApi.fetchEvent(eventId);
         }
         catch {
             return navigate("/error", { state: { message: `Failed to fetch event ${eventId}` } });
@@ -65,14 +65,12 @@ const EventDetails: React.FC<{}> = () => {
         setTickets(null);
         let fetchedTickets: Ticket[];
         try {
-            fetchedTickets = await fetchTickets(eventId) ?? [];
+            fetchedTickets = await TicketApi.fetchTickets(eventId) ?? [];
             if (!fetchedTickets) {
                 throw new Error(`Failed to fetch tickets for event ${eventId}`);
             }
         }
         catch {
-            // TODO - navigate? just display "error loading tickets"? What's better?
-            // return navigate("/error", { state: { message: `Failed to fetch tickets for event ${eventId}` } });
             fetchedTickets = [];
         }
         setTickets(fetchedTickets);
@@ -87,14 +85,12 @@ const EventDetails: React.FC<{}> = () => {
         setFailedFetchingComments(false);
         let fetchedComments: Comment[];
         try {
-            fetchedComments = await fetchComments(eventId) ?? [];
+            fetchedComments = await CommentApi.fetchComments(eventId) ?? [];
             if (!fetchedComments) {
                 throw new Error(`Failed to fetch comments for event ${eventId}`);
             }
         }
         catch (err) {
-            // TODO - navigate? just display "error loading comments"? What's better?
-            // return navigate("/error", { state: { message: `Failed to fetch comments for event ${eventId}` } });
             console.log(err)
             setFailedFetchingComments(true);
             fetchedComments = [];
@@ -110,7 +106,7 @@ const EventDetails: React.FC<{}> = () => {
 
     const TitleComponent = () => {
         if (event) {
-            return <Card.Title>{event.name}</Card.Title>
+            return <Card.Title>{event.title}</Card.Title>
         }
         return <Placeholder as={Card.Title} animation="glow"><Placeholder xs={6} /></Placeholder>
 
@@ -204,7 +200,7 @@ const EventDetails: React.FC<{}> = () => {
 
         const ticketPurchaseDetails: PurchaseDetails = {
             eventId: eventId ?? "0",
-            eventName: event?.name ?? "Unknown",
+            eventName: event?.title ?? "Unknown",
             name: name,
             quantity: ticketAmount,
             price: price
@@ -249,7 +245,7 @@ const EventDetails: React.FC<{}> = () => {
             </Card.Body>
         } else if (tickets === null) {
             bodyContent = <Card.Body>
-                <Card.Text><SpanningSpinnner /><SpanningSpinnner /><SpanningSpinnner /></Card.Text>
+                <Card.Text><ThreeSpanningSpinners /></Card.Text>
             </Card.Body>
         } else {
             bodyContent = tickets.map((ticket, index) => {
@@ -279,7 +275,7 @@ const EventDetails: React.FC<{}> = () => {
             </Card.Body>
         } else if (comments === null) {
             body = <Card.Body>
-                <Card.Text><SpanningSpinnner /><SpanningSpinnner /><SpanningSpinnner /></Card.Text>
+                <Card.Text><ThreeSpanningSpinners /></Card.Text>
             </Card.Body>
         } else {
             body = <Card.Body>

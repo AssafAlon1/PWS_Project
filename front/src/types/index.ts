@@ -1,6 +1,6 @@
 export interface CSEvent {
-    id: string;
-    name: string;
+    _id: string;
+    title: string;
     description: string;
     start_date: Date; // TODO - string?
     end_date: Date; // TODO - string?
@@ -42,4 +42,18 @@ export interface UserAction {
     amount: number;
     timestamp: Date;
     // TODO - MORE FIELDS!
+}
+
+export enum APIStatus {
+    Success,
+    BadRequest,
+    Unauthorized,
+    ServerError
+}
+
+// TODO - this is from the workshop. is it relevant to us?
+export interface PageProps {
+    navigateToMainPage(): void;
+    navigateToSignUpPage(): void;
+    navigateToLoginPage(): void;
 }

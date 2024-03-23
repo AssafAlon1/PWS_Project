@@ -1,4 +1,8 @@
-export const MAX_EVENTS_IN_PAGE = 12;
+import { UserRole } from "./types.js";
+
+export const DEFAULT_ROLE: UserRole = UserRole["Worker"];
+
+export const MAX_QUERY_LIMIT = 50;
 
 export const VALID_CATEGORIES = [
     "Charity%20Event",
@@ -11,4 +15,4 @@ export const VALID_CATEGORIES = [
     "Sports%20Event"
 ]
 
-export const API_GATEWAY_URL = "http://localhost:3000";
+export const EVENT_PATH = "/api/event";

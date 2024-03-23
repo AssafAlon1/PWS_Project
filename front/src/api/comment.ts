@@ -19,7 +19,7 @@ const CommentApi = {
         } catch (e) {
             console.error(e);
             if (isAxiosError(e)) {
-                throw new Error("Failed to add comment: " + e.response?.data.message); // TODO - Better handling?
+                throw new Error("Failed to add comment for event " + eventId + ": " + e.response.data); // TODO - Better handling?
             }
             throw new Error("Failed to add comment"); // TODO - Better handling?
         }

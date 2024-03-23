@@ -65,6 +65,5 @@ export const isAuthorized = (req: Request, res: Response, next: NextFunction): T
   //   return HTTPError["ERROR_403"];
   // }
   console.log(" > User is authorized!");
-  console.log(req.body);
   next();
 };

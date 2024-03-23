@@ -7,6 +7,7 @@ export interface CSEvent {
     category: string;
     location: string;
     image?: string;
+    comment_count: number;
     // TODO - MORE FIELDS!
 }
 

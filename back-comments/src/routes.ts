@@ -40,6 +40,7 @@ export const getComment = async (req: Request, res: Response) => {
 
 export const createComment = async (req: Request, res: Response) => {
   try {
+    console.log("POST /api/comments");
     const publisherChannel: PublisherChannel = req.publisherChannel;
     const commentData = req.body as ICSComment;
 
@@ -47,16 +48,19 @@ export const createComment = async (req: Request, res: Response) => {
     const { value, error } = commentSchema.validate(commentData, { abortEarly: false, allowUnknown: true, presence: 'required' });
 
     if (error) {
+      console.error("Comment schema validation failed");
       throw Error("Bad Request.");
     }
 
     const insertResult = await insertComment(value);
 
     if (insertResult == StatusCodes.BAD_REQUEST) {
+      console.error("Failed inserting comment to DB");
       throw Error("Bad Request.")
     }
 
     if (insertResult == StatusCodes.INTERNAL_SERVER_ERROR) {
+      console.error("Failed inserting comment to DB");
       res.status(StatusCodes.INTERNAL_SERVER_ERROR).send("Internal server error");
       return;
     }
@@ -66,6 +70,7 @@ export const createComment = async (req: Request, res: Response) => {
     res.status(StatusCodes.CREATED).send({ _id: insertResult });
   }
   catch (error) {
+    console.error("Encountered error while creating comment: ", error);
     res.status(StatusCodes.BAD_REQUEST).send("Bad Request");
     return;
   }

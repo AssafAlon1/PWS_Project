@@ -295,6 +295,8 @@ const EventDetails: React.FC = () => {
                     <Card.Title>
                         Comments:
                     </Card.Title>
+                    {/* TODO !!!!!! - Remove this when back office goes live */}
+                    <Card.Subtitle>(Total comments: {event?.comment_count})</Card.Subtitle>
                 </Card.Header>
                 {body}
             </Card>

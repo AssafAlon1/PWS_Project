@@ -16,3 +16,6 @@ export const VALID_CATEGORIES = [
 ]
 
 export const EVENT_PATH = "/api/event";
+
+export const COMMENT_EXCHANGE = 'comments_exchange';
+export const COMMENT_QUEUE = 'comments_queue';

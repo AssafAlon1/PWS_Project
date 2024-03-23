@@ -39,7 +39,6 @@ export const getComment = async (req: Request, res: Response) => {
 };
 
 export const createComment = async (req: Request, res: Response) => {
-  console.log("Creating comment");
   try {
     const publisherChannel: PublisherChannel = req.publisherChannel;
     const commentData = req.body as ICSComment;
@@ -52,7 +51,6 @@ export const createComment = async (req: Request, res: Response) => {
     }
 
     const insertResult = await insertComment(value);
-    console.log("Comment inserted!");
 
     if (insertResult == StatusCodes.BAD_REQUEST) {
       throw Error("Bad Request.")
@@ -62,12 +60,9 @@ export const createComment = async (req: Request, res: Response) => {
       res.status(StatusCodes.INTERNAL_SERVER_ERROR).send("Internal server error");
       return;
     }
-    // Publish the event to the WORLD
-    console.log("About to publish... WISH ME LUCK!");
-    await publisherChannel.sendEvent(commentData.eventId);
-    console.log(" @@ Published +Comment on event " + commentData.eventId);
 
-    // Let the client know the event was created
+    await publisherChannel.sendEvent(commentData.eventId);
+
     res.status(StatusCodes.CREATED).send({ _id: insertResult });
   }
   catch (error) {

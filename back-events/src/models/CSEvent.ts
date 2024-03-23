@@ -19,6 +19,7 @@ const mongooseEventSchema = new mongoose.Schema({
       price: { type: Number, required: true }
     }], required: true
   },
+  comment_count: { type: Number, required: false, default: 0 },
   image: { type: String, required: false },
 }, { versionKey: false });
 
@@ -41,7 +42,8 @@ export const eventSchema = Joi.object({
   }),
   location: Joi.string(),
   tickets: Joi.array().items(ticketSchema).min(1),
-  image: Joi.string().optional(), // By Piazza @94, no need to verify link.
+  comment_count: Joi.number().integer().min(0).optional(),
+  image: Joi.string().optional(),
 });
 
 export type ICSEvent = InferSchemaType<typeof mongooseEventSchema>;

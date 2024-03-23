@@ -40,3 +40,7 @@ export const deleteEventByID = async (id: string): Promise<void> => {
 export const updateEventByID = async (eventId: string, event: ICSEvent): Promise<void> => {
   await CSEvent.findByIdAndUpdate(eventId, event).exec();
 }
+
+export const plusCommentCount = async (eventId: string): Promise<void> => {
+  await CSEvent.findByIdAndUpdate(eventId, { $inc: { comment_count: 1 } }).exec();
+}

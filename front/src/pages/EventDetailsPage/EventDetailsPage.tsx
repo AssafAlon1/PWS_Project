@@ -5,23 +5,19 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Button, Card, Placeholder } from 'react-bootstrap';
 
 import MissingImage from "../../assets/MissingImage.png"
-import { CSEvent, Comment, PurchaseDetails, Ticket } from '../../types';
+import { CSEvent, PurchaseDetails, Ticket } from '../../types';
 import { getFormattedDate, getFormattedTime } from '../../utils/formatting';
 import ButtonWithTooltip from '../../components/ButtonWithTooltip/ButtonWithTooltip';
 import { usePurchaseDetails } from '../../components/PurchaseDetailsContext/PurchaseDetailsContext';
-import AddCommentForm from '../../components/AddCommentForm/AddCommentForm';
-import CommentApi from '../../api/comment';
-import CommentComponent from '../../components/CommentComponent/CommentComponent';
 import EventApi from '../../api/event';
 import TicketApi from '../../api/ticket';
 import { ThreeSpanningSpinners } from '../../components/SpinnerComponent/SpinnerComponent';
+import CommentsComponent from '../../components/CommentsComponent/CommentsComponent';
 
 // TODO - extract some components to other files?
 const EventDetails: React.FC = () => {
     const [event, setEvent] = useState<CSEvent | null>(null);
     const [tickets, setTickets] = useState<Ticket[] | null>(null);
-    const [comments, setComments] = useState<Comment[] | null>(null);
-    const [failedFetchingComments, setFailedFetchingComments] = useState<boolean>(false);
 
     // > Note about the failedFetchingComments state ^^^
     // > The tickets don't have a similar state because we can tell that the fetch failed if we
@@ -76,34 +72,10 @@ const EventDetails: React.FC = () => {
         setTickets(fetchedTickets);
     }
 
-    const updateComments = async () => {
-        if (!eventId) {
-            // I believe it should be impossible to get here, but just in case...
-            return navigate("/");
-        }
-        setComments(null);
-        setFailedFetchingComments(false);
-        let fetchedComments: Comment[];
-        try {
-            fetchedComments = await CommentApi.fetchComments(eventId) ?? [];
-            if (!fetchedComments) {
-                throw new Error(`Failed to fetch comments for event ${eventId}`);
-            }
-        }
-        catch (err) {
-            // TODO - Tone it down with all the try,catch,throw (just handle it in fetchComments and check for response value)
-            console.error(err);
-            console.error(`Failed to fetch comments for event ${eventId}`);
-            setFailedFetchingComments(true);
-            fetchedComments = [];
-        }
-        setComments(fetchedComments);
-    }
 
     useEffect(() => {
         updateEvent();
         updateTickets(); // TODO - separate this? How harsh do we want to be?
-        updateComments(); // TODO - separate this? How harsh do we want to be?
     }, [eventId]);
 
     const TitleComponent = () => {
@@ -266,53 +238,15 @@ const EventDetails: React.FC = () => {
         );
     }
 
-    const CommentsComponent = () => {
-        let body;
-        if (failedFetchingComments) {
-            body = <Card.Body>
-                <Card.Text>Failed fetching comments information</Card.Text>
-                <Button variant="light" onClick={updateComments}>Retry</Button>
-
-            </Card.Body>
-        } else if (comments === null) {
-            body = <Card.Body>
-                <Card.Text><ThreeSpanningSpinners /></Card.Text>
-            </Card.Body>
-        } else if (comments.length === 0) {
-            return <Card.Body>
-                <AddCommentForm eventId={eventId ?? ""} updateComments={updateComments} />
-                <hr />
-                <Card.Subtitle>Be the first to comment!</Card.Subtitle>
-            </Card.Body>
-        } else {
-            body = <Card.Body>
-                <AddCommentForm eventId={eventId ?? ""} updateComments={updateComments} />
-                <hr />
-                {comments.map((comment, index) => {
-                    return <CommentComponent key={index} comment={comment} />
-                })}
-            </Card.Body>;
-        }
-
-        return (
-            <Card>
-                <Card.Header>
-                    <Card.Title>
-                        Comments:
-                    </Card.Title>
-                    {/* TODO !!!!!! - Remove this when back office goes live */}
-                    <Card.Subtitle>(Total comments: {event?.comment_count})</Card.Subtitle>
-                </Card.Header>
-                {body}
-            </Card>
-        );
-    }
 
     return (
         <>
             <MainInformationComponent />
             <BuyTicketsComponent />
-            <CommentsComponent />
+            <CommentsComponent
+                comment_count={event?.comment_count ?? 0}
+                eventId={eventId}
+            />
         </>
 
     );

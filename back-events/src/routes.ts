@@ -22,7 +22,7 @@ export const getUpcomingEvents = async (req: Request, res: Response) => {
 }
 
 export const getEventById = async (req: Request, res: Response) => {
-  const id = new URL(req.url, `http://${req.headers.host}`).pathname.split("/").pop();
+  const id = req.params.eventId;
   // If the provided ID is not a valid mongoDB identifier, it cannot be in the DB (saves a query).
   if (!mongoose.Types.ObjectId.isValid(id)) {
     res.status(404).send({ message: "Event not found." });

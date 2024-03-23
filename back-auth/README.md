@@ -1,6 +1,6 @@
 # Backend microservice - Authentication, Authorization, API Gateway
 
-# Authors
+## Authors
 | Name           | ID        |
 | -------------- | --------- |
 | Alina Broitman | 321934275 |

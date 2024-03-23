@@ -1,4 +1,3 @@
-
 import express from 'express';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
@@ -26,8 +25,8 @@ if (!dbUri) {
   process.exit(1);
 }
 /* ========== */
+mongoose.set('strictQuery', true);
 await mongoose.connect(dbUri);
-
 const app = express();
 
 app.use(express.json());

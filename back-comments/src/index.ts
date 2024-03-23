@@ -1,40 +1,45 @@
-import { createServer, IncomingMessage, ServerResponse } from "http";
-import * as mongoose from "mongoose";
-import * as dotenv from "dotenv";
-// import with .js, and not ts.
-// for more info: https://devblogs.microsoft.com/typescript/announcing-typescript-4-7/#type-in-package-json-and-new-extensions
-import { createRoute, createComment, getComment, mainRoute } from "./routes.js";
-import { GET_COMMENT, POST_COMMENT } from "./const.js";
 
-// For environment-variables
+import express from 'express';
+import mongoose from 'mongoose';
+import dotenv from 'dotenv';
+import cookieParser from 'cookie-parser';
+import cors from 'cors';
+
+import { createComment, getComment } from "./routes.js";
+import { COMMENT_PATH } from "./const.js";
+
 dotenv.config();
-
+const dbUri = process.env.DB_CONNECTION_STRING;
 const port = process.env.PORT || 3000;
 
-// Connect to mongoDB
 
-/* Replaced with my connection string and add your DBPASS to a .env file */
-// const dbURI = `mongodb+srv://wsp:${process.env.DBPASS}@cluster0.fn26nur.mongodb.net/?retryWrites=true&w=majority`;
-const dbURI = `mongodb+srv://Abro:${process.env.DBPASS}@abrocluster.rq4spkc.mongodb.net/?retryWrites=true&w=majority`;
+
+if (!dbUri) {
+  console.error('Missing MongoDB URI');
+  process.exit(1);
+}
 /* ========== */
+mongoose.set('strictQuery', true);
+await mongoose.connect(dbUri);
 
-await mongoose.connect(dbURI);
+const app = express();
 
-const server = createServer((req: IncomingMessage, res: ServerResponse) => {
-  const route = createRoute(req.url, req.method);
+app.use(express.json());
+app.use(cookieParser());
 
-  switch (route) {
-    case POST_COMMENT:
-      createComment(req, res);
-      break;
-    case route.match(`^${GET_COMMENT}`)?.input:
-      getComment(req, res);
-      break;
-    default:
-      mainRoute(req, res);
-      break;
-  }
+let origin = process.env.ORIGIN;
+app.use(cors({
+  origin: origin,
+  methods: ['GET', 'POST'],
+  credentials: true,  // Frontend needs to send cookies with requests
+}));
+
+
+app.get(`${COMMENT_PATH}/:eventId`, getComment);
+
+app.post(COMMENT_PATH, createComment);
+
+app.listen(port, () => {
+  console.log(`Server running! port ${port}`);
+  console.log("ORIGIN: " + origin);
 });
-
-server.listen(port);
-console.log(`Server running! port ${port}`);

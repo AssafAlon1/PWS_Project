@@ -17,7 +17,7 @@ import TicketApi from '../../api/ticket';
 import { ThreeSpanningSpinners } from '../../components/SpinnerComponent/SpinnerComponent';
 
 // TODO - extract some components to other files?
-const EventDetails: React.FC<{}> = () => {
+const EventDetails: React.FC = () => {
     const [event, setEvent] = useState<CSEvent | null>(null);
     const [tickets, setTickets] = useState<Ticket[] | null>(null);
     const [comments, setComments] = useState<Comment[] | null>(null);

@@ -1,12 +1,12 @@
-# Stolen from PWS_HW3
+# Backend microservice - Events API
 Stolen from Programming Web Systems HW3. 
 
+## Authors
 | Name           | ID        |
 | -------------- | --------- |
 | Alina Broitman | 321934275 |
 | Assaf Alon     | 207376807 |
 
-# Backend microservice - Authentication, Authorization, API Gateway
 
 ## Introduction
 

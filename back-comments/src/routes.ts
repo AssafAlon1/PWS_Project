@@ -6,6 +6,7 @@ import { StatusCodes } from "http-status-codes";
 
 
 export const getComment = async (req: Request, res: Response) => {
+  console.log("GET /comments/:eventId");
   const event_id = req.params.eventId;
   
   let dbRes;

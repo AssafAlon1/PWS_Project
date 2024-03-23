@@ -55,14 +55,23 @@ app.post(SIGNUP_PATH, signupRoute);
 
 app.get(USERNAME_PATH, usernameRoute);
 
-// PROXIES
+// Events Microservice
 const eventProxy = createProxyMiddleware({
     target: EVENT_API_URL,
     changeOrigin: true, // TODO - What is this?
 });
 app.use('/api/event', isAuthorized, eventProxy);
 
+// Comments Microservice
+const commentProxy = createProxyMiddleware({
+    target: EVENT_API_URL,
+    changeOrigin: true, // TODO - What is this?
+});
+app.use('/api/comment', isAuthorized, commentProxy);
+
 app.listen(port, () => {
     console.log(`Server running! port ${port}`);
     console.log("ORIGIN: " + origin);
 });
+
+

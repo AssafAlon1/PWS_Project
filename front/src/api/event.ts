@@ -1,6 +1,4 @@
 import axios, { isAxiosError } from "axios";
-import { APIStatus } from "../types";
-import { MAX_EVENTS_IN_PAGE } from "../const";
 import { CSEvent } from "../types";
 import { API_GATEWAY_URL } from "../const";
 // import { getUserEventIds } from "./userAction";

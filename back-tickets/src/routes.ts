@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 import { Request, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
 
-import { insertTicket, queryAllTicketsByEventID, queryAvailableTicketsByEventID } from "./db.js";
+import { insertTicket, queryAllTicketsByEventID, queryAvailableTicketsByEventID, queryTicketByName, updateTicket } from "./db.js";
 import { ICSTicket, ticketSchema } from "./models/CSTicket.js";
 import { MAX_TICKET_LIMIT } from "./const.js";
 
@@ -42,6 +42,22 @@ export const getAvailableTicketsByEventId = async (req: Request, res: Response) 
     res.status(StatusCodes.OK).send(data);
 }
 
+export const getTicketByName = async (req: Request, res: Response) => {
+    console.log("GET /api/ticket");
+    const eventId = req.params.eventId;
+    const ticketName = req.params.ticketName;
+    let data;
+    try {
+        data = await queryTicketByName(eventId, ticketName);
+    }
+    catch (error) {
+        res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({ message: "Internal Server Error" });
+        return;
+    }
+    res.status(StatusCodes.OK).send(data);
+}
+    
+
 export const createTicket = async (req: Request, res: Response) => {
     try {
         const postData = req.body as ICSTicket;
@@ -76,9 +92,37 @@ export const createTicket = async (req: Request, res: Response) => {
 }
 
 export const purchaseTicket = async (req: Request, res: Response) => {
-    // TODO - implement
-    // TODO - check the tickets are available
     console.log("PUT /api/ticket");
-    // const putData = req.body as { ticket_id: string, amount: number, username: string };
+    try {
+        // TODO - check the tickets are available
+        console.log("PUT /api/ticket");
+        const putData = req.body as ICSTicket;
+        const ticketId = req.params.ticketId;
+
+        // Validate the ticket data
+        const { value, error } = ticketSchema.validate(putData, { abortEarly: false, allowUnknown: true, presence: 'required' });
+        if (error) {
+            console.error("Ticket schema validation failed");
+            throw Error("Bad Request.");
+        }
+
+        const insertResult = await updateTicket(ticketId, putData);
+
+        if (insertResult == StatusCodes.BAD_REQUEST) {
+        console.error("Failed updating ticket in DB");
+        throw Error("Bad Request.")
+        }
+
+        if (insertResult == StatusCodes.INTERNAL_SERVER_ERROR) {
+        console.error("Failed inserting comment to DB");
+        res.status(StatusCodes.INTERNAL_SERVER_ERROR).send("Internal server error");
+        return;
+        }
+    } catch (error) {
+        console.error("Encountered error while purchasing ticket: ", error);
+        res.status(StatusCodes.BAD_REQUEST).send({ message: "Bad Request." });
+        return;
+    }
+
     res.status(StatusCodes.OK).send({ message: "Ticket purchased" });
 }

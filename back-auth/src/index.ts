@@ -46,7 +46,7 @@ app.use(cookieParser());
 let origin = process.env.ORIGIN;
 app.use(cors({
     origin: origin,
-    methods: ['GET', 'POST'],
+    methods: ['GET', 'POST', 'PUT'],
     credentials: true,  // Frontend needs to send cookies with requests
 }));
 /* ========== */

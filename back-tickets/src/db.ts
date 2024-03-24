@@ -19,6 +19,24 @@ export const insertTicket = async (ticketData: ICSTicket): Promise<string | numb
   }
 }
 
+export const updateTicket = async (ticketId: String, ticketData: ICSTicket): Promise<number> => {
+  console.log("updateTicket for ticketData: ", ticketData);
+  try {
+    const ticket = await CSTicket.findById(ticketId).exec;
+    console.log("Found ticket: ", ticket);
+    if (!ticket) {
+      return StatusCodes.NOT_FOUND;
+    }
+    console.log("About to update ticket");
+    await CSTicket.updateOne({ _id: ticketId }, ticketData).exec();
+    console.log("Updated ticket");
+    return StatusCodes.OK;
+  }
+  catch (err) {
+    return StatusCodes.INTERNAL_SERVER_ERROR;
+  }
+}
+
 export const queryAllTicketsByEventID = async (eventId: string, skip: number, limit: number): Promise<ICSTicket[]> => {
   console.log("queryAllTicketsByEventID for eventId: ", eventId);
   const tickets = await CSTicket.find({ eventId: eventId }).skip(skip).limit(limit).exec();
@@ -30,5 +48,12 @@ export const queryAvailableTicketsByEventID = async (eventId: string, skip: numb
   console.log("queryAvailableTicketsByEventID for eventId: ", eventId);
   const tickets = await CSTicket.find({ eventId: eventId, quantity: { $gt: 0 } }).skip(skip).limit(limit).exec();
   console.log("Got tickets: ", tickets);
-    return tickets.map(ticket => ticket.toJSON() as ICSTicket);
+  return tickets.map(ticket => ticket.toJSON() as ICSTicket);
+}
+
+export const queryTicketByName = async (eventId: string, ticketName: string): Promise<ICSTicket | null> => {
+  console.log("queryTicketByName for eventId: ", eventId, " and ticketName: ", ticketName);
+  const ticket = await CSTicket.findOne({ eventId: eventId, name: ticketName }).exec();
+  console.log("Got ticket: ", ticket);
+  return ticket ? ticket.toJSON() as ICSTicket : null;
 }

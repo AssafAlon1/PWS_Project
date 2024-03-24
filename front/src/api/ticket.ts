@@ -1,6 +1,6 @@
 import axios, { isAxiosError } from "axios";
 
-import { Ticket } from "../types";
+import { APIStatus, Ticket } from "../types";
 import { API_GATEWAY_URL } from "../const";
 
 const axiosInstance = axios.create({ withCredentials: true, baseURL: API_GATEWAY_URL }); // TODO - withCredentials?
@@ -26,8 +26,40 @@ const RealTicketApi = {
             throw new Error("Failed to fetch tickets"); // TODO - Better handling?
         }
     },
-    purchaseTickets: async (eventId: string, ticketName: string, amount: number, username: string): Promise<string> => {
-        return "1234";
+    purchaseTickets: async (eventId: string, ticketName: string, amount: number, username: string) => {
+        // TODO - implement lock!
+        try {
+            // Get relevant ticket
+            const ticket = (await axiosInstance.get(`api/ticket/${eventId}/${ticketName}`)).data;
+            if (!ticket) { //shouldn't get here
+                console.log("Ticket not found");
+                throw new Error("Ticket not found");
+            }
+            if (ticket.quantity < amount) { // check we still have that amount of tickets left
+                console.log("Not enough tickets available");
+                throw new Error("Not enough tickets available");
+            }
+            console.log("Ticket found: ", ticket);
+            // Create new ticket with updated quantity
+            const updatedTicket = { 
+                eventId: eventId, 
+                name: ticketName, 
+                quantity: ticket.quantity - amount,
+                price: ticket.price
+            };
+            console.log("About to purchase tickets");
+            await axiosInstance.put(`/api/ticket/${ticket._id}`, updatedTicket);
+            console.log("Completed purchase");
+            return APIStatus.Success;
+
+        } catch (error) {
+            if (isAxiosError(error)) {
+                throw new Error("Failed to purchase tickets: " + error.response?.data.message); // TODO - Better handling?
+            }
+            throw new Error("Failed to purchase tickets"); // TODO - Better handling?
+        
+        }
+        // return "1234";
     },
 }
 

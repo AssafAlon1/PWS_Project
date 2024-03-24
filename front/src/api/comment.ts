@@ -29,7 +29,6 @@ const RealCommentApi = {
         try {
             const response = await axiosInstance.get(`/api/comment/${eventId}`, {
                 params: {
-                    // eventId, // TODO - event ID id not a param.... its part of the path!
                     skip,
                     limit
                 }

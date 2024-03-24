@@ -1,8 +1,9 @@
+import mongoose from "mongoose";
 import { Request, Response } from 'express';
+import { StatusCodes } from 'http-status-codes';
+
 import { deleteEventByID, insertEvent, queryEventByID, queryUpcomingEvents, updateEventByID } from "./db.js";
 import { ICSEvent, eventSchema } from "./models/CSEvent.js";
-import mongoose from "mongoose";
-import { StatusCodes } from 'http-status-codes';
 
 export const getUpcomingEvents = async (req: Request, res: Response) => {
   console.log("GET /api/event");

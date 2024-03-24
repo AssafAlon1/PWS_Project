@@ -18,6 +18,7 @@ import {
     LOGIN_PATH,
     LOGOUT_PATH,
     SIGNUP_PATH,
+    TICKET_API_URL,
     USERNAME_PATH, // TODO - remove?
 } from './const.js';
 import { isAuthorized } from './auths.js';
@@ -65,6 +66,14 @@ const commentProxy = createProxyMiddleware({
     changeOrigin: true, // TODO - What is this?
 });
 app.use('/api/comment', isAuthorized, commentProxy);
+
+// Ticket Microservice
+const ticketProxy = createProxyMiddleware({
+    target: TICKET_API_URL,
+    onProxyReq: fixRequestBody,
+    changeOrigin: true, // TODO - What is this?
+});
+app.use('/api/ticket', isAuthorized, ticketProxy);
 
 
 

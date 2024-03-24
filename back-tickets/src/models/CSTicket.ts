@@ -10,6 +10,7 @@ const mongooseTicketSchema = new mongoose.Schema({
 });
 
 export const ticketSchema = Joi.object({
+    event_id: Joi.string().required(),
     name: Joi.string().required(),
     quantity: Joi.number().integer().min(0).required(),
     price: Joi.number().min(0).required(),

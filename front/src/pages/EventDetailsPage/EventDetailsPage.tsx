@@ -61,7 +61,7 @@ const EventDetails: React.FC = () => {
         setTickets(null);
         let fetchedTickets: Ticket[];
         try {
-            fetchedTickets = await TicketApi.fetchTickets(eventId) ?? [];
+            fetchedTickets = await TicketApi.fetchAvailableTickets(eventId) ?? [];
             if (!fetchedTickets) {
                 throw new Error(`Failed to fetch tickets for event ${eventId}`);
             }

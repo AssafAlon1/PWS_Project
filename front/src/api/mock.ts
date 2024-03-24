@@ -191,7 +191,7 @@ export const MockTicketApi = {
             quantity: 0,
         },
     ],
-    fetchTickets: async (eventId: string): Promise<Ticket[] | null> => {
+    fetchAvailableTickets: async (eventId: string): Promise<Ticket[] | null> => {
         // TODO - implement
         await new Promise(resolve => setTimeout(resolve, 500));
         if (getRandomInt(10) === 0) {

@@ -222,7 +222,7 @@ const EventDetails: React.FC = () => {
             </Card.Body>
         } else {
             bodyContent = tickets.map((ticket, index) => {
-                return <BuyTicketComponent key={index} name={ticket.name} price={ticket.price} amountLeft={ticket.quantity} />
+                return <BuyTicketComponent key={index} name={ticket.name} price={ticket.price} amountLeft={ticket.available} />
             });
         }
 

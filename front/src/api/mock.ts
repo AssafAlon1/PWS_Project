@@ -138,7 +138,6 @@ export const MockCommentApi = {
     ],
 
     postComment: async (username: string, eventId: string, comment: string) => {
-        // TODO - implement this
         await new Promise(resolve => setTimeout(resolve, 500));
         if (getRandomInt(2) === 0) {
             throw new Error("Force error for testing purposes.");
@@ -154,7 +153,6 @@ export const MockCommentApi = {
     },
 
     fetchComments: async (eventId: string): Promise<Comment[]> => {
-        // TODO - implement
         await new Promise(resolve => setTimeout(resolve, 500));
         if (getRandomInt(10) === 0) {
             throw new Error("Force error for testing purposes.");
@@ -192,7 +190,6 @@ export const MockTicketApi = {
         },
     ],
     fetchAvailableTickets: async (eventId: string): Promise<Ticket[] | null> => {
-        // TODO - implement
         await new Promise(resolve => setTimeout(resolve, 500));
         if (getRandomInt(10) === 0) {
             throw new Error("Force error for testing purposes.");
@@ -200,13 +197,12 @@ export const MockTicketApi = {
         return MockTicketApi.allTickets.filter(ticket => ticket.eventId === eventId);
     },
     purchaseTickets: async (eventId: string, ticketName: string, amount: number, username: string): Promise<string> => {
-        // TODO - implement
         await new Promise(resolve => setTimeout(resolve, 1000));
         if (getRandomInt(3) === 0) {
             throw new Error("Force error for testing purposes.");
         }
 
-        const purchaseId = "1"; // TODO - DO THE ACTUAL PURCHASE AGAINST THE HAMMER HEAD API
+        const purchaseId = "1"; 
 
         registerUserAction(username, "purchase", eventId, purchaseId, ticketName, amount);
         return purchaseId;

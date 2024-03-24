@@ -19,16 +19,10 @@ export const insertTicket = async (ticketData: ICSTicket): Promise<string | numb
   }
 }
 
-export const updateTicket = async (ticketId: String, ticketData: ICSTicket): Promise<number> => {
+export const updateTicket = async (ticketData: ICSTicket): Promise<number> => {
   console.log("updateTicket for ticketData: ", ticketData);
   try {
-    const ticket = await CSTicket.findById(ticketId).exec;
-    console.log("Found ticket: ", ticket);
-    if (!ticket) {
-      return StatusCodes.NOT_FOUND;
-    }
-    console.log("About to update ticket");
-    await CSTicket.updateOne({ _id: ticketId }, ticketData).exec();
+    await CSTicket.updateOne({ _id: ticketData._id }, ticketData).exec();
     console.log("Updated ticket");
     return StatusCodes.OK;
   }

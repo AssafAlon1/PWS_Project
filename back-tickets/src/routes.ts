@@ -56,11 +56,11 @@ export const getTicketByName = async (req: Request, res: Response) => {
     }
     res.status(StatusCodes.OK).send(data);
 }
-    
 
 export const createTicket = async (req: Request, res: Response) => {
     try {
         const postData = req.body as ICSTicket;
+        postData.available = postData.total; // Added
 
         if (postData._id) {
             throw Error("_id is an automatically generated field.");
@@ -94,19 +94,36 @@ export const createTicket = async (req: Request, res: Response) => {
 export const purchaseTicket = async (req: Request, res: Response) => {
     console.log("PUT /api/ticket");
     try {
-        // TODO - check the tickets are available
-        console.log("PUT /api/ticket");
-        const putData = req.body as ICSTicket;
-        const ticketId = req.params.ticketId;
+        const putData = req.body as { eventId: string, ticketName: string, amount: number };
+
+        // Get the wanted ticket
+        const ticket = await queryTicketByName(putData.eventId, putData.ticketName);
+        if (!ticket) { // Shouldn't get here
+            throw Error("Ticket not found.");
+        }
+        // TODO - Make sure we have enough tickets to sell or that they are reseved in the locked array for the user!
+        if (ticket.available < putData.amount) { 
+            throw Error("Not enough tickets available.");
+        }
+
+        // Create updated ticket
+        const updatedTicket = {
+            _id: ticket._id,
+            eventId: putData.eventId,
+            name: putData.ticketName,
+            available: ticket.available - putData.amount,
+            total: ticket.total,
+            price: ticket.price
+        };
 
         // Validate the ticket data
-        const { value, error } = ticketSchema.validate(putData, { abortEarly: false, allowUnknown: true, presence: 'required' });
+        const { value, error } = ticketSchema.validate(updatedTicket, { abortEarly: false, allowUnknown: true, presence: 'required' });
         if (error) {
             console.error("Ticket schema validation failed");
             throw Error("Bad Request.");
         }
 
-        const insertResult = await updateTicket(ticketId, putData);
+        const insertResult = await updateTicket(updatedTicket);
 
         if (insertResult == StatusCodes.BAD_REQUEST) {
         console.error("Failed updating ticket in DB");

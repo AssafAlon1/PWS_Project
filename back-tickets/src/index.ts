@@ -42,7 +42,7 @@ app.get(`${Ticket_PATH}/:eventId/:ticketName`, getTicketByName);
 
 app.post(`${Ticket_PATH}/:eventId`, createTicket);
 
-app.put(`${Ticket_PATH}/:ticketId`, purchaseTicket);
+app.put(Ticket_PATH, purchaseTicket);
 
 
 app.listen(port, () => {

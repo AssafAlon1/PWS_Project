@@ -69,7 +69,6 @@ const CommentsComponent: React.FC<CommentsComponentProps> = ({ eventId, comment_
             }
             setComments(prevComments => [...prevComments ?? [], ...newComments]);
         } catch {
-            // TODO - Display alert instead of redirecting
             setDisplayError(true);
             setHasMore(false);
         }

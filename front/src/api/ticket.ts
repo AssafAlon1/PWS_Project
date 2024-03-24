@@ -29,26 +29,8 @@ const RealTicketApi = {
     purchaseTickets: async (eventId: string, ticketName: string, amount: number, username: string) => {
         // TODO - implement lock!
         try {
-            // Get relevant ticket
-            const ticket = (await axiosInstance.get(`api/ticket/${eventId}/${ticketName}`)).data;
-            if (!ticket) { //shouldn't get here
-                console.log("Ticket not found");
-                throw new Error("Ticket not found");
-            }
-            if (ticket.quantity < amount) { // check we still have that amount of tickets left
-                console.log("Not enough tickets available");
-                throw new Error("Not enough tickets available");
-            }
-            console.log("Ticket found: ", ticket);
-            // Create new ticket with updated quantity
-            const updatedTicket = { 
-                eventId: eventId, 
-                name: ticketName, 
-                quantity: ticket.quantity - amount,
-                price: ticket.price
-            };
-            console.log("About to purchase tickets");
-            await axiosInstance.put(`/api/ticket/${ticket._id}`, updatedTicket);
+            // TODO - Make sure we have enough tickets to sell or that they are reseved in the locked array for the user!
+            await axiosInstance.put('/api/ticket', {eventId, ticketName, amount /*, username */});
             console.log("Completed purchase");
             return APIStatus.Success;
 

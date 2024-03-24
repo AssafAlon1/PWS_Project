@@ -20,11 +20,15 @@ export const insertTicket = async (ticketData: ICSTicket): Promise<string | numb
 }
 
 export const queryAllTicketsByEventID = async (eventId: string, skip: number, limit: number): Promise<ICSTicket[]> => {
-    const tickets = await CSTicket.find({ event_id: eventId }).skip(skip).limit(limit).exec();
-    return tickets.map(ticket => ticket.toJSON() as ICSTicket);
+  console.log("queryAllTicketsByEventID for eventId: ", eventId);
+  const tickets = await CSTicket.find({ eventId: eventId }).skip(skip).limit(limit).exec();
+  console.log("Got tickets: ", tickets);
+  return tickets.map(ticket => ticket.toJSON() as ICSTicket);
 }
 
 export const queryAvailableTicketsByEventID = async (eventId: string, skip: number, limit: number): Promise<ICSTicket[]> => {
-    const tickets = await CSTicket.find({ event_id: eventId, quantity: { $gt: 0 } }).skip(skip).limit(limit).exec();
+  console.log("queryAvailableTicketsByEventID for eventId: ", eventId);
+  const tickets = await CSTicket.find({ eventId: eventId, quantity: { $gt: 0 } }).skip(skip).limit(limit).exec();
+  console.log("Got tickets: ", tickets);
     return tickets.map(ticket => ticket.toJSON() as ICSTicket);
 }

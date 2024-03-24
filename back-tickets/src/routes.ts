@@ -13,7 +13,9 @@ export const getALLTicketsByEventId = async (req: Request, res: Response) => {
     const limit = parseInt(req.query.limit as string) || MAX_TICKET_LIMIT; 
     let data;
     try {
+        console.log("Gonna fetch tickets for eventId: ", eventId);
         data = await queryAllTicketsByEventID(eventId, skip, limit);
+        console.log("Got data: ", data);
     }
     catch (error) {
         res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({ message: "Internal Server Error" });
@@ -71,4 +73,12 @@ export const createTicket = async (req: Request, res: Response) => {
     catch (error) {
         res.status(StatusCodes.BAD_REQUEST).send({ message: "Bad Request." });
     }
+}
+
+export const purchaseTicket = async (req: Request, res: Response) => {
+    // TODO - implement
+    // TODO - check the tickets are available
+    console.log("PUT /api/ticket");
+    // const putData = req.body as { ticket_id: string, amount: number, username: string };
+    res.status(StatusCodes.OK).send({ message: "Ticket purchased" });
 }

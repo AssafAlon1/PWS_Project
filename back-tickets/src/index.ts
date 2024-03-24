@@ -5,7 +5,7 @@ import cookieParser from 'cookie-parser';
 import cors from 'cors';
 
 import { ALL_Ticket_PATH, Ticket_PATH } from './const.js';
-import { insertTicket, queryAllTicketsByEventID, queryAvailableTicketsByEventID } from './db.js';
+import { createTicket, getALLTicketsByEventId, getAvailableTicketsByEventId, purchaseTicket } from './routes.js';
 
 dotenv.config();
 const dbUri = process.env.DB_CONNECTION_STRING;
@@ -30,15 +30,17 @@ app.use(cookieParser());
 let origin = process.env.ORIGIN;
 app.use(cors({
   origin: origin,
-  methods: ['GET', 'POST'],
+  methods: ['GET', 'POST', 'PUT'],
   credentials: true,  // Frontend needs to send cookies with requests
 }));
 
 // TODO - add routes
-app.get(`${ALL_Ticket_PATH}/:eventID`, queryAllTicketsByEventID);
-app.get(`${Ticket_PATH}/:eventID`, queryAvailableTicketsByEventID);
+app.get(`${ALL_Ticket_PATH}/:eventId`, getALLTicketsByEventId);
+app.get(`${Ticket_PATH}/:eventId`, getAvailableTicketsByEventId);
 
-app.post(`${Ticket_PATH}/:eventID`, insertTicket);
+app.post(`${Ticket_PATH}/:eventId`, createTicket);
+
+app.put(`${Ticket_PATH}/:ticketId`, purchaseTicket);
 
 
 app.listen(port, () => {

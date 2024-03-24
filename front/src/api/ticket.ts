@@ -9,6 +9,7 @@ const axiosInstance = axios.create({ withCredentials: true, baseURL: API_GATEWAY
 const RealTicketApi = {
 
     fetchAvailableTickets: async (eventId: string, skip?: number, limit?: number): Promise<Ticket[] | null> => {
+        console.log("fetchAvailableTickets for eventID: ", eventId);
         try {
             const response = await axiosInstance.get(`api/ticket/${eventId}`, {
                 params: {
@@ -16,6 +17,7 @@ const RealTicketApi = {
                     limit
                 }
             });
+            console.log("Got tickets: ", response.data);
             return response.data;
         } catch (error) {  
             if (isAxiosError(error)) {

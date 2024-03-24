@@ -31,8 +31,9 @@ Base was stolen from HW3, which had a skeleton provided by the wonderful course 
 Supported API endpoints:
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| GET    | /api/ticket/{id}[?limit={limit}&skip={skip}] | Gets available tickets for the specified event. |
-| GET    | /api/ticket/all/{id}[?limit={limit}&skip={skip}] | Gets unfiltered tickets for the specified event. (only for authorized users in BO) |
-| POST   | /api/ticket/{id} | Add tickets to the specified event. (only for authorized users in BO) |
+| GET    | /api/ticket/{event_id}[?limit={limit}&skip={skip}] | Gets available tickets for the specified event. |
+| GET    | /api/ticket/all/{event_id}[?limit={limit}&skip={skip}] | Gets unfiltered tickets for the specified event. (only for authorized users in BO) |
+| PUT    | /api/ticket/{id}[?limit={limit}&skip={skip}] | Updates the amount of tickets available for the specified ticket. |
+| POST   | /api/ticket/{event_id} | Add tickets to the specified event. (only for authorized users in BO) |
 
 **THIS API ISN'T FINAL. WE ARE INDECISIVE**

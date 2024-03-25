@@ -29,8 +29,8 @@ const EventDetails: React.FC<{ event: CSEvent }> = ({ event }) => {
                 <img src={event.image ?? MissingImage} className="card-img" />
                 <Card.Text>{formattedDate}</Card.Text>
                 <Card.Text>{event.category}</Card.Text>
-                <Card.Text>From 50$</Card.Text>
-                <Card.Text>1000 tickets available</Card.Text>
+                <Card.Text>From {event.cheapest_ticket_price}$</Card.Text>
+                <Card.Text>{event.total_available_tickets} tickets available</Card.Text>
                 <Button variant="primary" onClick={() => navigate("/events/" + event._id)}>Purchase Tickets</Button>
             </Card.Body>
         </Card>

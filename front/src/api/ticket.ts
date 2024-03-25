@@ -11,7 +11,7 @@ const RealTicketApi = {
     fetchAvailableTickets: async (eventId: string, skip?: number, limit?: number): Promise<Ticket[] | null> => {
         console.log("fetchAvailableTickets for eventID: ", eventId);
         try {
-            const response = await axiosInstance.get(`api/ticket/${eventId}`, {
+            const response = await axiosInstance.get(`/api/ticket/all/${eventId}`, { // Updated to fetch all tickets for an event
                 params: {
                     skip,
                     limit

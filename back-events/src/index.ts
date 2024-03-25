@@ -8,7 +8,8 @@ import {
   getEventById,
   createEvent,
   updateEvent,
-  getUpcomingEvents
+  getUpcomingEvents,
+  getUpcomingAvailableEvents
 } from "./routes.js";
 
 import {
@@ -43,7 +44,8 @@ app.use(cors({
 }));
 
 
-app.get(EVENT_PATH, getUpcomingEvents);
+app.get(EVENT_PATH, getUpcomingAvailableEvents); // Added for the frontend - only fetch events with available tickets
+app.get(`${EVENT_PATH}/all`, getUpcomingEvents); // chenged path for BO use
 app.get(`${EVENT_PATH}/:eventId`, getEventById);
 
 app.post(EVENT_PATH, createEvent);

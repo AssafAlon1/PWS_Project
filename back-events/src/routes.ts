@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 import { Request, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
 
-import { deleteEventByID, insertEvent, queryEventByID, queryUpcomingEvents, updateEventByID } from "./db.js";
+import { deleteEventByID, insertEvent, queryEventByID, queryUpcomingAvailableEvents, queryUpcomingEvents, updateEventByID } from "./db.js";
 import { ICSEvent, eventSchema } from "./models/CSEvent.js";
 
 export const getUpcomingEvents = async (req: Request, res: Response) => {
@@ -18,6 +18,22 @@ export const getUpcomingEvents = async (req: Request, res: Response) => {
     return;
   }
   
+  res.status(StatusCodes.OK).send(data);
+}
+
+export const getUpcomingAvailableEvents = async (req: Request, res: Response) => {
+  console.log("GET /api/event");
+  const skip = parseInt(req.query.skip as string) || 0;
+  const limit = parseInt(req.query.limit as string) || 50;
+  let data;
+  try {
+    data = await queryUpcomingAvailableEvents(skip, limit);
+  }
+  catch (error) {
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({ message: "Internal Server Error" });
+    return;
+  }
+
   res.status(StatusCodes.OK).send(data);
 }
 
@@ -80,7 +96,7 @@ export const createEvent = async (req: Request, res: Response) => {
 };
 
 export const updateEvent = async (req: Request, res: Response) => {
-  // TODO - UPDATE THIS FOR PROJECT REQUIREMENTS (what can be updated? what can't?)
+  // TODO - UPDATE THIS FOR PROJECT REQUIREMENTS - only allow start date to be postponed
 
   const eventID = new URL(req.url, `http://${req.headers.host}`).pathname.split("/").pop();
   let event;

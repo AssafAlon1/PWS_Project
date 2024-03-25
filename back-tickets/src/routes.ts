@@ -42,21 +42,6 @@ export const getAvailableTicketsByEventId = async (req: Request, res: Response) 
     res.status(StatusCodes.OK).send(data);
 }
 
-export const getTicketByName = async (req: Request, res: Response) => {
-    console.log("GET /api/ticket");
-    const eventId = req.params.eventId;
-    const ticketName = req.params.ticketName;
-    let data;
-    try {
-        data = await queryTicketByName(eventId, ticketName);
-    }
-    catch (error) {
-        res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({ message: "Internal Server Error" });
-        return;
-    }
-    res.status(StatusCodes.OK).send(data);
-}
-
 export const createTicket = async (req: Request, res: Response) => {
     try {
         const postData = req.body as ICSTicket;
@@ -91,6 +76,7 @@ export const createTicket = async (req: Request, res: Response) => {
     }
 }
 
+// TODO - check updateEvent in back-events/src/routes.ts and replicate logic!
 export const purchaseTicket = async (req: Request, res: Response) => {
     console.log("PUT /api/ticket");
     try {

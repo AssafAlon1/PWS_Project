@@ -4,8 +4,8 @@ import dotenv from 'dotenv';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 
-import { ALL_Ticket_PATH, Ticket_PATH } from './const.js';
-import { createTicket, getALLTicketsByEventId, getAvailableTicketsByEventId, getTicketByName, purchaseTicket } from './routes.js';
+import { ALL_TICKET_PATH, TICKET_PATH } from './const.js';
+import { createTicket, getALLTicketsByEventId, getAvailableTicketsByEventId, purchaseTicket } from './routes.js';
 import { get } from 'http';
 
 dotenv.config();
@@ -36,13 +36,12 @@ app.use(cors({
 }));
 
 // TODO - add routes
-app.get(`${ALL_Ticket_PATH}/:eventId`, getALLTicketsByEventId);
-app.get(`${Ticket_PATH}/:eventId`, getAvailableTicketsByEventId);
-app.get(`${Ticket_PATH}/:eventId/:ticketName`, getTicketByName);
+app.get(`${ALL_TICKET_PATH}/:eventId`, getALLTicketsByEventId);
+app.get(`${TICKET_PATH}/:eventId`, getAvailableTicketsByEventId); // Currently not used - maybe for BO?
 
-app.post(`${Ticket_PATH}/:eventId`, createTicket);
+app.post(`${TICKET_PATH}/:eventId`, createTicket);
 
-app.put(Ticket_PATH, purchaseTicket);
+app.put(TICKET_PATH, purchaseTicket);
 
 
 app.listen(port, () => {

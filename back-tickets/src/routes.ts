@@ -2,9 +2,10 @@ import mongoose from "mongoose";
 import { Request, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
 
-import { insertTicket, queryAllTicketsByEventID, queryAvailableTicketsByEventID, queryTicketByName, updateTicket } from "./db.js";
+import { insertTicket, queryAllTicketsByEventID, queryAvailableTicketsByEventID, queryCheapestTicketsByEventID, queryTicketByName, updateTicket } from "./db.js";
 import { ICSTicket, ticketSchema } from "./models/CSTicket.js";
 import { MAX_TICKET_LIMIT } from "./const.js";
+import { PublisherChannel } from "./publisher-channel.js";
 
 export const getALLTicketsByEventId = async (req: Request, res: Response) => {
     console.log("GET /api/ticket/all");
@@ -81,7 +82,7 @@ export const purchaseTicket = async (req: Request, res: Response) => {
     console.log("PUT /api/ticket");
     try {
         const putData = req.body as { eventId: string, ticketName: string, amount: number };
-
+        const publisherChannel: PublisherChannel = req.publisherChannel;
         // Get the wanted ticket
         const ticket = await queryTicketByName(putData.eventId, putData.ticketName);
         if (!ticket) { // Shouldn't get here
@@ -112,16 +113,23 @@ export const purchaseTicket = async (req: Request, res: Response) => {
         const insertResult = await updateTicket(updatedTicket);
 
         if (insertResult == StatusCodes.BAD_REQUEST) {
-        console.error("Failed updating ticket in DB");
-        throw Error("Bad Request.")
+            console.error("Failed updating ticket in DB");
+            throw Error("Bad Request.")
         }
 
         if (insertResult == StatusCodes.INTERNAL_SERVER_ERROR) {
-        console.error("Failed inserting comment to DB");
-        res.status(StatusCodes.INTERNAL_SERVER_ERROR).send("Internal server error");
-        return;
+            console.error("Failed inserting comment to DB");
+            res.status(StatusCodes.INTERNAL_SERVER_ERROR).send("Internal server error");
+            return;
         }
-    } catch (error) {
+
+        if(ticket.available === putData.amount) { // If we sold all tickets, send new cheapest ticket
+            const newCheapestTicket = await queryCheapestTicketsByEventID(putData.eventId); // could be null
+            await publisherChannel.sendEvent(JSON.stringify(newCheapestTicket));
+        }
+        res.status(StatusCodes.OK);
+    } 
+    catch (error) {
         console.error("Encountered error while purchasing ticket: ", error);
         res.status(StatusCodes.BAD_REQUEST).send({ message: "Bad Request." });
         return;

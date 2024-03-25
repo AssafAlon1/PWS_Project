@@ -7,9 +7,8 @@ export interface CSEvent {
     category: string;
     location: string;
     image?: string;
-    // cheapest_ticket_id?: string;
+    cheapest_ticket_name?: string;
     cheapest_ticket_price: number;
-    cheapest_ticket_num: number;
     total_available_tickets: number;
     comment_count: number;
 }

@@ -21,7 +21,7 @@ export class PublisherChannel {
             await this.createChannel();
         }
 
-        const exchange = 'comments_exchange';
+        const exchange = 'ticket_info_exchange';
 
         // Declare an exchange with the specified name and type ('fanout').
         // If the exchange doesn't exist, it will be created.

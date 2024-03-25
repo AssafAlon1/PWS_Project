@@ -6,8 +6,8 @@ import cors from 'cors';
 
 import { createComment, getComment } from "./routes.js";
 import { COMMENT_PATH } from "./const.js";
-import { PublisherChannel } from './publisher-channel.js';
 import { Request, Response, NextFunction } from 'express';
+import { PublisherChannel } from './publisher-channel.js';
 
 dotenv.config();
 const dbUri = process.env.DB_CONNECTION_STRING;
@@ -35,7 +35,6 @@ app.use(cors({
 }));
 
 app.get(`${COMMENT_PATH}/:eventId`, getComment);
-
 
 // Middleware to attach publisherChannel to the request
 function attachPublisherChannel(req: Request, res: Response, next: NextFunction) {

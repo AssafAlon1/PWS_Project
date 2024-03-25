@@ -14,9 +14,8 @@ const mongooseEventSchema = new mongoose.Schema({
   end_date: { type: Date, required: true },
   location: { type: String, required: true },
   comment_count: { type: Number, required: false, default: 0 },
-  cheapest_ticket_id: { type: String, required: false },       // for enabling quick access to the cheapest ticket - TODO check if possible to maintain
+  cheapest_ticket_name: { type: String, required: false },     // for enabling quick access to the cheapest ticket - TODO check if possible to maintain
   cheapest_ticket_price: { type: Number, required: true },     // for catalog page 
-  cheapest_ticket_num: { type: Number, required: true },       // maybe redundent since ticket microservice will provide events the cheapest ticket every time a ticket runs out
   total_available_tickets: { type: Number, required: true },   // for catalog page
   image: { type: String, required: false },
 }, { versionKey: false });
@@ -34,9 +33,8 @@ export const eventSchema = Joi.object({
   }),
   location: Joi.string(),
   comment_count: Joi.number().integer().min(0).optional(),
-  cheapest_ticket_id: Joi.string().optional(),
+  cheapest_ticket_name: Joi.string().optional(),
   cheapest_ticket_price: Joi.number().min(0),
-  cheapest_ticket_num: Joi.number().min(0),
   total_available_tickets: Joi.number(),
   image: Joi.string().optional(),
 });

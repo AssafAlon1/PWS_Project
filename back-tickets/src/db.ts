@@ -51,3 +51,10 @@ export const queryTicketByName = async (eventId: string, ticketName: string): Pr
   console.log("Got ticket: ", ticket);
   return ticket ? ticket.toJSON() as ICSTicket : null;
 }
+
+export const queryCheapestTicketsByEventID = async (eventId: string): Promise<ICSTicket | null> => {
+  console.log("queryCheapestTicketsByEventID for eventId: ", eventId);
+  const ticket = await CSTicket.find({ eventId: eventId, quantity: { $gt: 0 } }).sort({ price: 1 }).limit(1).exec();
+  console.log("Got tickets: ", ticket);
+  return ticket.length > 0 ? ticket[0].toJSON() as ICSTicket : null;
+}

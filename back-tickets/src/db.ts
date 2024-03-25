@@ -20,7 +20,7 @@ export const insertTicket = async (ticketData: ICSTicket): Promise<string | numb
 }
 
 export const updateTicket = async (ticketData: ICSTicket): Promise<number> => {
-  console.log("updateTicket for ticketData: ", ticketData);
+  console.log("updateTicket for ticket: ", ticketData._id);
   try {
     await CSTicket.updateOne({ _id: ticketData._id }, ticketData).exec();
     console.log("Updated ticket");
@@ -34,27 +34,23 @@ export const updateTicket = async (ticketData: ICSTicket): Promise<number> => {
 export const queryAllTicketsByEventID = async (eventId: string, skip: number, limit: number): Promise<ICSTicket[]> => {
   console.log("queryAllTicketsByEventID for eventId: ", eventId);
   const tickets = await CSTicket.find({ eventId: eventId }).skip(skip).limit(limit).exec();
-  console.log("Got tickets: ", tickets);
   return tickets.map(ticket => ticket.toJSON() as ICSTicket);
 }
 
 export const queryAvailableTicketsByEventID = async (eventId: string, skip: number, limit: number): Promise<ICSTicket[]> => {
   console.log("queryAvailableTicketsByEventID for eventId: ", eventId);
-  const tickets = await CSTicket.find({ eventId: eventId, quantity: { $gt: 0 } }).skip(skip).limit(limit).exec();
-  console.log("Got tickets: ", tickets);
+  const tickets = await CSTicket.find({ eventId: eventId, available: { $gt: 0 } }).skip(skip).limit(limit).exec();
   return tickets.map(ticket => ticket.toJSON() as ICSTicket);
 }
 
 export const queryTicketByName = async (eventId: string, ticketName: string): Promise<ICSTicket | null> => {
   console.log("queryTicketByName for eventId: ", eventId, " and ticketName: ", ticketName);
   const ticket = await CSTicket.findOne({ eventId: eventId, name: ticketName }).exec();
-  console.log("Got ticket: ", ticket);
   return ticket ? ticket.toJSON() as ICSTicket : null;
 }
 
 export const queryCheapestTicketsByEventID = async (eventId: string): Promise<ICSTicket | null> => {
   console.log("queryCheapestTicketsByEventID for eventId: ", eventId);
-  const ticket = await CSTicket.find({ eventId: eventId, quantity: { $gt: 0 } }).sort({ price: 1 }).limit(1).exec();
-  console.log("Got tickets: ", ticket);
+  const ticket = await CSTicket.find({ eventId: eventId, available: { $gt: 0 } }).sort({ price: 1 }).limit(1).exec();
   return ticket.length > 0 ? ticket[0].toJSON() as ICSTicket : null;
 }

@@ -49,3 +49,8 @@ export const updateEventByID = async (eventId: string, event: ICSEvent): Promise
 export const plusCommentCount = async (eventId: string): Promise<void> => {
   await CSEvent.findByIdAndUpdate(eventId, { $inc: { comment_count: 1 } }).exec();
 }
+
+export const updateCheapesstTicket = async (eventId: string, ticketName: string, price: number): Promise<void> => {
+  console.log("updateCheapesstTicket for eventId: ", eventId, " and ticketName: ", ticketName, " and price: ", price);
+  await CSEvent.findByIdAndUpdate(eventId, { cheapest_ticket_name: ticketName, cheapest_ticket_price: price }).exec();
+}

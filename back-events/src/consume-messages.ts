@@ -1,7 +1,7 @@
 import * as amqp from 'amqplib';
 import dotenv from 'dotenv';
 import { COMMENT_EXCHANGE, COMMENT_QUEUE, TICKET_INFO_EXCHANGE, TICKET_INFO_QUEUE } from './const.js';
-import { plusCommentCount } from './db.js';
+import { plusCommentCount, updateCheapesstTicket } from './db.js';
 
 dotenv.config();
 
@@ -30,10 +30,11 @@ export const consumeMessages = async () => {
         });
 
         await channel.consume(TICKET_INFO_QUEUE, async (msg) => {
-            const eventId = msg.content.toString();
-            console.log(`Comsumer >>> received message: ${eventId} for ticket info`);
-            // await plusCommentCount(eventId);
-            // TODO - implement the logic to update ticket info (msg is the cheapest ticket)
+            console.log("TICKET_INFO_QUEUE");
+            // TODO - handle null (meaning no ticket available for the event)
+            const cheapest_ticket = JSON.parse(msg.content.toString());
+            console.log(`Comsumer >>> received message: ${cheapest_ticket.eventId} for ticket info`);
+            await updateCheapesstTicket(cheapest_ticket.eventId, cheapest_ticket.name, cheapest_ticket.price);
             channel.ack(msg);
         });
 

@@ -16,7 +16,6 @@ export const getALLTicketsByEventId = async (req: Request, res: Response) => {
     try {
         console.log("Gonna fetch tickets for eventId: ", eventId);
         data = await queryAllTicketsByEventID(eventId, skip, limit);
-        console.log("Got data: ", data);
     }
     catch (error) {
         res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({ message: "Internal Server Error" });
@@ -111,6 +110,7 @@ export const purchaseTicket = async (req: Request, res: Response) => {
         }
 
         const insertResult = await updateTicket(updatedTicket);
+        console.log("insertResult: ", insertResult);
 
         if (insertResult == StatusCodes.BAD_REQUEST) {
             console.error("Failed updating ticket in DB");

@@ -47,7 +47,6 @@ export const refundTickets = async (req: Request, res: Response) => {
         res.status(StatusCodes.OK).send({ message: "Refund successful" });
     }
     catch (error) {
-        console.log(error);
         res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({ message: "Internal Server Error" });
     }
 }

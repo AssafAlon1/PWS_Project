@@ -6,6 +6,7 @@ dotenv.config();
 export const EVENT_API_URL = process.env.EVENT_API_URL;
 export const COMMENT_API_URL = process.env.COMMENT_API_URL;
 export const TICKET_API_URL = process.env.TICKET_API_URL;
+export const USER_ACTION_API_URL = process.env.USER_ACTION_API_URL;
 
 
 export const LOGIN_PATH = "/api/login";

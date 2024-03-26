@@ -3,7 +3,10 @@ import { StatusCodes } from 'http-status-codes';
 
 import { addRefundTicketsAction, queryUserClosestEvent, queryNonRefundedPurchases, addBuyTicketsAction, isPurchaseRefunded } from './db.js';
 import { hasEventStarted } from "./utils.js";
-import { ACTIONS_PATH, CLOSEST_EVENT_PATH, REFUND_OPTIONS_PATH } from "./const.js";
+import { ACTIONS_PATH, CLOSEST_EVENT_PATH, ORDER_API_URL, REFUND_OPTIONS_PATH } from "./const.js";
+import axios from 'axios';
+
+const axiosInstance = axios.create({ withCredentials: true, baseURL: ORDER_API_URL });
 
 // TODO - convert to rabbit
 export const buyTickets = async (req: Request, res: Response) => {
@@ -40,7 +43,8 @@ export const refundTickets = async (req: Request, res: Response) => {
         const postData = req.body as { purchase_id: string };
         if (!postData.purchase_id) {
             console.error("No purchase_id provided.")
-            throw Error("No purchase_id provided.");
+            res.status(StatusCodes.BAD_REQUEST).send({ message: "Bad Request." });
+            return;
         }
 
         if (await isPurchaseRefunded(postData.purchase_id)) {
@@ -52,10 +56,12 @@ export const refundTickets = async (req: Request, res: Response) => {
             return res.status(StatusCodes.BAD_REQUEST).send({ message: "Event has already started." });
         }
 
-
-
         // TODO - refund with the order service
-
+        const refundResult = await axiosInstance.post('/api/refund', { order_id: postData.purchase_id });
+        if (refundResult.status !== StatusCodes.OK) {
+            throw Error("Failed to refund tickets.");
+            return;
+        }
 
         const insertResult = await addRefundTicketsAction(postData.purchase_id, refundDate);
         // irl, we would've checked for failure here.
@@ -64,7 +70,8 @@ export const refundTickets = async (req: Request, res: Response) => {
         res.status(StatusCodes.OK).send({ message: "Refund success for purchase " + postData.purchase_id });
     }
     catch (error) {
-        res.status(StatusCodes.BAD_REQUEST).send({ message: "Bad Request." });
+        res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({ message: "Failed to refund tickets." });
+        console.error("Failed to refund tickets.");
     }
 }
 

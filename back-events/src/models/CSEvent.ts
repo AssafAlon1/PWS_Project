@@ -25,7 +25,7 @@ export const eventSchema = Joi.object({
   category: Joi.string().valid(...VALID_CATEGORIES),
   description: Joi.string(),
   organizer: Joi.string(),
-  start_date: Joi.date().iso(),  
+  start_date: Joi.date().iso(),
   end_date: Joi.date().iso().when('start_date', { // This means validations will only run if both start_date and end_date are present.
     is: Joi.exist(),
     then: Joi.date().iso().greater(Joi.ref('start_date')),

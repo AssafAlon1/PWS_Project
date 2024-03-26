@@ -19,7 +19,7 @@ import {
     LOGOUT_PATH,
     SIGNUP_PATH,
     TICKET_API_URL,
-    USERNAME_PATH, 
+    USERNAME_PATH,
 } from './const.js';
 import { isAuthorized } from './auths.js';
 

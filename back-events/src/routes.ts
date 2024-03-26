@@ -3,9 +3,9 @@ import { Request, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
 
 import { deleteEventByID, insertEvent, queryEventByID, queryUpcomingAvailableEvents, queryUpcomingEvents, updateEventByID } from "./db.js";
-import { ICSEvent, eventSchema } from "./models/CSEvent.js";
+import { ICSEvent, JoiEventCreationRequestSchema, eventSchema } from "./models/CSEvent.js";
 import { MAX_QUERY_LIMIT, TICKET_SERVICE_URL } from "./const.js";
-import { CSEventWithTickets, JoiEventCreationRequestSchema } from "./types.js";
+import { CSEventWithTickets } from "./types.js";
 import axios from "axios";
 
 const axiosInstance = axios.create({ withCredentials: true, baseURL: TICKET_SERVICE_URL });

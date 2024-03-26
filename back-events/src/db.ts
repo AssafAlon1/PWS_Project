@@ -1,7 +1,5 @@
-import { DEFAULT_ROLE } from "./const.js";
 import CSEvent, { ICSEvent } from "./models/CSEvent.js";
 import { StatusCodes } from 'http-status-codes';
-// import { UserRole } from "./types.js";
 
 export const insertEvent = async (eventData: ICSEvent): Promise<string | number> => {
   const newEvent = new CSEvent(eventData);

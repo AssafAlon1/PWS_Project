@@ -6,4 +6,3 @@ export enum Routes {
     NOT_FOUND = "NOT_FOUND"
 }
 
-export enum UserRole { Admin, Manager, Worker };

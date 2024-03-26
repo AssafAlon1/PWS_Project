@@ -1,40 +1,60 @@
-// TODO - implement!
+import axios, { isAxiosError } from "axios";
 
-const userActions = [
-    {
-        username: "Alice",
-        actionType: "purchase",
-        eventId: "1",
-        purchaseId: "1",
-        ticketName: "General Admission",
-        amount: 3,
-        timestamp: new Date("2024-03-17T11:32"),
+import { APIStatus, CSEvent } from "../types";
+import { API_GATEWAY_URL } from "../const";
+
+const axiosInstance = axios.create({ withCredentials: true, baseURL: API_GATEWAY_URL }); // TODO - withCredentials?
+
+// TODO - rename to UserActionApi
+const RealUserActionApi = {
+    // TODO - will be moved to the tickets service (and forwarded to the user-actions service via rabbit)
+    purchaseTickets: async (eventId: string, ticketName: string, amount: number, username: string) => {
+        const purchaseTime = new Date();
+        const purchaseId = `${purchaseTime.getTime()}`;
+        try {
+            axiosInstance.post("/api/user_actions", { event_id: eventId, purchase_id: purchaseId, ticket_name: ticketName, amount, username, purchase_time: purchaseTime });
+        }
+        catch (error) {
+            throw new Error("Failed to purchase tickets");
+        }
+    },
+    refundPurchase: async (purchaseId: string) => {
+        try {
+            await axiosInstance.put("/api/user_actions", { purchase_id: purchaseId });
+            console.log("Completed refund");
+            return APIStatus.Success;
+
+        } catch (error) {
+            if (isAxiosError(error)) {
+                throw new Error("Failed to refund purchase: " + error.response?.data.message); // TODO - Better handling?
+            }
+            throw new Error("Failed to refund purchase"); // TODO - Better handling?
+
+        }
     },
 
-];
+    getUserClosestEvent: async (username: string): Promise<CSEvent | null> => {
+        return null; // Should first implement the logic in the events service
+        try {
+            const response = await axiosInstance.get("/api/closest_event", {
+                params: {
+                    username
+                }
+            });
+            return response.data;
+        }
+        catch (error) {
+            console.error("Couldn't find closest event for " + username);
+            return null;
+        }
+    }
 
-export const registerUserAction = (
-    username: string,
-    actionType: string,
-    eventId: string,
-    purchaseId: string,
-    ticketName: string,
-    amount: number,) => {
-    const timestamp = new Date();
-    userActions.push({
-        username,
-        actionType,
-        eventId,
-        purchaseId,
-        ticketName,
-        amount,
-        timestamp,
-    });
 }
 
-// TODO - This probably won't be here in the final version (the user Action microservice will do this, and send the data to the events service)
-export const getUserEventIds = (username: string): string[] => {
-    // TODO - Actually, this will be a database call. I think we agreed to keep the active events in an array or something..? For easier selection
-    const userEvents = userActions.filter(action => action.username === username && action.actionType === "purchase");
-    return userEvents.map(purchase => purchase.eventId);
-}
+// import { MockUserActionApi } from "./mock";
+// const UserActionApi = MockUserActionApi;
+
+const UserActionApi = RealUserActionApi;
+
+
+export default UserActionApi;

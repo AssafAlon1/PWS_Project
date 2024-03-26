@@ -1,3 +1,5 @@
+import { ICSEvent } from './models/CSEvent.js';
+
 export enum Routes {
     GET_EVENT = "GET /api/event/",
     POST_EVENT = "POST /api/event/",
@@ -6,4 +8,7 @@ export enum Routes {
     NOT_FOUND = "NOT_FOUND"
 }
 
-export enum UserRole { Admin, Manager, Worker };
+export type CSEventWithTickets = ICSEvent & {
+    tickets: { name: string, total: number, price: number }[]
+}
+

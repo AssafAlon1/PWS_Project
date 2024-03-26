@@ -1,6 +1,5 @@
 import { Comment, Ticket, CSEvent } from "../types";
 import { MAX_EVENTS_IN_PAGE } from "../const";
-import { getUserEventIds, registerUserAction } from "./userAction";
 
 // Mock API
 function getRandomInt(max: number) {
@@ -17,7 +16,10 @@ export const MockEventApi = {
             end_date: new Date("2024-04-11T22:00"),
             category: "Sports Event",
             location: "Madison Square Garden",
-            image: "https://miro.medium.com/v2/resize:fit:1400/1*ydhn1QPAKsrbt6UWfn3YnA.jpeg"
+            image: "https://miro.medium.com/v2/resize:fit:1400/1*ydhn1QPAKsrbt6UWfn3YnA.jpeg",
+            cheapest_ticket_price: 50,
+            total_available_tickets: 1097,
+            comment_count: 3,
         },
         {
             _id: "2",
@@ -27,6 +29,9 @@ export const MockEventApi = {
             end_date: new Date("2024-03-29T01:00"),
             category: "Conference",
             location: "Some Conference Center idk",
+            cheapest_ticket_price: 20,
+            total_available_tickets: 500,
+            comment_count: 1,
         },
         {
             _id: "3",
@@ -37,12 +42,10 @@ export const MockEventApi = {
             start_date: new Date("2024-03-27T20:00"),
             end_date: new Date("2024-03-28T02:00"),
             location: "Nesher",
-            tickets: [
-                { "name": "Entrance", "quantity": 800, "price": 20 },
-                { "name": "Interview", "quantity": 300, "price": 30 },
-                { "name": "Meetups", "quantity": 100, "price": 70 }
-            ],
-            image: "https://t4.ftcdn.net/jpg/01/20/28/25/360_F_120282530_gMCruc8XX2mwf5YtODLV2O1TGHzu4CAb.jpg"
+            image: "https://t4.ftcdn.net/jpg/01/20/28/25/360_F_120282530_gMCruc8XX2mwf5YtODLV2O1TGHzu4CAb.jpg",
+            cheapest_ticket_price: 5,
+            total_available_tickets: 38,
+            comment_count: 0,
         }
     ],
 
@@ -61,40 +64,6 @@ export const MockEventApi = {
         // }
         return MockEventApi.allEvents.find(event => event._id === eventId) ?? null;
     },
-
-    getUserClosestEvent: async (username: string): Promise<CSEvent | null> => {
-        console.log(" > Getting closest event for " + username);
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        const userEventIds = getUserEventIds(username);
-        if (!userEventIds) {
-            console.log(" > No events found for " + username);
-            return null;
-        }
-
-        const userEvents: CSEvent[] = userEventIds.map(eventId => MockEventApi.allEvents.find(event => event._id === eventId)).filter(event => event !== undefined) as CSEvent[];
-        if (userEvents.length === 0) {
-            console.log(" > No events found for " + username);
-            return null;
-        }
-
-        const nextEvent = userEvents.reduce((minEvent, event) => {
-            if (!minEvent) {
-                return event;
-            }
-            if (event.start_date.getTime() < minEvent.start_date.getTime()) {
-                return event;
-            }
-            return minEvent;
-        }, userEvents[0]);
-
-        if (nextEvent) {
-            console.log(" > Next event found for " + username + ": " + nextEvent.title);
-            return nextEvent;
-        }
-
-        console.log(" > SHOULDN'T BE REACHABLE No events found for " + username);
-        return null;
-    }
 };
 
 for (let i = 100; i < 170; i++) {
@@ -106,6 +75,9 @@ for (let i = 100; i < 170; i++) {
         end_date: new Date("2024-03-29T01:00"),
         category: "Conference",
         location: "Some Conference Center idk",
+        cheapest_ticket_price: 1000,
+        total_available_tickets: 500,
+        comment_count: 0,
     });
 }
 
@@ -168,25 +140,36 @@ export const MockTicketApi = {
             eventId: "1",
             name: "General Admission",
             price: 50,
-            quantity: 997,
+            available: 997,
+            total: 1000,
         },
         {
             eventId: "1",
             name: "VIP",
             price: 100,
-            quantity: 100,
+            available: 100,
+            total: 100,
         },
         {
             eventId: "2",
             name: "General Admission",
             price: 20,
-            quantity: 500,
+            available: 500,
+            total: 500,
         },
         {
             eventId: "2",
             name: "Golden Ring",
             price: 200,
-            quantity: 0,
+            available: 0,
+            total: 100,
+        },
+        {
+            eventId: "3",
+            name: "Entrance",
+            price: 5,
+            available: 38,
+            total: 100,
         },
     ],
     fetchAvailableTickets: async (eventId: string): Promise<Ticket[] | null> => {
@@ -202,9 +185,77 @@ export const MockTicketApi = {
             throw new Error("Force error for testing purposes.");
         }
 
-        const purchaseId = "1"; 
+        const purchaseId = `${new Date().getTime()}`;
 
-        registerUserAction(username, "purchase", eventId, purchaseId, ticketName, amount);
+        MockUserActionApi.registerUserAction(username, eventId, purchaseId, ticketName, amount);
         return purchaseId;
     },
+}
+
+export const MockUserActionApi = {
+    allUserActions: [
+        {
+            username: "Alice",
+            event_id: "3",
+            purchase_id: "2",
+            ticket_name: "General Admission",
+            amount: 3,
+            purchase_time: new Date("2024-03-17T11:32"),
+            refund_time: undefined
+        },
+    ],
+
+    registerUserAction: (
+        username: string,
+        eventId: string,
+        purchaseId: string,
+        ticketName: string,
+        amount: number,) => {
+        const timestamp = new Date();
+        MockUserActionApi.allUserActions.push({
+            username,
+            event_id: eventId,
+            purchase_id: purchaseId,
+            ticket_name: ticketName,
+            amount,
+            purchase_time: timestamp,
+            refund_time: undefined
+        });
+
+    },
+    getUserClosestEvent: async (username: string): Promise<CSEvent | null> => {
+        console.log(" > Getting closest event for " + username);
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        const userEventIds = MockUserActionApi.allUserActions
+            .filter(action => action.username === username && !action.refund_time)
+            .map(purchase => purchase.event_id);
+        if (!userEventIds) {
+            console.log(" > No events found for " + username);
+            return null;
+        }
+
+        const userEvents: CSEvent[] = userEventIds.map(eventId => MockEventApi.allEvents.find(event => event._id === eventId)).filter(event => event !== undefined) as CSEvent[];
+        if (userEvents.length === 0) {
+            console.log(" > No events found for " + username);
+            return null;
+        }
+
+        const nextEvent = userEvents.reduce((minEvent, event) => {
+            if (!minEvent) {
+                return event;
+            }
+            if (event.start_date.getTime() < minEvent.start_date.getTime()) {
+                return event;
+            }
+            return minEvent;
+        }, userEvents[0]);
+
+        if (nextEvent) {
+            console.log(" > Next event found for " + username + ": " + nextEvent.title);
+            return nextEvent;
+        }
+
+        console.log(" > SHOULDN'T BE REACHABLE No events found for " + username);
+        return null;
+    }
 }

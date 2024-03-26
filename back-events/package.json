@@ -1,5 +1,5 @@
 {
-  "name": "hw3-node-ts-auth",
+  "name": "pws-project-events",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -20,6 +20,7 @@
   },
   "dependencies": {
     "amqplib": "^0.10.3",
+    "axios": "^1.6.8",
     "bcrypt": "^5.1.0",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",

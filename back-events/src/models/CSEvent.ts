@@ -39,6 +39,28 @@ export const eventSchema = Joi.object({
   image: Joi.string().optional(),
 });
 
+const ticketSchema = Joi.object({
+  name: Joi.string().required(),
+  total: Joi.number().integer().min(0).required(),
+  price: Joi.number().min(0).required(),
+});
+
+export const JoiEventCreationRequestSchema = Joi.object({
+  title: Joi.string(),
+  category: Joi.string().valid(...VALID_CATEGORIES),
+  description: Joi.string(),
+  organizer: Joi.string(),
+  start_date: Joi.date().iso(),
+  end_date: Joi.date().iso().when('start_date', {
+    is: Joi.exist(),
+    then: Joi.date().iso().greater(Joi.ref('start_date')),
+    otherwise: Joi.date().iso()
+  }),
+  location: Joi.string(),
+  image: Joi.string().optional(),
+  tickets: Joi.array().items(ticketSchema).min(1),
+});
+
 export type ICSEvent = InferSchemaType<typeof mongooseEventSchema>;
 
 export default mongoose.model("CSEvent", mongooseEventSchema, "events");

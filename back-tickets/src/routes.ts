@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 import { Request, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
 
-import { insertTicket, insertTickets, queryAllTicketsByEventID, queryAvailableTicketsByEventID, queryCheapestTicketsByEventID, queryTicketByName, updateTicket } from "./db.js";
+import { insertTicket, insertTickets, queryAllTicketsByEventID, queryAvailableTicketsByEventID, queryCheapestTicketsByEventID, queryTicketByName, updateTicket, updateTicketAmount } from "./db.js";
 import { ICSTicket, ticketSchema } from "./models/CSTicket.js";
 import { MAX_TICKET_LIMIT } from "./const.js";
 import { PublisherChannel } from "./publisher-channel.js";
@@ -129,27 +129,9 @@ export const purchaseTicket = async (req: Request, res: Response) => {
             throw Error("Not enough tickets available.");
         }
 
-        // Create updated ticket
-        const updatedTicket = {
-            _id: ticket._id,
-            eventId: putData.eventId,
-            name: putData.ticketName,
-            available: ticket.available - putData.amount,
-            total: ticket.total,
-            price: ticket.price
-        };
+        const result = await updateTicketAmount(ticket._id.toString(), putData.amount);
 
-        // Validate the ticket data
-        const { value, error } = ticketSchema.validate(updatedTicket, { abortEarly: false, allowUnknown: true, presence: 'required' });
-        if (error) {
-            console.error("Ticket schema validation failed");
-            throw Error("Bad Request.");
-        }
-
-        const insertResult = await updateTicket(updatedTicket);
-        console.log("insertResult: ", insertResult);
-
-        if (insertResult != StatusCodes.OK) {
+        if (result != StatusCodes.OK) {
             console.error("Failed updating ticket in DB");
             res.status(StatusCodes.INTERNAL_SERVER_ERROR).send("Internal server error");
             return;

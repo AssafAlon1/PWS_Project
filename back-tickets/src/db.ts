@@ -62,6 +62,27 @@ export const updateTicket = async (ticketData: ICSTicket): Promise<number> => {
   }
 }
 
+export const updateTicketAmount = async (ticketId: string, purchaseAmount: number): Promise<number> => {
+  try {
+    // This is done atomically (check amount and update if enough tickets are available)
+    const result = await CSTicket.updateOne(
+      { _id: ticketId, available: { $gte: purchaseAmount } },
+      { $inc: { available: -purchaseAmount } }
+    ).exec();
+
+    if (result.modifiedCount === 0) {
+      console.error("Not enough tickets available for ticket with id: ", ticketId);
+      return StatusCodes.BAD_REQUEST;
+    }
+
+    return StatusCodes.OK;
+  }
+  catch (err) {
+    console.error("Failed to update ticket amount for ticket with id: ", ticketId + " and purchaseAmount: ", purchaseAmount);
+    return StatusCodes.INTERNAL_SERVER_ERROR;
+  }
+}
+
 export const queryAllTicketsByEventID = async (eventId: string, skip: number, limit: number): Promise<ICSTicket[]> => {
   console.log("queryAllTicketsByEventID for eventId: ", eventId);
   const tickets = await CSTicket.find({ eventId: eventId }).skip(skip).limit(limit).exec();

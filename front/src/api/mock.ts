@@ -17,7 +17,10 @@ export const MockEventApi = {
             end_date: new Date("2024-04-11T22:00"),
             category: "Sports Event",
             location: "Madison Square Garden",
-            image: "https://miro.medium.com/v2/resize:fit:1400/1*ydhn1QPAKsrbt6UWfn3YnA.jpeg"
+            image: "https://miro.medium.com/v2/resize:fit:1400/1*ydhn1QPAKsrbt6UWfn3YnA.jpeg",
+            cheapest_ticket_price: 50,
+            total_available_tickets: 1097,
+            comment_count: 3,
         },
         {
             _id: "2",
@@ -27,6 +30,9 @@ export const MockEventApi = {
             end_date: new Date("2024-03-29T01:00"),
             category: "Conference",
             location: "Some Conference Center idk",
+            cheapest_ticket_price: 20,
+            total_available_tickets: 500,
+            comment_count: 1,
         },
         {
             _id: "3",
@@ -37,12 +43,10 @@ export const MockEventApi = {
             start_date: new Date("2024-03-27T20:00"),
             end_date: new Date("2024-03-28T02:00"),
             location: "Nesher",
-            tickets: [
-                { "name": "Entrance", "quantity": 800, "price": 20 },
-                { "name": "Interview", "quantity": 300, "price": 30 },
-                { "name": "Meetups", "quantity": 100, "price": 70 }
-            ],
-            image: "https://t4.ftcdn.net/jpg/01/20/28/25/360_F_120282530_gMCruc8XX2mwf5YtODLV2O1TGHzu4CAb.jpg"
+            image: "https://t4.ftcdn.net/jpg/01/20/28/25/360_F_120282530_gMCruc8XX2mwf5YtODLV2O1TGHzu4CAb.jpg",
+            cheapest_ticket_price: 5,
+            total_available_tickets: 38,
+            comment_count: 0,
         }
     ],
 
@@ -168,25 +172,36 @@ export const MockTicketApi = {
             eventId: "1",
             name: "General Admission",
             price: 50,
-            quantity: 997,
+            available: 997,
+            total: 1000,
         },
         {
             eventId: "1",
             name: "VIP",
             price: 100,
-            quantity: 100,
+            available: 100,
+            total: 100,
         },
         {
             eventId: "2",
             name: "General Admission",
             price: 20,
-            quantity: 500,
+            available: 500,
+            total: 500,
         },
         {
             eventId: "2",
             name: "Golden Ring",
             price: 200,
-            quantity: 0,
+            available: 0,
+            total: 100,
+        },
+        {
+            eventId: "3",
+            name: "Entrance",
+            price: 5,
+            available: 38,
+            total: 100,
         },
     ],
     fetchAvailableTickets: async (eventId: string): Promise<Ticket[] | null> => {
@@ -202,7 +217,7 @@ export const MockTicketApi = {
             throw new Error("Force error for testing purposes.");
         }
 
-        const purchaseId = "1"; 
+        const purchaseId = "1";
 
         registerUserAction(username, "purchase", eventId, purchaseId, ticketName, amount);
         return purchaseId;

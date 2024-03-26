@@ -19,7 +19,7 @@ const RealTicketApi = {
             });
             console.log("Got tickets: ", response.data);
             return response.data;
-        } catch (error) {  
+        } catch (error) {
             if (isAxiosError(error)) {
                 throw new Error("Failed to fetch tickets: " + error.response?.data.message); // TODO - Better handling?
             }
@@ -30,7 +30,7 @@ const RealTicketApi = {
         // TODO - implement lock!
         try {
             // TODO - Make sure we have enough tickets to sell or that they are reseved in the locked array for the user!
-            await axiosInstance.put('/api/ticket', {eventId, ticketName, amount /*, username */});
+            await axiosInstance.put('/api/ticket', { eventId, ticketName, amount /*, username */ });
             console.log("Completed purchase");
             return APIStatus.Success;
 
@@ -39,13 +39,13 @@ const RealTicketApi = {
                 throw new Error("Failed to purchase tickets: " + error.response?.data.message); // TODO - Better handling?
             }
             throw new Error("Failed to purchase tickets"); // TODO - Better handling?
-        
+
         }
         // return "1234";
     },
 }
 
-import { MockTicketApi } from "./mock";
+// import { MockTicketApi } from "./mock";
 // const TicketApi = MockTicketApi;
 
 const TicketApi = RealTicketApi;

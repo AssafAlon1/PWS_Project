@@ -11,7 +11,7 @@ export const getALLTicketsByEventId = async (req: Request, res: Response) => {
     console.log("GET /api/ticket/all");
     const eventId = req.params.eventId;
     const skip = parseInt(req.query.skip as string) || 0;
-    const limit = parseInt(req.query.limit as string) || MAX_TICKET_LIMIT; 
+    const limit = parseInt(req.query.limit as string) || MAX_TICKET_LIMIT;
     let data;
     try {
         console.log("Gonna fetch tickets for eventId: ", eventId);
@@ -29,7 +29,7 @@ export const getAvailableTicketsByEventId = async (req: Request, res: Response) 
     console.log("GET /api/ticket");
     const eventId = req.params.eventId;
     const skip = parseInt(req.query.skip as string) || 0;
-    const limit = parseInt(req.query.limit as string) || MAX_TICKET_LIMIT; 
+    const limit = parseInt(req.query.limit as string) || MAX_TICKET_LIMIT;
     let data;
     try {
         data = await queryAvailableTicketsByEventID(eventId, skip, limit);
@@ -63,10 +63,10 @@ export const createTicket = async (req: Request, res: Response) => {
         if (insertResult == StatusCodes.BAD_REQUEST) {
             throw Error("Bad Request.")
         }
-      
+
         if (insertResult == StatusCodes.INTERNAL_SERVER_ERROR) {
-        res.status(StatusCodes.INTERNAL_SERVER_ERROR).send("Internal server error");
-        return;
+            res.status(StatusCodes.INTERNAL_SERVER_ERROR).send("Internal server error");
+            return;
         }
 
         res.status(StatusCodes.CREATED).send({ ticket_id: insertResult });
@@ -84,11 +84,11 @@ export const purchaseTicket = async (req: Request, res: Response) => {
         const publisherChannel: PublisherChannel = req.publisherChannel;
         // Get the wanted ticket
         const ticket = await queryTicketByName(putData.eventId, putData.ticketName);
-        if (!ticket) { // Shouldn't get here
+        if (!ticket) {
             throw Error("Ticket not found.");
         }
         // TODO - Make sure we have enough tickets to sell or that they are reseved in the locked array for the user!
-        if (ticket.available < putData.amount) { 
+        if (ticket.available < putData.amount) {
             throw Error("Not enough tickets available.");
         }
 
@@ -112,23 +112,17 @@ export const purchaseTicket = async (req: Request, res: Response) => {
         const insertResult = await updateTicket(updatedTicket);
         console.log("insertResult: ", insertResult);
 
-        if (insertResult == StatusCodes.BAD_REQUEST) {
+        if (insertResult != StatusCodes.OK) {
             console.error("Failed updating ticket in DB");
-            throw Error("Bad Request.")
-        }
-
-        if (insertResult == StatusCodes.INTERNAL_SERVER_ERROR) {
-            console.error("Failed inserting comment to DB");
             res.status(StatusCodes.INTERNAL_SERVER_ERROR).send("Internal server error");
             return;
         }
 
-        if(ticket.available === putData.amount) { // If we sold all tickets, send new cheapest ticket
+        if (ticket.available === putData.amount) { // If we sold all tickets, send new cheapest ticket
             const newCheapestTicket = await queryCheapestTicketsByEventID(putData.eventId); // could be null
             await publisherChannel.sendEvent(JSON.stringify(newCheapestTicket));
         }
-        res.status(StatusCodes.OK);
-    } 
+    }
     catch (error) {
         console.error("Encountered error while purchasing ticket: ", error);
         res.status(StatusCodes.BAD_REQUEST).send({ message: "Bad Request." });

@@ -41,7 +41,7 @@ app.use(cors({
 app.get(`${ALL_TICKET_PATH}/:eventId`, getALLTicketsByEventId);
 app.get(`${TICKET_PATH}/:eventId`, getAvailableTicketsByEventId); // Currently not used - maybe for BO?
 
-app.post(`${TICKET_PATH}/:eventId`, createTicket);
+app.post(`${TICKET_PATH}`, createTicket);
 
 // Middleware to attach publisherChannel to the request
 function attachPublisherChannel(req: Request, res: Response, next: NextFunction) {
@@ -53,7 +53,6 @@ app.put(TICKET_PATH, attachPublisherChannel, purchaseTicket);
 
 
 app.listen(port, () => {
-    console.log(`Server running! port ${port}`);
-    console.log("ORIGIN: " + origin);
+  console.log(`Server running! port ${port}`);
+  console.log("ORIGIN: " + origin);
 });
-  

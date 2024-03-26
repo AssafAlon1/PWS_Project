@@ -4,11 +4,12 @@ import { StatusCodes } from 'http-status-codes';
 
 import { deleteEventByID, insertEvent, queryEventByID, queryUpcomingAvailableEvents, queryUpcomingEvents, updateEventByID } from "./db.js";
 import { ICSEvent, eventSchema } from "./models/CSEvent.js";
+import { MAX_QUERY_LIMIT } from "./const.js";
 
 export const getUpcomingEvents = async (req: Request, res: Response) => {
   console.log("GET /api/event");
   const skip = parseInt(req.query.skip as string) || 0;
-  const limit = parseInt(req.query.limit as string) || 50;
+  const limit = parseInt(req.query.limit as string) || MAX_QUERY_LIMIT;
   let data;
   try {
     data = await queryUpcomingEvents(skip, limit);
@@ -17,14 +18,14 @@ export const getUpcomingEvents = async (req: Request, res: Response) => {
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({ message: "Internal Server Error" });
     return;
   }
-  
+
   res.status(StatusCodes.OK).send(data);
 }
 
 export const getUpcomingAvailableEvents = async (req: Request, res: Response) => {
   console.log("GET /api/event");
   const skip = parseInt(req.query.skip as string) || 0;
-  const limit = parseInt(req.query.limit as string) || 50;
+  const limit = parseInt(req.query.limit as string) || MAX_QUERY_LIMIT;
   let data;
   try {
     data = await queryUpcomingAvailableEvents(skip, limit);

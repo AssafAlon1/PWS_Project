@@ -8,7 +8,8 @@ import {
   getEventById,
   createEvent,
   updateEvent,
-  getUpcomingEvents
+  getUpcomingEvents,
+  getUpcomingAvailableEvents
 } from "./routes.js";
 
 import {
@@ -38,12 +39,13 @@ app.use(cookieParser());
 let origin = process.env.ORIGIN;
 app.use(cors({
   origin: origin,
-  methods: ['GET', 'POST'],
+  methods: ['GET', 'POST'], // TODO - PUT, DELETE?
   credentials: true,  // Frontend needs to send cookies with requests
 }));
 
 
-app.get(EVENT_PATH, getUpcomingEvents);
+app.get(EVENT_PATH, getUpcomingAvailableEvents); // Added for the frontend - only fetch events with available tickets
+app.get(`${EVENT_PATH}/all`, getUpcomingEvents); // chenged path for BO use
 app.get(`${EVENT_PATH}/:eventId`, getEventById);
 
 app.post(EVENT_PATH, createEvent);

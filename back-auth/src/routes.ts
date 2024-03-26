@@ -36,7 +36,7 @@ export async function loginRoute(req: Request, res: Response) {
   const secure = process.env.NODE_ENV === 'production';
   const sameSite = process.env.NODE_ENV === 'production' ? 'none' : 'strict';
   // We are Deployed - must use secure cookies with sameSite none
-  res.cookie('token', token, { httpOnly: true, sameSite:sameSite, secure, maxAge: 172800000 }); 
+  res.cookie('token', token, { httpOnly: true, sameSite: sameSite, secure, maxAge: 172800000 });
   res.send('Logged in');
 }
 
@@ -44,7 +44,7 @@ export async function logoutRoute(req: Request, res: Response) {
   const secure = process.env.NODE_ENV === 'production';
   const sameSite = process.env.NODE_ENV === 'production' ? 'none' : 'strict';
   // We are Deployed - must use secure cookies with sameSite none
-  res.clearCookie('token', { httpOnly: true, sameSite: sameSite, secure }); 
+  res.clearCookie('token', { httpOnly: true, sameSite: sameSite, secure });
   res.status(StatusCodes.OK).send('Logged out');
 }
 
@@ -61,9 +61,9 @@ export async function signupRoute(req: Request, res: Response) {
     res.status(StatusCodes.BAD_REQUEST).send('Username already exists');
     return;
   }
-  
+
   user.password = await bcrypt.hash(user.password, 10);
-  
+
   try {
     await user.save();
   }
@@ -92,5 +92,5 @@ export async function usernameRoute(req: Request, res: Response) {
     return;
   }
 
-  res.status(StatusCodes.OK).send({username});
+  res.status(StatusCodes.OK).send({ username });
 }

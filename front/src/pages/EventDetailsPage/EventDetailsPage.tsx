@@ -61,7 +61,7 @@ const EventDetails: React.FC = () => {
         setTickets(null);
         let fetchedTickets: Ticket[];
         try {
-            fetchedTickets = await TicketApi.fetchTickets(eventId) ?? [];
+            fetchedTickets = await TicketApi.fetchAvailableTickets(eventId) ?? [];
             if (!fetchedTickets) {
                 throw new Error(`Failed to fetch tickets for event ${eventId}`);
             }
@@ -222,7 +222,7 @@ const EventDetails: React.FC = () => {
             </Card.Body>
         } else {
             bodyContent = tickets.map((ticket, index) => {
-                return <BuyTicketComponent key={index} name={ticket.name} price={ticket.price} amountLeft={ticket.quantity} />
+                return <BuyTicketComponent key={index} name={ticket.name} price={ticket.price} amountLeft={ticket.available} />
             });
         }
 

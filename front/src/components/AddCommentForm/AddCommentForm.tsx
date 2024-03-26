@@ -23,7 +23,7 @@ const AddCommentForm: React.FC<AddCommentProps> = ({ eventId, updateComments }) 
 
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        // TODO - implement this
+        
         if (!context.user) {
             alert("Could not identify user. Please refresh the page and try again."); // TODO - error?
             return;

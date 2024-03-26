@@ -18,7 +18,8 @@ import {
     LOGIN_PATH,
     LOGOUT_PATH,
     SIGNUP_PATH,
-    USERNAME_PATH, // TODO - remove?
+    TICKET_API_URL,
+    USERNAME_PATH,
 } from './const.js';
 import { isAuthorized } from './auths.js';
 
@@ -45,7 +46,7 @@ app.use(cookieParser());
 let origin = process.env.ORIGIN;
 app.use(cors({
     origin: origin,
-    methods: ['GET', 'POST'],
+    methods: ['GET', 'POST', 'PUT'],
     credentials: true,  // Frontend needs to send cookies with requests
 }));
 /* ========== */
@@ -65,6 +66,14 @@ const commentProxy = createProxyMiddleware({
     changeOrigin: true, // TODO - What is this?
 });
 app.use('/api/comment', isAuthorized, commentProxy);
+
+// Ticket Microservice
+const ticketProxy = createProxyMiddleware({
+    target: TICKET_API_URL,
+    onProxyReq: fixRequestBody,
+    changeOrigin: true, // TODO - What is this?
+});
+app.use('/api/ticket', isAuthorized, ticketProxy);
 
 
 

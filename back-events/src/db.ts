@@ -26,7 +26,12 @@ export const queryEventByID = async (id: string): Promise<ICSEvent | null> => {
   return event ? event.toJSON() as ICSEvent : null;
 }
 
-// TODO - queryUpcomingAvailableEvents ??
+export const queryUpcomingAvailableEvents = async (skip: number, limit: number): Promise<ICSEvent[]> => {
+  const currentDate = new Date();
+  const events = await CSEvent.find({ start_date: { $gt: currentDate }, total_available_tickets: { $gt: 0 } }).skip(skip).limit(limit).exec();
+  return events.map(event => event.toJSON() as ICSEvent);
+}
+
 export const queryUpcomingEvents = async (skip: number, limit: number): Promise<ICSEvent[]> => {
   const currentDate = new Date();
   const events = await CSEvent.find({ start_date: { $gt: currentDate } }).skip(skip).limit(limit).exec();
@@ -43,4 +48,9 @@ export const updateEventByID = async (eventId: string, event: ICSEvent): Promise
 
 export const plusCommentCount = async (eventId: string): Promise<void> => {
   await CSEvent.findByIdAndUpdate(eventId, { $inc: { comment_count: 1 } }).exec();
+}
+
+export const updateCheapesstTicket = async (eventId: string, ticketName: string, price: number): Promise<void> => {
+  console.log("updateCheapesstTicket for eventId: ", eventId, " and ticketName: ", ticketName, " and price: ", price);
+  await CSEvent.findByIdAndUpdate(eventId, { cheapest_ticket_name: ticketName, cheapest_ticket_price: price }).exec();
 }

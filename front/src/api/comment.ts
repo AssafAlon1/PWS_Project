@@ -19,7 +19,7 @@ const RealCommentApi = {
         } catch (e) {
             console.error(e);
             if (isAxiosError(e)) {
-                throw new Error("Failed to add comment for event " + eventId + ": " + e.response.data); // TODO - Better handling?
+                throw new Error("Failed to add comment for event " + eventId + ": " + e.response?.data); // TODO - Better handling?
             }
             throw new Error("Failed to add comment"); // TODO - Better handling?
         }
@@ -29,7 +29,6 @@ const RealCommentApi = {
         try {
             const response = await axiosInstance.get(`/api/comment/${eventId}`, {
                 params: {
-                    // eventId, // TODO - event ID id not a param.... its part of the path!
                     skip,
                     limit
                 }

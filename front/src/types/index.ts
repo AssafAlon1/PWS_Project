@@ -2,13 +2,15 @@ export interface CSEvent {
     _id: string;
     title: string;
     description: string;
-    start_date: Date; // TODO - string?
-    end_date: Date; // TODO - string?
+    start_date: Date; 
+    end_date: Date;
     category: string;
     location: string;
     image?: string;
+    cheapest_ticket_name?: string;
+    cheapest_ticket_price: number;
+    total_available_tickets: number;
     comment_count: number;
-    // TODO - MORE FIELDS!
 }
 
 export interface Comment {
@@ -16,14 +18,14 @@ export interface Comment {
     content: string;
     createdAt: Date;
     author: string;
-    // TODO - MORE FIELDS!
 }
 
 export interface Ticket {
     eventId: string;
     name: string;
+    available: number;
+    total: number;
     price: number;
-    quantity: number;
 }
 
 export interface PurchaseDetails {
@@ -36,13 +38,12 @@ export interface PurchaseDetails {
 
 export interface UserAction {
     username: string;
-    actionType: "purchase" | "refund"; // TODO - Maybe comment as well if we're feeling funky?
+    actionType: "purchase" | "refund";
     eventId: string;
     purchaseId: string;
     ticketName: string;
     amount: number;
     timestamp: Date;
-    // TODO - MORE FIELDS!
 }
 
 export enum APIStatus {
@@ -50,11 +51,4 @@ export enum APIStatus {
     BadRequest,
     Unauthorized,
     ServerError
-}
-
-// TODO - this is from the workshop. is it relevant to us?
-export interface PageProps {
-    navigateToMainPage(): void;
-    navigateToSignUpPage(): void;
-    navigateToLoginPage(): void;
 }

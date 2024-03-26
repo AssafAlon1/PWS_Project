@@ -1,5 +1,7 @@
+import axios from "axios";
 import UserAction, { IUserAction } from "./models/UserAction.js";
 import { StatusCodes } from 'http-status-codes';
+import { EVENT_API_URL } from "./const.js";
 
 export const addBuyTicketsAction = async (purchaseDetails: IUserAction): Promise<number> => {
     let newUserAction;
@@ -37,14 +39,15 @@ export const addRefundTicketsAction = async (purchaseId: string, refundDate: Dat
     }
 }
 
-export const queryUserClosestEvent = async (username: string): Promise<string | number> => {
+export const queryUserClosestEvent = async (username: string): Promise<{ eventTitle: string, eventStartDate: Date } | number> => {
     try {
-        // TODO - THIS DOESN'T WORK RIGHT NOW. Needs to get from the events service...
-        const userActions = await UserAction.find({ username: username, refund_time: { $exists: false } }).sort({ purchase_time: 1 });
+        const userActions = (await UserAction.find({ username: username, refund_time: { $exists: false } })).map((userAction) => userAction.event_id);
         if (userActions.length === 0) {
             return StatusCodes.NOT_FOUND;
         }
-        return userActions[0].event_id;
+        const axiosInstance = axios.create({ withCredentials: true, baseURL: EVENT_API_URL });
+        const result = await axiosInstance.get("/api/closest_event?event_ids=" + userActions.join(","));
+        return result.data as { eventTitle: string, eventStartDate: Date };
     }
     catch (error) {
         console.error("Error getting closest event for user " + username);

@@ -2,13 +2,13 @@ import mongoose from "mongoose";
 import { Request, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
 
-import { deleteEventByID, insertEvent, queryEventByID, queryUpcomingAvailableEvents, queryUpcomingEvents, updateEventByID } from "./db.js";
+import { deleteEventByID, insertEvent, queryClosestEvent, queryEventByID, queryUpcomingAvailableEvents, queryUpcomingEvents, updateEventByID } from "./db.js";
 import { ICSEvent, JoiEventCreationRequestSchema, eventSchema } from "./models/CSEvent.js";
-import { MAX_QUERY_LIMIT, TICKET_SERVICE_URL } from "./const.js";
+import { MAX_QUERY_LIMIT, TICKET_API_URL } from "./const.js";
 import { CSEventWithTickets } from "./types.js";
 import axios from "axios";
 
-const axiosInstance = axios.create({ withCredentials: true, baseURL: TICKET_SERVICE_URL });
+const axiosInstance = axios.create({ withCredentials: true, baseURL: TICKET_API_URL });
 
 export const getUpcomingEvents = async (req: Request, res: Response) => {
   console.log("GET /api/event");
@@ -116,7 +116,6 @@ export const createEvent = async (req: Request, res: Response) => {
 
   // Insertion was successful - add the tickets
   try {
-    console.log("Initialized axios instance with Tickets URL: ", TICKET_SERVICE_URL);
     await axiosInstance.post('/api/tickets', postData.tickets.map(ticket => ({ ...ticket, eventId: insertResult })));
     res.status(StatusCodes.CREATED).send({ _id: insertResult });
   }
@@ -225,6 +224,32 @@ export const updateEvent = async (req: Request, res: Response) => {
     return;
   }
 };
+
+
+export const getClosestEvent = async (req: Request, res: Response) => {
+  console.log("GET /api/closest_event");
+  const eventIDs = req.query.event_ids as string;
+  if (!eventIDs) {
+    res.status(StatusCodes.BAD_REQUEST).send({ message: "Bad Request." });
+    return;
+  }
+
+  const eventIDArray = eventIDs.split(",");
+
+  let closestEvent;
+  try {
+    closestEvent = await queryClosestEvent(eventIDArray);
+    if (!closestEvent) {
+      res.status(StatusCodes.NOT_FOUND).send({ message: "No events found." });
+      return;
+    }
+  }
+  catch (error) {
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({ message: "Internal Server Error" });
+    return;
+  }
+  res.status(StatusCodes.OK).send({ eventTitle: closestEvent.title, eventStartDate: closestEvent.start_date });
+}
 
 // export const deleteEvent = async (req: Request, res: Response) => {
 

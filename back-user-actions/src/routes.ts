@@ -84,12 +84,12 @@ export const getClosestEvent = async (req: Request, res: Response) => {
             throw Error("No username provided.");
         }
 
-        const eventId = await queryUserClosestEvent(username);
-        if (eventId === StatusCodes.NOT_FOUND) {
+        const closestEvent = await queryUserClosestEvent(username);
+        if (closestEvent === StatusCodes.NOT_FOUND) {
             return res.status(StatusCodes.NOT_FOUND).send({ message: "No events found." });
         }
 
-        res.status(StatusCodes.OK).send({ eventId });
+        res.status(StatusCodes.OK).send(closestEvent);
     }
     catch (error) {
         res.status(StatusCodes.BAD_REQUEST).send({ message: "Bad Request." });

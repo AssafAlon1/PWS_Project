@@ -1,7 +1,8 @@
 import axios, { isAxiosError } from "axios";
 
-import { APIStatus, CSEvent } from "../types";
+import { APIStatus } from "../types";
 import { API_GATEWAY_URL } from "../const";
+import { getFormattedDateTime } from "../utils/formatting";
 
 const axiosInstance = axios.create({ withCredentials: true, baseURL: API_GATEWAY_URL }); // TODO - withCredentials?
 
@@ -33,15 +34,18 @@ const RealUserActionApi = {
         }
     },
 
-    getUserClosestEvent: async (username: string): Promise<CSEvent | null> => {
-        return null; // Should first implement the logic in the events service
+    getUserClosestEvent: async (username: string): Promise<string | null> => {
         try {
-            const response = await axiosInstance.get("/api/closest_event", {
+            const response = (await axiosInstance.get("/api/closest_event", {
                 params: {
                     username
                 }
-            });
-            return response.data;
+            })).data;
+            if (!response.eventTitle || !response.eventStartDate) {
+                console.error("Couldn't find closest event for " + username);
+                return null;
+            }
+            return `${response.eventTitle} (${getFormattedDateTime(response.eventStartDate)})`;
         }
         catch (error) {
             console.error("Couldn't find closest event for " + username);

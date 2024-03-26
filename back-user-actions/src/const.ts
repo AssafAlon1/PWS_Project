@@ -10,3 +10,4 @@ export const BUY_TICKETS_EXCHANGE = "buy_tickets_exchange";
 export const BUY_TICKETS_QUEUE = "buy_tickets_queue";
 
 export const ORDER_API_URL = process.env.ORDER_API_URL
+export const EVENT_API_URL = process.env.EVENT_API_URL

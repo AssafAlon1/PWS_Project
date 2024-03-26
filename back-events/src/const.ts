@@ -23,4 +23,4 @@ export const COMMENT_QUEUE = 'comments_queue';
 export const TICKET_INFO_EXCHANGE = 'ticket_info_exchange';
 export const TICKET_INFO_QUEUE = 'ticket_info_queue';
 
-export const TICKET_SERVICE_URL = process.env.TICKET_SERVICE_URL;
+export const TICKET_API_URL = process.env.TICKET_API_URL;

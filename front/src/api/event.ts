@@ -33,11 +33,6 @@ const RealEventApi = {
         }
     },
 
-    getUserClosestEvent: async (username: string): Promise<CSEvent | null> => {
-        // TODO - implement
-        console.log(" > No events found for " + username);
-        return null;
-    }
 };
 
 

@@ -1,6 +1,5 @@
 import { Comment, Ticket, CSEvent } from "../types";
 import { MAX_EVENTS_IN_PAGE } from "../const";
-import { getUserEventIds, registerUserAction } from "./userAction";
 
 // Mock API
 function getRandomInt(max: number) {
@@ -65,40 +64,6 @@ export const MockEventApi = {
         // }
         return MockEventApi.allEvents.find(event => event._id === eventId) ?? null;
     },
-
-    getUserClosestEvent: async (username: string): Promise<CSEvent | null> => {
-        console.log(" > Getting closest event for " + username);
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        const userEventIds = getUserEventIds(username);
-        if (!userEventIds) {
-            console.log(" > No events found for " + username);
-            return null;
-        }
-
-        const userEvents: CSEvent[] = userEventIds.map(eventId => MockEventApi.allEvents.find(event => event._id === eventId)).filter(event => event !== undefined) as CSEvent[];
-        if (userEvents.length === 0) {
-            console.log(" > No events found for " + username);
-            return null;
-        }
-
-        const nextEvent = userEvents.reduce((minEvent, event) => {
-            if (!minEvent) {
-                return event;
-            }
-            if (event.start_date.getTime() < minEvent.start_date.getTime()) {
-                return event;
-            }
-            return minEvent;
-        }, userEvents[0]);
-
-        if (nextEvent) {
-            console.log(" > Next event found for " + username + ": " + nextEvent.title);
-            return nextEvent;
-        }
-
-        console.log(" > SHOULDN'T BE REACHABLE No events found for " + username);
-        return null;
-    }
 };
 
 for (let i = 100; i < 170; i++) {
@@ -110,6 +75,9 @@ for (let i = 100; i < 170; i++) {
         end_date: new Date("2024-03-29T01:00"),
         category: "Conference",
         location: "Some Conference Center idk",
+        cheapest_ticket_price: 1000,
+        total_available_tickets: 500,
+        comment_count: 0,
     });
 }
 
@@ -217,9 +185,77 @@ export const MockTicketApi = {
             throw new Error("Force error for testing purposes.");
         }
 
-        const purchaseId = "1";
+        const purchaseId = `${new Date().getTime()}`;
 
-        registerUserAction(username, "purchase", eventId, purchaseId, ticketName, amount);
+        MockUserActionApi.registerUserAction(username, eventId, purchaseId, ticketName, amount);
         return purchaseId;
     },
+}
+
+export const MockUserActionApi = {
+    allUserActions: [
+        {
+            username: "Alice",
+            event_id: "3",
+            purchase_id: "2",
+            ticket_name: "General Admission",
+            amount: 3,
+            purchase_time: new Date("2024-03-17T11:32"),
+            refund_time: undefined
+        },
+    ],
+
+    registerUserAction: (
+        username: string,
+        eventId: string,
+        purchaseId: string,
+        ticketName: string,
+        amount: number,) => {
+        const timestamp = new Date();
+        MockUserActionApi.allUserActions.push({
+            username,
+            event_id: eventId,
+            purchase_id: purchaseId,
+            ticket_name: ticketName,
+            amount,
+            purchase_time: timestamp,
+            refund_time: undefined
+        });
+
+    },
+    getUserClosestEvent: async (username: string): Promise<CSEvent | null> => {
+        console.log(" > Getting closest event for " + username);
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        const userEventIds = MockUserActionApi.allUserActions
+            .filter(action => action.username === username && !action.refund_time)
+            .map(purchase => purchase.event_id);
+        if (!userEventIds) {
+            console.log(" > No events found for " + username);
+            return null;
+        }
+
+        const userEvents: CSEvent[] = userEventIds.map(eventId => MockEventApi.allEvents.find(event => event._id === eventId)).filter(event => event !== undefined) as CSEvent[];
+        if (userEvents.length === 0) {
+            console.log(" > No events found for " + username);
+            return null;
+        }
+
+        const nextEvent = userEvents.reduce((minEvent, event) => {
+            if (!minEvent) {
+                return event;
+            }
+            if (event.start_date.getTime() < minEvent.start_date.getTime()) {
+                return event;
+            }
+            return minEvent;
+        }, userEvents[0]);
+
+        if (nextEvent) {
+            console.log(" > Next event found for " + username + ": " + nextEvent.title);
+            return nextEvent;
+        }
+
+        console.log(" > SHOULDN'T BE REACHABLE No events found for " + username);
+        return null;
+    }
 }

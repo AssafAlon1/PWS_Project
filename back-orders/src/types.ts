@@ -13,7 +13,8 @@ export type PaymentInformation = {
 }
 
 export const paymentInformationSchema = Joi.object({
-    cc: Joi.string().creditCard().required(),
+    cc: Joi.string().required(),
+    // cc: Joi.string().creditCard().required(), // <<<--- F*** THIS!!
     holder: Joi.string().required(),
     cvv: Joi.string().length(3).required(),
     exp: Joi.string().required(),

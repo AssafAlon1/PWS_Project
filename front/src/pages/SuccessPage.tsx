@@ -5,9 +5,9 @@ import { Link, useLocation } from 'react-router-dom';
 const SuccessPage: React.FC = () => {
     const location = useLocation();
     const message = "Payment successful! Thank you for your purchase";
-    const eventName = location.state?.eventName;
-    const ticketQuantity = location.state?.quantity;
-    const ticketName = location.state?.name;
+    const eventName = location.state?.event_name;
+    const ticketQuantity = location.state?.ticket_amount;
+    const ticketName = location.state?.ticket_name;
     const ticketPrice = location.state?.price;
     const orderId = location.state?.orderId;
 

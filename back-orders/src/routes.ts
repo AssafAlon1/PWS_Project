@@ -18,7 +18,8 @@ export const buyTickets = async (req: Request, res: Response) => {
         const { error } = paymentInformationSchema.validate(postData);
 
         if (error) {
-            console.error("Missing required fields.")
+            console.error("Missing required fields.");
+            console.error(error);
             res.status(StatusCodes.BAD_REQUEST).send({ message: "Missing required fields." });
             return;
         }

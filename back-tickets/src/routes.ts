@@ -4,8 +4,13 @@ import { StatusCodes } from 'http-status-codes';
 
 import { insertTicket, insertTickets, queryAllTicketsByEventID, queryAvailableTicketsByEventID, queryCheapestTicketsByEventID, queryTicketByName, updateTicket, updateTicketAmount } from "./db.js";
 import { ICSTicket, ticketSchema } from "./models/CSTicket.js";
-import { MAX_TICKET_LIMIT } from "./const.js";
+import { MAX_TICKET_LIMIT, ORDER_API_URL } from "./const.js";
 import { PublisherChannel } from "./publisher-channel.js";
+import axios from 'axios';
+import { PaymentInformation, paymentInformationSchema } from "./types.js";
+
+const axiosInstance = axios.create({ withCredentials: true, baseURL: ORDER_API_URL });
+
 
 export const getALLTicketsByEventId = async (req: Request, res: Response) => {
     console.log("GET /api/ticket/all");
@@ -116,30 +121,37 @@ export const createTickets = async (req: Request, res: Response) => {
 // TODO - check updateEvent in back-events/src/routes.ts and replicate logic!
 export const purchaseTicket = async (req: Request, res: Response) => {
     console.log("PUT /api/ticket");
+    let putData;
+    let ticket;
+    const publisherChannel: PublisherChannel = req.publisherChannel;
     try {
-        const putData = req.body as { eventId: string, ticketName: string, amount: number };
-        const publisherChannel: PublisherChannel = req.publisherChannel;
+        putData = req.body as PaymentInformation;
+        const { error } = paymentInformationSchema.validate(putData);
+        if (error) {
+            console.log(error);
+            res.status(StatusCodes.BAD_REQUEST).send({ message: "Bad Request." });
+            return;
+        }
         // Get the wanted ticket
-        const ticket = await queryTicketByName(putData.eventId, putData.ticketName);
+        ticket = await queryTicketByName(putData.event_id, putData.ticket_name);
         if (!ticket) {
+            console.error("Ticket not found");
+            console.error(ticket);
             throw Error("Ticket not found.");
         }
         // TODO - Make sure we have enough tickets to sell or that they are reseved in the locked array for the user!
-        if (ticket.available < putData.amount) {
+        if (ticket.available < putData.ticket_amount) {
+            console.error("Not enough tickets available.");
             throw Error("Not enough tickets available.");
         }
 
-        const result = await updateTicketAmount(ticket._id.toString(), putData.amount);
+        console.log(`>> Buying ${putData.ticket_amount} tickets for of id ${ticket._id}`);
+        const result = await updateTicketAmount(ticket._id.toString(), putData.ticket_amount);
 
         if (result != StatusCodes.OK) {
             console.error("Failed updating ticket in DB");
             res.status(StatusCodes.INTERNAL_SERVER_ERROR).send("Internal server error");
             return;
-        }
-
-        if (ticket.available === putData.amount) { // If we sold all tickets, send new cheapest ticket
-            const newCheapestTicket = await queryCheapestTicketsByEventID(putData.eventId); // could be null
-            await publisherChannel.sendEvent(JSON.stringify(newCheapestTicket));
         }
     }
     catch (error) {
@@ -148,5 +160,26 @@ export const purchaseTicket = async (req: Request, res: Response) => {
         return;
     }
 
-    res.status(StatusCodes.OK).send({ message: "Ticket purchased" });
+    try {
+        // CREATE THE ORDER, AND UNDO CHANGES IF FAILED
+        const orderResult = await axiosInstance.post("/api/buy", putData);
+        if (orderResult.status != StatusCodes.OK) {
+            console.error("Failed buying ticket - Order API failed");
+            throw Error("Failed buying ticket!");
+        }
+
+        if (ticket.available === putData.ticket_amount) { // If we sold all tickets, send new cheapest ticket
+            const newCheapestTicket = await queryCheapestTicketsByEventID(putData.event_id); // could be null
+            await publisherChannel.sendEvent(JSON.stringify(newCheapestTicket));
+        }
+
+        res.status(StatusCodes.OK).send({ message: "Ticket purchased" });
+    }
+    catch (error) {
+        // UNDO CHANGES
+        console.error(error);
+        await updateTicketAmount(ticket._id.toString(), -putData.ticket_amount);
+        return;
+    }
+
 }

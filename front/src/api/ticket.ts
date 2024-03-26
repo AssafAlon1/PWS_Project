@@ -1,6 +1,6 @@
 import axios, { isAxiosError } from "axios";
 
-import { APIStatus, Ticket } from "../types";
+import { APIStatus, PaymentDetails, PurchaseDetails, Ticket } from "../types";
 import { API_GATEWAY_URL } from "../const";
 
 const axiosInstance = axios.create({ withCredentials: true, baseURL: API_GATEWAY_URL }); // TODO - withCredentials?
@@ -26,11 +26,17 @@ const RealTicketApi = {
             throw new Error("Failed to fetch tickets"); // TODO - Better handling?
         }
     },
-    purchaseTickets: async (eventId: string, ticketName: string, amount: number, username: string) => {
+    purchaseTickets: async (purchaseDetails: PurchaseDetails, paymentDetails: PaymentDetails, username: string) => {
         // TODO - implement lock!
         try {
-            // TODO - Make sure we have enough tickets to sell or that they are reseved in the locked array for the user!
-            await axiosInstance.put('/api/ticket', { eventId, ticketName, amount /*, username */ });
+            // This is disgusting but doing it in a better way will require precious time of my life
+            const putData = {
+                event_id: purchaseDetails.event_id,
+                ticket_amount: purchaseDetails.ticket_amount,
+                ticket_name: purchaseDetails.ticket_name,
+                ...paymentDetails, username
+            }
+            await axiosInstance.put('/api/ticket', putData);
             console.log("Completed purchase");
             return APIStatus.Success;
 

@@ -1,3 +1,7 @@
+import dotenv from 'dotenv';
+
+dotenv.config();
+
 export const MAX_QUERY_LIMIT = 50;
 
 export const VALID_CATEGORIES = [
@@ -18,3 +22,5 @@ export const COMMENT_QUEUE = 'comments_queue';
 
 export const TICKET_INFO_EXCHANGE = 'ticket_info_exchange';
 export const TICKET_INFO_QUEUE = 'ticket_info_queue';
+
+export const TICKET_SERVICE_URL = process.env.TICKET_SERVICE_URL;

@@ -7,9 +7,10 @@ import cors from 'cors';
 import {
   getEventById,
   createEvent,
+  createTicketlessEvent,
   updateEvent,
   getUpcomingEvents,
-  getUpcomingAvailableEvents
+  getUpcomingAvailableEvents,
 } from "./routes.js";
 
 import {
@@ -49,6 +50,7 @@ app.get(`${EVENT_PATH}/all`, getUpcomingEvents); // chenged path for BO use
 app.get(`${EVENT_PATH}/:eventId`, getEventById);
 
 app.post(EVENT_PATH, createEvent);
+app.post(`${EVENT_PATH}/ticketless`, createTicketlessEvent); // TODO - legacy, may remove
 
 // TODO - Update event? Delete event (I think this is not required?)
 

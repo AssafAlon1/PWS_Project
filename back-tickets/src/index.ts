@@ -4,7 +4,7 @@ import dotenv from 'dotenv';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 
-import { createTicket, getALLTicketsByEventId, getAvailableTicketsByEventId, purchaseTicket } from './routes.js';
+import { createTicket, createTickets, getALLTicketsByEventId, getAvailableTicketsByEventId, purchaseTicket } from './routes.js';
 import { ALL_TICKET_PATH, TICKET_PATH } from './const.js';
 import { Request, Response, NextFunction } from 'express';
 import { PublisherChannel } from './publisher-channel.js';
@@ -42,6 +42,7 @@ app.get(`${ALL_TICKET_PATH}/:eventId`, getALLTicketsByEventId);
 app.get(`${TICKET_PATH}/:eventId`, getAvailableTicketsByEventId); // Currently not used - maybe for BO?
 
 app.post(`${TICKET_PATH}`, createTicket);
+app.post(`${TICKET_PATH}s`, createTickets);
 
 // Middleware to attach publisherChannel to the request
 function attachPublisherChannel(req: Request, res: Response, next: NextFunction) {

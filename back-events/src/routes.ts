@@ -4,7 +4,11 @@ import { StatusCodes } from 'http-status-codes';
 
 import { deleteEventByID, insertEvent, queryEventByID, queryUpcomingAvailableEvents, queryUpcomingEvents, updateEventByID } from "./db.js";
 import { ICSEvent, eventSchema } from "./models/CSEvent.js";
-import { MAX_QUERY_LIMIT } from "./const.js";
+import { MAX_QUERY_LIMIT, TICKET_SERVICE_URL } from "./const.js";
+import { CSEventWithTickets, JoiEventCreationRequestSchema } from "./types.js";
+import axios from "axios";
+
+const axiosInstance = axios.create({ withCredentials: true, baseURL: TICKET_SERVICE_URL });
 
 export const getUpcomingEvents = async (req: Request, res: Response) => {
   console.log("GET /api/event");
@@ -39,6 +43,7 @@ export const getUpcomingAvailableEvents = async (req: Request, res: Response) =>
 }
 
 export const getEventById = async (req: Request, res: Response) => {
+  console.log("GET /api/event/:eventId")
   const id = req.params.eventId;
   // If the provided ID is not a valid mongoDB identifier, it cannot be in the DB (saves a query).
   if (!mongoose.Types.ObjectId.isValid(id)) {
@@ -63,6 +68,69 @@ export const getEventById = async (req: Request, res: Response) => {
 };
 
 export const createEvent = async (req: Request, res: Response) => {
+  console.log("POST /api/event");
+  let insertResult;
+  let postData: CSEventWithTickets;
+  try {
+    postData = req.body;
+
+    if (postData._id) {
+      throw Error("_id is an automatically generated field.");
+    }
+
+    // Validate the event data
+    const { value, error } = JoiEventCreationRequestSchema.validate(postData, { abortEarly: false, allowUnknown: true, presence: 'required' });
+
+    if (error) {
+      console.error("Error validating event creation request: ", error);
+      throw Error("Bad Request.");
+    }
+
+    // Validate all pre-processing was successful
+    value.total_available_tickets = value.tickets.reduce((acc, ticket) => acc + ticket.total, 0);
+    value.cheapest_ticket_price = Math.min(...value.tickets.map(ticket => ticket.price));
+    value.cheapest_ticket_name = value.tickets.find(ticket => ticket.price === value.cheapest_ticket_price)?.name;
+    value.comment_count = 0;
+    const { value: validatedEvent, error: errorEvent } = eventSchema.validate(value, { abortEarly: false, allowUnknown: true, presence: 'required' });
+
+    if (errorEvent) {
+      console.error("Error validating event creation request: ", errorEvent);
+      throw Error("Bad Request.");
+    }
+
+    insertResult = await insertEvent(validatedEvent);
+
+    if (insertResult == StatusCodes.BAD_REQUEST) {
+      throw Error("Bad Request.")
+    }
+
+    if (insertResult == StatusCodes.INTERNAL_SERVER_ERROR) {
+      res.status(StatusCodes.INTERNAL_SERVER_ERROR).send("Internal server error");
+      return;
+    }
+  }
+  catch (error) {
+    res.status(StatusCodes.BAD_REQUEST).send("Bad Request");
+    return;
+  }
+
+  // Insertion was successful - add the tickets
+  try {
+    console.log("Initialized axios instance with Tickets URL: ", TICKET_SERVICE_URL);
+    await axiosInstance.post('/api/tickets', postData.tickets.map(ticket => ({ ...ticket, eventId: insertResult })));
+    res.status(StatusCodes.CREATED).send({ _id: insertResult });
+  }
+  catch (error) {
+    console.error("Error inserting tickets for event: ", insertResult + ". Deleting event...");
+    console.error(error.response.data);
+    deleteEventByID(insertResult); // Cleanup event if ticket insertion fails
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).send("Internal server error");
+    return;
+  }
+};
+
+// TODO - Legacy, may remove
+export const createTicketlessEvent = async (req: Request, res: Response) => {
   try {
     const postData = req.body as ICSEvent;
 

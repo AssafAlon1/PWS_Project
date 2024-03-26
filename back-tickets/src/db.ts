@@ -1,5 +1,36 @@
 import CSTicket, { ICSTicket } from "./models/CSTicket.js";
 import { StatusCodes } from 'http-status-codes';
+import { startSession } from 'mongoose';
+
+// Adds all tickets in one transaction
+export const insertTickets = async (ticketData: ICSTicket[]): Promise<number> => {
+  let session;
+  try {
+    session = await startSession();
+    session.startTransaction();
+
+    for (const ticket of ticketData) {
+      const newTicket = new CSTicket(ticket);
+      await newTicket.validate();
+      await newTicket.save();
+    }
+
+    await session.commitTransaction();
+    return StatusCodes.CREATED;
+  }
+  catch (err) {
+    console.log("ERROR?!")
+    if (session) {
+      await session.abortTransaction();
+    }
+    return StatusCodes.INTERNAL_SERVER_ERROR;
+  }
+  finally {
+    if (session) {
+      session.endSession();
+    }
+  }
+}
 
 export const insertTicket = async (ticketData: ICSTicket): Promise<string | number> => {
   const newTicket = new CSTicket(ticketData);

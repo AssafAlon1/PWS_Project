@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 import { Request, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
 
-import { insertTicket, queryAllTicketsByEventID, queryAvailableTicketsByEventID, queryCheapestTicketsByEventID, queryTicketByName, updateTicket } from "./db.js";
+import { insertTicket, insertTickets, queryAllTicketsByEventID, queryAvailableTicketsByEventID, queryCheapestTicketsByEventID, queryTicketByName, updateTicket } from "./db.js";
 import { ICSTicket, ticketSchema } from "./models/CSTicket.js";
 import { MAX_TICKET_LIMIT } from "./const.js";
 import { PublisherChannel } from "./publisher-channel.js";
@@ -43,6 +43,7 @@ export const getAvailableTicketsByEventId = async (req: Request, res: Response) 
 }
 
 export const createTicket = async (req: Request, res: Response) => {
+    console.log("POST /api/ticket");
     try {
         const postData = req.body as ICSTicket;
         postData.available = postData.total; // Added
@@ -70,6 +71,42 @@ export const createTicket = async (req: Request, res: Response) => {
         }
 
         res.status(StatusCodes.CREATED).send({ ticket_id: insertResult });
+    }
+    catch (error) {
+        res.status(StatusCodes.BAD_REQUEST).send({ message: "Bad Request." });
+    }
+}
+
+export const createTickets = async (req: Request, res: Response) => {
+    console.log("POST /api/tickets");
+    try {
+        const postData = req.body as ICSTicket[];
+        if (postData.length === 0) {
+            console.error("No tickets provided.")
+            throw Error("No tickets provided.");
+        }
+
+        postData.map(ticket => ticket.available = ticket.total); // Added
+        // Validate the ticket data
+        const validationResults = postData.map(ticket => ticketSchema.validate(ticket, { abortEarly: false, allowUnknown: true, presence: 'required' }));
+        const errors = validationResults.filter(result => result.error);
+        if (errors.length > 0) {
+            console.error("Ticket schema validation failed");
+            throw Error("Bad Request.");
+        }
+        const insertResult = await insertTickets(postData);
+
+        if (insertResult == StatusCodes.BAD_REQUEST) {
+            console.error("Failed inserting tickets to DB");
+            throw Error("Bad Request.")
+        }
+
+        if (insertResult == StatusCodes.INTERNAL_SERVER_ERROR) {
+            res.status(StatusCodes.INTERNAL_SERVER_ERROR).send("Internal server error");
+            return;
+        }
+
+        res.status(StatusCodes.CREATED).send({ "message": "Tickets created." });
     }
     catch (error) {
         res.status(StatusCodes.BAD_REQUEST).send({ message: "Bad Request." });

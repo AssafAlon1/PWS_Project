@@ -21,8 +21,9 @@ export const consumeMessages = async () => {
 
         await channel.consume(BUY_TICKETS_QUEUE, async (msg) => {
             // TODO - Parse message, add to db
-            console.log(`Comsumer >>> received message: ${msg}`);
-            // await (addBuyTicketsAction(msg));
+            console.log(`Consumer >>> received message: ${msg.content.toString()}`);
+            const buyTicketsAction = JSON.parse(msg.content.toString());
+            await addBuyTicketsAction(buyTicketsAction);
             channel.ack(msg);
         });
 

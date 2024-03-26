@@ -4,6 +4,7 @@ import { StatusCodes } from 'http-status-codes';
 import { BUY_PATH, PAYMER_PROVIDER_URL, REFUND_PATH } from "./const.js";
 import { PaymentInformation, paymentInformationSchema } from './types.js';
 import axios from 'axios';
+import { PublisherChannel } from './publisher-channel.js';
 
 // const axiosInstance = axios.create({ withCredentials: true, baseURL: PAYMER_PROVIDER_URL });
 const axiosPayment = axios.create({ baseURL: PAYMER_PROVIDER_URL });
@@ -12,6 +13,7 @@ const axiosPayment = axios.create({ baseURL: PAYMER_PROVIDER_URL });
 export const buyTickets = async (req: Request, res: Response) => {
     console.log("POST " + BUY_PATH);
     try {
+        const publisherChannel: PublisherChannel = req.publisherChannel;
         const postData = req.body as PaymentInformation;
         const { error } = paymentInformationSchema.validate(postData);
 
@@ -22,9 +24,19 @@ export const buyTickets = async (req: Request, res: Response) => {
         }
 
         const paymentResult = await axiosPayment.post("/_functions/pay", postData);
-        // TODO - Notify rabbit
+        const orderId = paymentResult.data.paymentToken;
 
-        res.status(StatusCodes.OK).send({ order_id: paymentResult.data.paymentToken });
+        const orderData = {
+            username: postData.username,
+            event_id: postData.event_id,
+            ticket_name: postData.ticket_name,
+            ticket_amount: postData.ticket_amount,
+            purchase_id: orderId,
+            purchase_time: new Date(),
+        };
+        publisherChannel.sendBuyEvent(JSON.stringify(orderData));
+
+        res.status(StatusCodes.OK).send({ order_id: orderId });
     }
     catch (error) {
         res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({ message: "Internal Server Error" });

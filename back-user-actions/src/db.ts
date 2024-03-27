@@ -66,6 +66,7 @@ export const queryNonRefundedPurchases = async (username: string): Promise<IUser
     }
 }
 
+// TODO - remove?
 export const isPurchaseRefunded = async (purchaseId: string): Promise<boolean> => {
     try {
         const userAction = await UserAction.findOne({ purchase_id: purchaseId });
@@ -74,5 +75,16 @@ export const isPurchaseRefunded = async (purchaseId: string): Promise<boolean> =
     catch (error) {
         console.error("Error checking if purchase " + purchaseId + " is refunded.");
         return false;
+    }
+}
+
+export const queryActionByPurchaseId = async (purchaseId: string): Promise<IUserAction | null> => {
+    try {
+        const userAction = await UserAction.findOne({ purchase_id: purchaseId });
+        return userAction.toJSON() as IUserAction;
+    }
+    catch (error) {
+        console.error("Error getting purchase " + purchaseId);
+        return null;
     }
 }

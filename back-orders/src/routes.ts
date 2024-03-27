@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
 
 import { BUY_PATH, PAYMENT_PROVIDER_URL, REFUND_PATH } from "./const.js";
-import { PaymentInformation, paymentInformationSchema } from './types.js';
+import { PaymentInformation, RefundInformation, paymentInformationSchema } from './types.js';
 import axios from 'axios';
 import { PublisherChannel } from './publisher-channel.js';
 
@@ -47,15 +47,28 @@ export const buyTickets = async (req: Request, res: Response) => {
 export const refundTickets = async (req: Request, res: Response) => {
     console.log("POST " + REFUND_PATH);
     try {
-        const postData = req.body as { order_id: string };
-        if (!postData.order_id) {
+        const postData = req.body as RefundInformation;
+        const publisherChannel: PublisherChannel = req.publisherChannel;
+
+        if (!postData.purchase_id) {
             console.error("Missing required fields.")
             res.status(StatusCodes.BAD_REQUEST).send({ message: "Missing required fields." });
             return;
         }
 
-        await axiosPayment.post("/_functions/refund", { orderId: postData.order_id });
+        const refund_result = await axiosPayment.post("/_functions/refund", { orderId: postData.purchase_id });
+        // TODO - redundant??
+        if (refund_result.status !== StatusCodes.OK) {
+            res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({ message: "Internal Server Error" });
+            return;
+        }
         // TODO - Notify rabbit
+        const refundData = {
+            event_id: postData.event_id,
+            ticket_name: postData.ticket_name,
+            ticket_amount: postData.ticket_amount,
+        };
+        publisherChannel.sendRefundEvent(JSON.stringify(refundData));
 
         res.status(StatusCodes.OK).send({ message: "Refund successful" });
     }

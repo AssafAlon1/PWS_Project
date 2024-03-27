@@ -12,6 +12,13 @@ export type PaymentInformation = {
     ticket_amount: number,
 }
 
+export type RefundInformation = {
+    purchase_id: string,
+    event_id: string,
+    ticket_name: string,
+    ticket_amount: number,
+}
+
 export const paymentInformationSchema = Joi.object({
     cc: Joi.string().required(),
     // cc: Joi.string().creditCard().required(), // <<<--- F*** THIS!!

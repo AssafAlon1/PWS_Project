@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 import { Request, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
 
-import { insertTicket, insertTickets, queryAllTicketsByEventID, queryAvailableTicketsByEventID, queryCheapestTicketsByEventID, queryTicketByName, updateTicket, updateTicketAmount } from "./db.js";
+import { insertTicket, insertTickets, queryAllTicketsByEventID, queryAvailableTicketsByEventID, queryCheapestTicketsByEventID, queryTicketByName, updateTicketAmount } from "./db.js";
 import { ICSTicket, ticketSchema } from "./models/CSTicket.js";
 import { MAX_TICKET_LIMIT, ORDER_API_URL } from "./const.js";
 import { PublisherChannel } from "./publisher-channel.js";

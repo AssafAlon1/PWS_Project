@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
 
-import { addRefundTicketsAction, queryUserClosestEvent, queryNonRefundedPurchases, addBuyTicketsAction, isPurchaseRefunded } from './db.js';
+import { addRefundTicketsAction, queryUserClosestEvent, queryNonRefundedPurchases, addBuyTicketsAction, isPurchaseRefunded, queryActionByPurchaseId } from './db.js';
 import { hasEventStarted } from "./utils.js";
 import { ACTIONS_PATH, CLOSEST_EVENT_PATH, ORDER_API_URL, REFUND_OPTIONS_PATH } from "./const.js";
 import axios from 'axios';
@@ -47,7 +47,12 @@ export const refundTickets = async (req: Request, res: Response) => {
             return;
         }
 
-        if (await isPurchaseRefunded(postData.purchase_id)) {
+        const refund_details = await queryActionByPurchaseId(postData.purchase_id);
+        if (refund_details === null) {
+            return res.status(StatusCodes.NOT_FOUND).send({ message: "Error getting the action details" });
+        }
+        if(refund_details.refund_time !== undefined) {
+        // if (await isPurchaseRefunded(postData.purchase_id)) {
             console.error("Purchase doesn't exist or has already been refunded.")
             return res.status(StatusCodes.NOT_FOUND).send({ message: "Purchase doesn't exist or has already been refunded." });
         }
@@ -56,11 +61,16 @@ export const refundTickets = async (req: Request, res: Response) => {
             return res.status(StatusCodes.BAD_REQUEST).send({ message: "Event has already started." });
         }
 
+        const refundInformation = { 
+            purchase_id: postData.purchase_id, 
+            event_id: refund_details.event_id, 
+            ticket_id: refund_details.ticket_name,
+            ticket_amount: refund_details.ticket_amount,
+        };
         // TODO - refund with the order service
-        const refundResult = await axiosInstance.post('/api/refund', { order_id: postData.purchase_id });
+        const refundResult = await axiosInstance.post('/api/refund', { refundInformation });
         if (refundResult.status !== StatusCodes.OK) {
             throw Error("Failed to refund tickets.");
-            return;
         }
 
         const insertResult = await addRefundTicketsAction(postData.purchase_id, refundDate);

@@ -32,6 +32,7 @@ export const insertTickets = async (ticketData: ICSTicket[]): Promise<number> =>
   }
 }
 
+// legacy - maybe remove
 export const insertTicket = async (ticketData: ICSTicket): Promise<string | number> => {
   const newTicket = new CSTicket(ticketData);
   try {
@@ -50,6 +51,7 @@ export const insertTicket = async (ticketData: ICSTicket): Promise<string | numb
   }
 }
 
+// legacy - maybe remove
 export const updateTicket = async (ticketData: ICSTicket): Promise<number> => {
   console.log("updateTicket for ticket: ", ticketData._id);
   try {
@@ -62,6 +64,7 @@ export const updateTicket = async (ticketData: ICSTicket): Promise<number> => {
   }
 }
 
+// Will be used for buying and refunding tickets
 export const updateTicketAmount = async (ticketId: string, purchaseAmount: number): Promise<number> => {
   try {
     // This is done atomically (check amount and update if enough tickets are available)
@@ -105,4 +108,16 @@ export const queryCheapestTicketsByEventID = async (eventId: string): Promise<IC
   console.log("queryCheapestTicketsByEventID for eventId: ", eventId);
   const ticket = await CSTicket.find({ eventId: eventId, available: { $gt: 0 } }).sort({ price: 1 }).limit(1).exec();
   return ticket.length > 0 ? ticket[0].toJSON() as ICSTicket : null;
+}
+
+export const updateRefund = async (event_id: string, ticket_name: string, amount: number): Promise<number> => {
+  // TODO - implement - call queryTicketByNAme and then updateTicketAmount
+  console.log("updateRefund for event_id: ", event_id, " ticket_name: ", ticket_name, " amount: ", amount);
+  const ticket = await queryTicketByName(event_id, ticket_name);
+  if(ticket === null) {
+    // TODO - better handeling
+    console.error("Ticket not found for event_id: ", event_id, " ticket_name: ", ticket_name);
+    return StatusCodes.NOT_FOUND;
+  }
+  return await updateTicketAmount(ticket._id.toString(), -amount);
 }

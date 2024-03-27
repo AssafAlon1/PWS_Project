@@ -32,7 +32,7 @@ export const insertTickets = async (ticketData: ICSTicket[]): Promise<number> =>
   }
 }
 
-// legacy - maybe remove
+// TODO - legacy - maybe remove
 export const insertTicket = async (ticketData: ICSTicket): Promise<string | number> => {
   const newTicket = new CSTicket(ticketData);
   try {
@@ -51,7 +51,7 @@ export const insertTicket = async (ticketData: ICSTicket): Promise<string | numb
   }
 }
 
-// legacy - maybe remove
+// TODO - legacy - maybe remove
 export const updateTicket = async (ticketData: ICSTicket): Promise<number> => {
   try {
     await CSTicket.updateOne({ _id: ticketData._id }, ticketData).exec();

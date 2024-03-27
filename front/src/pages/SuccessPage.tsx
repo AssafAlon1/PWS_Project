@@ -13,10 +13,10 @@ const SuccessPage: React.FC = () => {
     const orderId = location.state?.orderId;
 
     const CardBody = () => {
-        const context = useContext(AuthContext); // Is this OK? We need to update the next event after purchase...
+        const authContext = useContext(AuthContext); // Is this OK? We need to update the next event after purchase...
 
         const handleReturnToCatalog = () => {
-            context.updateNextEvent(); 
+            authContext.updateNextEvent();
         };
 
         if (!eventName || !ticketQuantity || !ticketName || !ticketPrice || !orderId) {
@@ -35,7 +35,7 @@ const SuccessPage: React.FC = () => {
             </Card.Body>
         }
     }
-    
+
     return (
         <>
             <Card border="success">

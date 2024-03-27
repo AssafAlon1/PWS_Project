@@ -20,10 +20,9 @@ export const consumeMessages = async () => {
         await channel.bindQueue(REFUND_TICKETS_QUEUE, REFUND_TICKETS_EXCHANGE, '');
 
         await channel.consume(REFUND_TICKETS_QUEUE, async (msg) => {
-            // TODO - Parse message, update db
             console.log(`Consumer >>> received message: ${msg.content.toString()}`);
-            const buyTicketsAction = JSON.parse(msg.content.toString());
-            await updateRefund(buyTicketsAction.event_id, buyTicketsAction.ticket_name, buyTicketsAction.ticket_amount);
+            const refundTicketsAction = JSON.parse(msg.content.toString());
+            await updateRefund(refundTicketsAction.event_id, refundTicketsAction.ticket_name, refundTicketsAction.ticket_amount);
             channel.ack(msg);
         });
 

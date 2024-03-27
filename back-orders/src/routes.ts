@@ -50,6 +50,7 @@ export const refundTickets = async (req: Request, res: Response) => {
         const postData = req.body as RefundInformation;
         const publisherChannel: PublisherChannel = req.publisherChannel;
 
+        // TODO - validate postData indeed has the properties of RefundInformation using JOI
         if (!postData.purchase_id) {
             console.error("Missing required fields.")
             res.status(StatusCodes.BAD_REQUEST).send({ message: "Missing required fields." });
@@ -62,7 +63,6 @@ export const refundTickets = async (req: Request, res: Response) => {
             res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({ message: "Internal Server Error" });
             return;
         }
-        // TODO - Notify rabbit
         const refundData = {
             event_id: postData.event_id,
             ticket_name: postData.ticket_name,

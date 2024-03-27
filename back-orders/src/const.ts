@@ -7,4 +7,4 @@ export const BUY_TICKETS_EXCHANGE = "buy_tickets_exchange";
 export const REFUND_TICKETS_EXCHANGE = "refund_tickets_exchange";
 // export const REFUND_TICKETS_QUEUE = "refund_tickets_queue";
 
-export const PAYMER_PROVIDER_URL = "https://www.cs-wsp.net"
+export const PAYMENT_PROVIDER_URL = "https://www.cs-wsp.net"

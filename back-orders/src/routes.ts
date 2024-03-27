@@ -1,13 +1,13 @@
 import { Request, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
 
-import { BUY_PATH, PAYMER_PROVIDER_URL, REFUND_PATH } from "./const.js";
+import { BUY_PATH, PAYMENT_PROVIDER_URL, REFUND_PATH } from "./const.js";
 import { PaymentInformation, paymentInformationSchema } from './types.js';
 import axios from 'axios';
 import { PublisherChannel } from './publisher-channel.js';
 
 // const axiosInstance = axios.create({ withCredentials: true, baseURL: PAYMER_PROVIDER_URL });
-const axiosPayment = axios.create({ baseURL: PAYMER_PROVIDER_URL });
+const axiosPayment = axios.create({ baseURL: PAYMENT_PROVIDER_URL });
 
 
 export const buyTickets = async (req: Request, res: Response) => {

@@ -230,11 +230,13 @@ export const getClosestEvent = async (req: Request, res: Response) => {
   console.log("GET /api/closest_event");
   const eventIDs = req.query.event_ids as string;
   if (!eventIDs) {
+    console.error("No event_ids provided.")
     res.status(StatusCodes.BAD_REQUEST).send({ message: "Bad Request." });
     return;
   }
 
   const eventIDArray = eventIDs.split(",");
+  console.log("Event IDs: ", eventIDArray.join(","));
 
   let closestEvent;
   try {

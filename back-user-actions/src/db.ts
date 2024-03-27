@@ -45,6 +45,7 @@ export const queryUserClosestEvent = async (username: string): Promise<{ eventTi
         if (userActions.length === 0) {
             return StatusCodes.NOT_FOUND;
         }
+        console.log("User actions: ", userActions.join(","));
         const axiosInstance = axios.create({ withCredentials: true, baseURL: EVENT_API_URL });
         const result = await axiosInstance.get("/api/closest_event?event_ids=" + userActions.join(","));
         return result.data as { eventTitle: string, eventStartDate: Date };

@@ -58,5 +58,6 @@ export const queryClosestEvent = async (eventIds: string[]): Promise<ICSEvent | 
   const currentDate = new Date();
   eventIds = eventIds.filter(id => isValidObjectId(id));
   const events = await CSEvent.find({ _id: { $in: eventIds }, start_date: { $gt: currentDate } }).sort({ start_date: 1 }).limit(1).exec();
+  console.log("queryClosestEvent: ", events);
   return events.length > 0 ? events[0].toJSON() as ICSEvent : null;
 }

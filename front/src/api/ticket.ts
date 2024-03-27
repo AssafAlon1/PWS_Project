@@ -45,7 +45,6 @@ const RealTicketApi = {
                 throw new Error("Failed to purchase tickets: " + error.response?.data.message); // TODO - Better handling?
             }
             throw new Error("Failed to purchase tickets"); // TODO - Better handling?
-
         }
         // return "1234";
     },

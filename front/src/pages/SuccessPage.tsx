@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { Button, Card } from 'react-bootstrap';
 import { Link, useLocation } from 'react-router-dom';
+import { AuthContext } from '../components/AuthProvider/AuthProvider';
 
 const SuccessPage: React.FC = () => {
     const location = useLocation();
@@ -12,6 +13,12 @@ const SuccessPage: React.FC = () => {
     const orderId = location.state?.orderId;
 
     const CardBody = () => {
+        const context = useContext(AuthContext); // Is this OK? We need to update the next event after purchase...
+
+        const handleReturnToCatalog = () => {
+            context.updateNextEvent(); 
+        };
+
         if (!eventName || !ticketQuantity || !ticketName || !ticketPrice || !orderId) {
             return <Card.Body>
                 <Card.Text>{message}</Card.Text>
@@ -24,11 +31,11 @@ const SuccessPage: React.FC = () => {
                 <Card.Text>Tickets: {ticketQuantity} x {ticketName}</Card.Text>
                 <Card.Text>Total: ${ticketPrice * ticketQuantity}</Card.Text>
                 <Card.Text>{message}</Card.Text>
-                <Link to="/"><Button variant="primary">Return to Catalog</Button></Link>
+                <Link to="/"><Button variant="primary" onClick={handleReturnToCatalog}>Return to Catalog</Button></Link>
             </Card.Body>
         }
     }
-
+    
     return (
         <>
             <Card border="success">

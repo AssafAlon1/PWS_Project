@@ -1,21 +1,37 @@
 import React, { useState } from 'react';
 import { Button, Card, Col, FloatingLabel, Form, Row } from 'react-bootstrap';
 import { SpanningSpinnner } from '../SpinnerComponent/SpinnerComponent';
+import { PaymentDetails } from '../../types';
 
 
 interface PaymentFormProps {
     purchaseTickets: () => Promise<void>;
     afterSuccessfulPurchase: () => void;
     isLoading: boolean;
+    setPaymentDetails: (paymentDetails: PaymentDetails) => void;
+    price: number;
 }
 
-const PaymentForm: React.FC<PaymentFormProps> = ({ purchaseTickets, afterSuccessfulPurchase, isLoading }) => {
+const PaymentForm: React.FC<PaymentFormProps> = ({ purchaseTickets, afterSuccessfulPurchase, isLoading, setPaymentDetails, price }) => {
 
     const [isFormValidated, setFormValidated] = useState<boolean>(false);
     const [year, setYear] = useState<number>(0);
     const [month, setMonth] = useState<number>(0);
+    const [cardholderName, setCardholderName] = useState<string>('');
+    const [cvv, setCvv] = useState<string>('');
+    const [creditCardNumber, setCreditCardNumber] = useState<string>('');
 
+    const updatePaymentDetails = () => {
+        setPaymentDetails({
+            cc: creditCardNumber,
+            holder: cardholderName,
+            cvv: cvv,
+            exp: `${month}/${year}`,
+            charge: price
+        });
+    }
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+        updatePaymentDetails();
         event.preventDefault();
         const form = event.currentTarget;
         if (form.checkValidity() === false) {
@@ -70,11 +86,13 @@ const PaymentForm: React.FC<PaymentFormProps> = ({ purchaseTickets, afterSuccess
                                 required
                                 type="text"
                                 pattern="^[a-zA-Z\s\-]+$"
-                                placeholder="Nisso Ohana" />
+                                placeholder="Nisso Ohana"
+                                value={cardholderName}
+                                onChange={(e) => setCardholderName(e.target.value)} />
                             <Form.Control.Feedback type="invalid">Cardholder name must be non-empty and in English</Form.Control.Feedback>
                         </FloatingLabel>
                     </Form.Group>
-                    {/* <hr />
+                    <hr />
                     <Form.Group controlId="creditCardNumber">
                         <FloatingLabel label="Credit Card Number">
                             <Form.Control
@@ -82,7 +100,9 @@ const PaymentForm: React.FC<PaymentFormProps> = ({ purchaseTickets, afterSuccess
                                 type="text"
                                 placeholder="**** **** **** ****"
                                 pattern="^[0-9]{16}$"
-                                maxLength={16} />
+                                maxLength={16}
+                                value={creditCardNumber}
+                                onChange={(e) => setCreditCardNumber(e.target.value)} />
                             <Form.Control.Feedback type="invalid">Credit Card Number must be 16 digits</Form.Control.Feedback>
                         </FloatingLabel>
                     </Form.Group>
@@ -108,11 +128,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({ purchaseTickets, afterSuccess
                                         value={month}
                                         // isValid={isFutureDate(year, month)}
                                         isInvalid={!isFutureDate(year, month)}
-                                        onChange={(event) => {
-                                            console.log("Old Month: " + month);
-                                            console.log("New Month: " + event.target.value);
-                                            setMonth(parseInt(event.target.value))
-                                        }}
+                                        onChange={(event) => setMonth(parseInt(event.target.value))}
                                     >
                                         <MonthOptions />
                                     </Form.Select>
@@ -129,10 +145,13 @@ const PaymentForm: React.FC<PaymentFormProps> = ({ purchaseTickets, afterSuccess
                                 type="text"
                                 placeholder="***"
                                 pattern="^[0-9]{3}$"
-                                maxLength={3} />
+                                maxLength={3}
+                                value={cvv}
+                                onChange={(e) => setCvv(e.target.value)}
+                            />
                             <Form.Control.Feedback type="invalid">Security Code must be 3 digits</Form.Control.Feedback>
                         </FloatingLabel>
-                    </Form.Group> */}
+                    </Form.Group>
                     <hr />
                     <BuyNowButton />
                 </Form>

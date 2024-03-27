@@ -11,6 +11,7 @@ import {
   updateEvent,
   getUpcomingEvents,
   getUpcomingAvailableEvents,
+  getClosestEvent,
 } from "./routes.js";
 
 import {
@@ -48,6 +49,7 @@ app.use(cors({
 app.get(EVENT_PATH, getUpcomingAvailableEvents); // Added for the frontend - only fetch events with available tickets
 app.get(`${EVENT_PATH}/all`, getUpcomingEvents); // chenged path for BO use
 app.get(`${EVENT_PATH}/:eventId`, getEventById);
+app.get("/api/closest_event", getClosestEvent); // !! NOTE: this is NOT exposed to the API Gateway (therefore it's OK that it shares the same path as the user-actions service)
 
 app.post(EVENT_PATH, createEvent);
 app.post(`${EVENT_PATH}/ticketless`, createTicketlessEvent); // TODO - legacy, may remove

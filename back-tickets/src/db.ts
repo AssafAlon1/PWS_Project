@@ -32,6 +32,7 @@ export const insertTickets = async (ticketData: ICSTicket[]): Promise<number> =>
   }
 }
 
+// TODO - legacy - maybe remove
 export const insertTicket = async (ticketData: ICSTicket): Promise<string | number> => {
   const newTicket = new CSTicket(ticketData);
   try {
@@ -50,11 +51,10 @@ export const insertTicket = async (ticketData: ICSTicket): Promise<string | numb
   }
 }
 
+// TODO - legacy - maybe remove
 export const updateTicket = async (ticketData: ICSTicket): Promise<number> => {
-  console.log("updateTicket for ticket: ", ticketData._id);
   try {
     await CSTicket.updateOne({ _id: ticketData._id }, ticketData).exec();
-    console.log("Updated ticket");
     return StatusCodes.OK;
   }
   catch (err) {
@@ -62,26 +62,54 @@ export const updateTicket = async (ticketData: ICSTicket): Promise<number> => {
   }
 }
 
+// Will be used for buying and refunding tickets
+export const updateTicketAmount = async (ticketId: string, purchaseAmount: number): Promise<number> => {
+  try {
+    // This is done atomically (check amount and update if enough tickets are available)
+    const result = await CSTicket.updateOne(
+      { _id: ticketId, available: { $gte: purchaseAmount } },
+      { $inc: { available: purchaseAmount } }
+    ).exec();
+
+    if (result.modifiedCount === 0) {
+      console.error("Not enough tickets available for ticket with id: ", ticketId);
+      return StatusCodes.BAD_REQUEST;
+    }
+
+    return StatusCodes.OK;
+  }
+  catch (err) {
+    console.error("Failed to update ticket amount for ticket with id: ", ticketId + " and purchaseAmount: ", purchaseAmount);
+    return StatusCodes.INTERNAL_SERVER_ERROR;
+  }
+}
+
 export const queryAllTicketsByEventID = async (eventId: string, skip: number, limit: number): Promise<ICSTicket[]> => {
-  console.log("queryAllTicketsByEventID for eventId: ", eventId);
   const tickets = await CSTicket.find({ eventId: eventId }).skip(skip).limit(limit).exec();
   return tickets.map(ticket => ticket.toJSON() as ICSTicket);
 }
 
 export const queryAvailableTicketsByEventID = async (eventId: string, skip: number, limit: number): Promise<ICSTicket[]> => {
-  console.log("queryAvailableTicketsByEventID for eventId: ", eventId);
   const tickets = await CSTicket.find({ eventId: eventId, available: { $gt: 0 } }).skip(skip).limit(limit).exec();
   return tickets.map(ticket => ticket.toJSON() as ICSTicket);
 }
 
 export const queryTicketByName = async (eventId: string, ticketName: string): Promise<ICSTicket | null> => {
-  console.log("queryTicketByName for eventId: ", eventId, " and ticketName: ", ticketName);
   const ticket = await CSTicket.findOne({ eventId: eventId, name: ticketName }).exec();
   return ticket ? ticket.toJSON() as ICSTicket : null;
 }
 
 export const queryCheapestTicketsByEventID = async (eventId: string): Promise<ICSTicket | null> => {
-  console.log("queryCheapestTicketsByEventID for eventId: ", eventId);
   const ticket = await CSTicket.find({ eventId: eventId, available: { $gt: 0 } }).sort({ price: 1 }).limit(1).exec();
   return ticket.length > 0 ? ticket[0].toJSON() as ICSTicket : null;
+}
+
+export const updateRefund = async (event_id: string, ticket_name: string, amount: number): Promise<number> => {
+  const ticket = await queryTicketByName(event_id, ticket_name);
+  if (ticket === null) {
+    // TODO - better handeling
+    console.error("Ticket not found for event_id: ", event_id, " ticket_name: ", ticket_name);
+    return StatusCodes.NOT_FOUND;
+  }
+  return await updateTicketAmount(ticket._id.toString(), amount);
 }

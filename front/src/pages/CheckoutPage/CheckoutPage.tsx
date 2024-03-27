@@ -5,11 +5,13 @@ import PaymentForm from '../../components/PaymentForm/PaymentForm';
 import { usePurchaseDetails } from '../../components/PurchaseDetailsContext/PurchaseDetailsContext';
 import TicketApi from '../../api/ticket';
 import { AuthContext } from '../../components/AuthProvider/AuthProvider';
+import { PaymentDetails } from '../../types';
 
 const CheckoutPage: React.FC = () => {
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [displayError, setDisplayError] = useState<boolean>(false);
     const { purchaseDetails, setPurchaseDetails } = usePurchaseDetails();
+    const [paymentDetails, setPaymentDetails] = useState<PaymentDetails | null>(null);
     const navigate = useNavigate();
     const context = useContext(AuthContext);
 
@@ -42,7 +44,14 @@ const CheckoutPage: React.FC = () => {
         console.log("About to purchase tickets");
         setIsLoading(true);
         try {
-            await TicketApi.purchaseTickets(purchaseDetails.eventId, purchaseDetails.name, purchaseDetails.quantity, username);
+            if (!paymentDetails) {
+                throw new Error("No payment details found");
+            }
+            const username = context.user;
+            if (!username) {
+                throw new Error("No user found");
+            }
+            await TicketApi.purchaseTickets(purchaseDetails, paymentDetails, username);
         }
         catch (err) {
             setIsLoading(false);
@@ -65,14 +74,16 @@ const CheckoutPage: React.FC = () => {
         console.log("Redirecting after purchase");
         navigate("/success", {
             state: {
-                eventName: detailsForSuccess.eventName,
-                quantity: detailsForSuccess.quantity,
-                name: detailsForSuccess.name,
+                event_name: detailsForSuccess.event_name,
+                ticket_amount: detailsForSuccess.ticket_amount,
+                ticket_name: detailsForSuccess.ticket_name,
                 price: detailsForSuccess.price,
                 orderId: 1234 // TODO - get from server
             }
         });
     }
+
+    const price = (purchaseDetails?.price ?? 0) * (purchaseDetails?.ticket_amount ?? 0);
 
     const OrderSummaryComponent = () => {
         return (
@@ -81,9 +92,9 @@ const CheckoutPage: React.FC = () => {
                     <Card.Title>Order Summary</Card.Title>
                 </Card.Header>
                 <Card.Body>
-                    <Card.Text>{purchaseDetails?.eventName}</Card.Text>
-                    <Card.Text>Tickets: {purchaseDetails?.quantity} x {purchaseDetails?.name}</Card.Text>
-                    <Card.Text>Total: ${(purchaseDetails?.price ?? 0) * (purchaseDetails?.quantity ?? 0)}</Card.Text>
+                    <Card.Text>{purchaseDetails?.event_name}</Card.Text>
+                    <Card.Text>Tickets: {purchaseDetails?.ticket_amount} x {purchaseDetails?.ticket_name}</Card.Text>
+                    <Card.Text>Total: ${price}</Card.Text>
                 </Card.Body>
             </Card>
         );
@@ -95,7 +106,12 @@ const CheckoutPage: React.FC = () => {
             <h1>Checkout</h1>
             <Row>
                 <Col>
-                    <PaymentForm purchaseTickets={performPurchase} afterSuccessfulPurchase={afterPurchaseRedirect} isLoading={isLoading} />
+                    <PaymentForm
+                        purchaseTickets={performPurchase}
+                        afterSuccessfulPurchase={afterPurchaseRedirect}
+                        isLoading={isLoading}
+                        setPaymentDetails={setPaymentDetails}
+                        price={price} />
                 </Col>
                 <Col>
                     <OrderSummaryComponent />

@@ -1,3 +1,4 @@
+import { isValidObjectId } from "mongoose";
 import CSEvent, { ICSEvent } from "./models/CSEvent.js";
 import { StatusCodes } from 'http-status-codes';
 
@@ -49,6 +50,16 @@ export const plusCommentCount = async (eventId: string): Promise<void> => {
 }
 
 export const updateCheapesstTicket = async (eventId: string, ticketName: string, price: number): Promise<void> => {
-  console.log("updateCheapesstTicket for eventId: ", eventId, " and ticketName: ", ticketName, " and price: ", price);
   await CSEvent.findByIdAndUpdate(eventId, { cheapest_ticket_name: ticketName, cheapest_ticket_price: price }).exec();
+}
+
+export const queryClosestEvent = async (eventIds: string[]): Promise<ICSEvent | null> => {
+  const currentDate = new Date();
+  eventIds = eventIds.filter(id => isValidObjectId(id));
+  const events = await CSEvent.find({ _id: { $in: eventIds }, start_date: { $gt: currentDate } }).sort({ start_date: 1 }).limit(1).exec();
+  return events.length > 0 ? events[0].toJSON() as ICSEvent : null;
+}
+
+export const updateAvailableTickets = async (eventId: string, ticketAmount: number): Promise<void> => {
+  await CSEvent.findByIdAndUpdate(eventId, { $inc: { total_available_tickets: ticketAmount } }).exec();
 }

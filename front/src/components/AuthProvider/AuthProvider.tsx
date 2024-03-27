@@ -2,7 +2,6 @@ import { createContext, useState } from "react";
 import { AuthApi } from '../../api/auth';
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
-import { getFormattedDateTime } from "../../utils/formatting";
 import UserActionApi from "../../api/userAction";
 
 interface AuthContextProps {
@@ -45,7 +44,7 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         }
         const closestEvent = await UserActionApi.getUserClosestEvent(user);
         if (closestEvent) {
-            setNextEvent(`${closestEvent.title} (${getFormattedDateTime(closestEvent.start_date)})`);
+            setNextEvent(closestEvent);
         }
     }
 

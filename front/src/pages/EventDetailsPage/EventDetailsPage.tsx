@@ -173,10 +173,10 @@ const EventDetails: React.FC = () => {
         const [ticketAmount, setTicketAmount] = useState<number>(0);
 
         const ticketPurchaseDetails: PurchaseDetails = {
-            eventId: eventId ?? "0",
-            eventName: event?.title ?? "Unknown",
-            name: name,
-            quantity: ticketAmount,
+            event_id: eventId ?? "0",
+            event_name: event?.title ?? "Unknown",
+            ticket_name: name,
+            ticket_amount: ticketAmount,
             price: price
         }
 

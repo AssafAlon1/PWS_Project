@@ -2,7 +2,7 @@ export interface CSEvent {
     _id: string;
     title: string;
     description: string;
-    start_date: Date; 
+    start_date: Date;
     end_date: Date;
     category: string;
     location: string;
@@ -29,21 +29,31 @@ export interface Ticket {
 }
 
 export interface PurchaseDetails {
-    eventId: string;
-    eventName: string
-    name: string;
-    quantity: number;
+    event_id: string;
+    event_name: string
+    ticket_name: string;
+    ticket_amount: number;
     price: number;
 }
 
+export interface PaymentDetails {
+    cc: string;
+    holder: string;
+    cvv: string;
+    exp: string;
+    charge: number;
+}
+
+// This will change...
+// TODO - add event name??
 export interface UserAction {
     username: string;
-    actionType: "purchase" | "refund";
     eventId: string;
     purchaseId: string;
     ticketName: string;
     amount: number;
-    timestamp: Date;
+    purchase_time: Date;
+    refund_time?: Date;
 }
 
 export enum APIStatus {

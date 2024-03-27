@@ -20,6 +20,7 @@ import {
     SIGNUP_PATH,
     TICKET_API_URL,
     USERNAME_PATH,
+    USER_ACTION_API_URL,
 } from './const.js';
 import { isAuthorized } from './auths.js';
 
@@ -67,7 +68,7 @@ const commentProxy = createProxyMiddleware({
 });
 app.use('/api/comment', isAuthorized, commentProxy);
 
-// Ticket Microservice
+// Tickets Microservice
 const ticketProxy = createProxyMiddleware({
     target: TICKET_API_URL,
     onProxyReq: fixRequestBody,
@@ -75,6 +76,15 @@ const ticketProxy = createProxyMiddleware({
 });
 app.use('/api/ticket', isAuthorized, ticketProxy);
 
+// User Actions Microservice
+const userActionProxy = createProxyMiddleware({
+    target: USER_ACTION_API_URL,
+    onProxyReq: fixRequestBody,
+    changeOrigin: true,
+});
+app.use('/api/user_actions', isAuthorized, userActionProxy);
+app.use('/api/closest_event', isAuthorized, userActionProxy);
+app.use('/api/refund_options', isAuthorized, userActionProxy);
 
 
 app.post(LOGIN_PATH, loginRoute);

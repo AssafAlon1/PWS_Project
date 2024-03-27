@@ -29,11 +29,11 @@ Base was stolen from HW3, which had a skeleton provided by the wonderful course 
 ## API Routes
 
 Supported API endpoints:
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET    | /api/event[?limit={limit}&skip={skip}] | Gets upcomming events that still have tickets for sale. |
+| Method | Endpoint                                   | Description                                               |
+| ------ | ------------------------------------------ | --------------------------------------------------------- |
+| GET    | /api/event[?limit={limit}&skip={skip}]     | Gets upcomming events that still have tickets for sale.   |
 | GET    | /api/event/all[?limit={limit}&skip={skip}] | Gets unfiltered events. (only for authorized users in BO) |
-| POST   | /api/event/{id} | Get the data of the specifiied even |
-| POST   | /api/event | Add an event. (only for authorized users in BO) |
+| POST   | /api/event/{id}                            | Get the data of the specifiied even                       |
+| POST   | /api/event                                 | Add an event. (only for authorized users in BO)           |
 
 **THIS API ISN'T FINAL. WE ARE INDECISIVE**

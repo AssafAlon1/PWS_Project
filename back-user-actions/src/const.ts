@@ -2,6 +2,8 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
+export const MAX_QUERY_LIMIT = 50;
+
 export const ACTIONS_PATH = "/api/user_actions";
 export const CLOSEST_EVENT_PATH = "/api/closest_event";
 export const REFUND_OPTIONS_PATH = "/api/refund_options";

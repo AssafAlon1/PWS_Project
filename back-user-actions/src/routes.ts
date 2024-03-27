@@ -1,9 +1,9 @@
 import { Request, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
 
-import { addRefundTicketsAction, queryUserClosestEvent, queryNonRefundedPurchases, addBuyTicketsAction, isPurchaseRefunded, queryActionByPurchaseId } from './db.js';
+import { addRefundTicketsAction, queryUserClosestEvent, queryNonRefundedPurchases, addBuyTicketsAction, isPurchaseRefunded, queryActionByPurchaseId, queryAllUserActions } from './db.js';
 import { hasEventStarted } from "./utils.js";
-import { ACTIONS_PATH, CLOSEST_EVENT_PATH, ORDER_API_URL, REFUND_OPTIONS_PATH } from "./const.js";
+import { ACTIONS_PATH, CLOSEST_EVENT_PATH, MAX_QUERY_LIMIT, ORDER_API_URL, REFUND_OPTIONS_PATH } from "./const.js";
 import axios from 'axios';
 
 const axiosInstance = axios.create({ withCredentials: true, baseURL: ORDER_API_URL });
@@ -51,8 +51,8 @@ export const refundTickets = async (req: Request, res: Response) => {
         if (refund_details === null) {
             return res.status(StatusCodes.NOT_FOUND).send({ message: "Error getting the action details" });
         }
-        if(refund_details.refund_time !== undefined) {
-        // if (await isPurchaseRefunded(postData.purchase_id)) {
+        if (refund_details.refund_time !== undefined) {
+            // if (await isPurchaseRefunded(postData.purchase_id)) {
             console.error("Purchase doesn't exist or has already been refunded.")
             return res.status(StatusCodes.NOT_FOUND).send({ message: "Purchase doesn't exist or has already been refunded." });
         }
@@ -61,9 +61,9 @@ export const refundTickets = async (req: Request, res: Response) => {
             return res.status(StatusCodes.BAD_REQUEST).send({ message: "Event has already started." });
         }
 
-        const refundInformation = { 
-            purchase_id: postData.purchase_id, 
-            event_id: refund_details.event_id, 
+        const refundInformation = {
+            purchase_id: postData.purchase_id,
+            event_id: refund_details.event_id,
             ticket_id: refund_details.ticket_name,
             ticket_amount: refund_details.ticket_amount,
         };
@@ -127,6 +127,26 @@ export const getNonRefundedPurchases = async (req: Request, res: Response) => {
         }
 
         res.status(StatusCodes.OK).send({ purchases });
+    }
+    catch (error) {
+        res.status(StatusCodes.BAD_REQUEST).send({ message: "Bad Request." });
+    }
+}
+
+export const getUserActions = async (req: Request, res: Response) => {
+    console.log("GET " + ACTIONS_PATH);
+    const skip = parseInt(req.query.skip as string) || 0;
+    const limit = parseInt(req.query.limit as string) || MAX_QUERY_LIMIT;
+    try {
+        const username = req.query.username as string;
+        if (!username) {
+            console.error("No username provided.")
+            throw Error("No username provided.");
+        }
+
+        const actions = await queryAllUserActions(username, skip, limit);
+
+        res.status(StatusCodes.OK).send(actions);
     }
     catch (error) {
         res.status(StatusCodes.BAD_REQUEST).send({ message: "Bad Request." });

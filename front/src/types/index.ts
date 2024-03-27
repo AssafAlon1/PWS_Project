@@ -45,14 +45,15 @@ export interface PaymentDetails {
 }
 
 // This will change...
+// TODO - add event name??
 export interface UserAction {
     username: string;
-    actionType: "purchase" | "refund";
     eventId: string;
     purchaseId: string;
     ticketName: string;
     amount: number;
-    timestamp: Date;
+    purchase_time: Date;
+    refund_time?: Date;
 }
 
 export enum APIStatus {

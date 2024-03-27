@@ -87,3 +87,8 @@ export const queryActionByPurchaseId = async (purchaseId: string): Promise<IUser
         return null;
     }
 }
+
+export const queryAllUserActions = async (username: string, skip?: number, limit?: number): Promise<IUserAction[] | number> => {
+    const actions = await UserAction.find({ username: username }).sort({ purchase_time: -1 }).skip(skip).limit(limit).exec();
+    return actions.map((action) => action.toJSON() as IUserAction);
+}

@@ -23,7 +23,7 @@ export const consumeMessages = async () => {
             // TODO - Parse message, update db
             console.log(`Consumer >>> received message: ${msg.content.toString()}`);
             const buyTicketsAction = JSON.parse(msg.content.toString());
-            await updateRefund( buyTicketsAction.event_id, buyTicketsAction.ticket_name, buyTicketsAction.ticket_amount );
+            await updateRefund(buyTicketsAction.event_id, buyTicketsAction.ticket_name, buyTicketsAction.ticket_amount);
             channel.ack(msg);
         });
 

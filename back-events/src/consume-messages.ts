@@ -31,7 +31,7 @@ export const consumeMessages = async () => {
         await channel.consume(COMMENT_QUEUE, async (msg) => {
             console.log("COMMENT_QUEUE");
             const eventId = msg.content.toString();
-            console.log(`Comsumer >>> received message: ${ eventId } for comments`);
+            console.log(`Comsumer >>> received message: ${eventId} for comments`);
             await plusCommentCount(eventId);
             channel.ack(msg);
         });
@@ -40,7 +40,7 @@ export const consumeMessages = async () => {
             console.log("TICKET_INFO_QUEUE");
             // TODO - handle null (meaning no ticket available for the event)
             const cheapest_ticket = JSON.parse(msg.content.toString());
-            console.log(`Comsumer >>> received message: ${ cheapest_ticket.eventId } for ticket info`);
+            console.log(`Comsumer >>> received message: ${cheapest_ticket.eventId} for ticket info`);
             await updateCheapesstTicket(cheapest_ticket.eventId, cheapest_ticket.name, cheapest_ticket.price);
             channel.ack(msg);
         });
@@ -48,7 +48,7 @@ export const consumeMessages = async () => {
         await channel.consume(BUY_TICKETS_QUEUE, async (msg) => {
             console.log("BUY_TICKETS_QUEUE");
             const order_data = JSON.parse(msg.content.toString());
-            console.log(`Comsumer >>> received message: ${ order_data.purchase_id } for buying tickets`);
+            console.log(`Comsumer >>> received message: ${order_data.purchase_id} for buying tickets`);
             // TODO - update ticket count
             await updateAvailableTickets(order_data.event_id, -order_data.ticket_amount);
             channel.ack(msg);

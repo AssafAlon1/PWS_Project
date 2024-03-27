@@ -51,6 +51,24 @@ const RealUserActionApi = {
             console.error("Couldn't find closest event for " + username);
             return null;
         }
+    },
+
+    getUserActions: async (username: string, skip?: number, limit?: number) => {
+        try {
+            const response = await axiosInstance.get("/api/user_actions", {
+                params: {
+                    username,
+                    skip,
+                    limit
+                }
+            });
+            return response.data;
+        } catch (error) {
+            if (isAxiosError(error)) {
+                throw new Error("Failed to fetch user actions: " + error.response?.data.message); // TODO - Better handling?
+            }
+            throw new Error("Failed to fetch user actions"); // TODO - Better handling?
+        }
     }
 
 }

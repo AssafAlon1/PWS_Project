@@ -106,7 +106,7 @@ export const queryCheapestTicketsByEventID = async (eventId: string): Promise<IC
 
 export const updateRefund = async (event_id: string, ticket_name: string, amount: number): Promise<number> => {
   const ticket = await queryTicketByName(event_id, ticket_name);
-  if(ticket === null) {
+  if (ticket === null) {
     // TODO - better handeling
     console.error("Ticket not found for event_id: ", event_id, " ticket_name: ", ticket_name);
     return StatusCodes.NOT_FOUND;

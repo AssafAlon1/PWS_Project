@@ -11,7 +11,6 @@ export class PublisherChannel {
     refundChannel: amqp.Channel;
 
     async createBuyChannel() {
-        console.log("Creating buy channel");
         const connection = await amqp.connect(RABBITMQ_URL);
         this.buyChannel = await connection.createChannel();
     }
@@ -25,7 +24,6 @@ export class PublisherChannel {
         if (!this.buyChannel) {
             await this.createBuyChannel();
         }
-        console.log("Sending buy event");
         await this.buyChannel.assertExchange(BUY_TICKETS_EXCHANGE, 'fanout', { durable: false });
         await this.buyChannel.publish(BUY_TICKETS_EXCHANGE, '', Buffer.from(msg));
         console.log(

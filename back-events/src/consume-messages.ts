@@ -29,6 +29,7 @@ export const consumeMessages = async () => {
         await channel.bindQueue(REFUND_TICKETS_QUEUE, REFUND_TICKETS_EXCHANGE, '');
 
         await channel.consume(COMMENT_QUEUE, async (msg) => {
+            console.log("COMMENT_QUEUE");
             const eventId = msg.content.toString();
             console.log(`Comsumer >>> received message: ${ eventId } for comments`);
             await plusCommentCount(eventId);

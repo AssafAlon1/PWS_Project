@@ -236,7 +236,6 @@ export const getClosestEvent = async (req: Request, res: Response) => {
   }
 
   const eventIDArray = eventIDs.split(",");
-  console.log("Event IDs: ", eventIDArray.join(","));
 
   let closestEvent;
   try {

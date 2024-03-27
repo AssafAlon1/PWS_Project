@@ -50,7 +50,6 @@ export const plusCommentCount = async (eventId: string): Promise<void> => {
 }
 
 export const updateCheapesstTicket = async (eventId: string, ticketName: string, price: number): Promise<void> => {
-  console.log("updateCheapesstTicket for eventId: ", eventId, " and ticketName: ", ticketName, " and price: ", price);
   await CSEvent.findByIdAndUpdate(eventId, { cheapest_ticket_name: ticketName, cheapest_ticket_price: price }).exec();
 }
 
@@ -58,11 +57,9 @@ export const queryClosestEvent = async (eventIds: string[]): Promise<ICSEvent | 
   const currentDate = new Date();
   eventIds = eventIds.filter(id => isValidObjectId(id));
   const events = await CSEvent.find({ _id: { $in: eventIds }, start_date: { $gt: currentDate } }).sort({ start_date: 1 }).limit(1).exec();
-  console.log("queryClosestEvent: ", events);
   return events.length > 0 ? events[0].toJSON() as ICSEvent : null;
 }
 
 export const updateAvailableTickets = async (eventId: string, ticketAmount: number): Promise<void> => {
-  console.log("updateTicketCount for eventId: ", eventId, " and ticketAmount: ", ticketAmount);
   await CSEvent.findByIdAndUpdate(eventId, { $inc: { total_available_tickets: ticketAmount } }).exec();
 }

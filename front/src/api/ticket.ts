@@ -17,7 +17,6 @@ const RealTicketApi = {
                     limit
                 }
             });
-            console.log("Got tickets: ", response.data);
             return response.data;
         } catch (error) {
             if (isAxiosError(error)) {

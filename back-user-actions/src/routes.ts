@@ -99,7 +99,7 @@ export const getClosestEvent = async (req: Request, res: Response) => {
             return res.status(StatusCodes.NOT_FOUND).send({ message: "No events found." });
         }
 
-        console.log(" >> Closest event: ", closestEvent);
+        // console.log(" >> Closest event: ", closestEvent);
         res.status(StatusCodes.OK).send(closestEvent);
     }
     catch (error) {

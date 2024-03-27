@@ -147,6 +147,7 @@ export const purchaseTicket = async (req: Request, res: Response) => {
 
         console.log(`>> Buying ${putData.ticket_amount} tickets for of id ${ticket._id}`);
         const result = await updateTicketAmount(ticket._id.toString(), -putData.ticket_amount);
+        console.log("Result: ", result);
 
         if (result != StatusCodes.OK) {
             console.error("Failed updating ticket in DB");
@@ -177,8 +178,11 @@ export const purchaseTicket = async (req: Request, res: Response) => {
     }
     catch (error) {
         // UNDO CHANGES
-        console.error(error);
+        // console.error(error);
+        // TODO - when hammerhead returns 500 we don't handel it properly - can't try to purchase again...
+        console.error("Failed buying ticket - Order API failed");
         await updateTicketAmount(ticket._id.toString(), putData.ticket_amount);
+        console.error("Ticket purchase failed. Rolling back changes.");
         return;
     }
 

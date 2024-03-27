@@ -61,3 +61,8 @@ export const queryClosestEvent = async (eventIds: string[]): Promise<ICSEvent | 
   console.log("queryClosestEvent: ", events);
   return events.length > 0 ? events[0].toJSON() as ICSEvent : null;
 }
+
+export const updateAvailableTickets = async (eventId: string, ticketAmount: number): Promise<void> => {
+  console.log("updateTicketCount for eventId: ", eventId, " and ticketAmount: ", ticketAmount);
+  await CSEvent.findByIdAndUpdate(eventId, { $inc: { total_available_tickets: ticketAmount } }).exec();
+}

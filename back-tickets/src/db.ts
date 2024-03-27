@@ -111,7 +111,6 @@ export const queryCheapestTicketsByEventID = async (eventId: string): Promise<IC
 }
 
 export const updateRefund = async (event_id: string, ticket_name: string, amount: number): Promise<number> => {
-  // TODO - implement - call queryTicketByNAme and then updateTicketAmount
   console.log("updateRefund for event_id: ", event_id, " ticket_name: ", ticket_name, " amount: ", amount);
   const ticket = await queryTicketByName(event_id, ticket_name);
   if(ticket === null) {

@@ -64,11 +64,11 @@ export const refundTickets = async (req: Request, res: Response) => {
         const refundInformation = {
             purchase_id: postData.purchase_id,
             event_id: refund_details.event_id,
-            ticket_id: refund_details.ticket_name,
+            ticket_name: refund_details.ticket_name,
             ticket_amount: refund_details.ticket_amount,
         };
         // TODO - refund with the order service
-        const refundResult = await axiosInstance.post('/api/refund', { refundInformation });
+        const refundResult = await axiosInstance.post('/api/refund',  refundInformation );
         if (refundResult.status !== StatusCodes.OK) {
             throw Error("Failed to refund tickets.");
         }

@@ -34,7 +34,7 @@ const ActionDetails: React.FC<{ action: UserAction }> = ({ action }) => {
 }
 
 
-// TODO - Code duplication with UserActionDetails.tsx, maybe remove
+// TODO - Code duplication with CatalogEventDetails.tsx, maybe remove
 export const ActionPlaceholder = () => {
     return (
         <Card>

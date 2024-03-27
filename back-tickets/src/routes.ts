@@ -146,7 +146,7 @@ export const purchaseTicket = async (req: Request, res: Response) => {
         }
 
         console.log(`>> Buying ${putData.ticket_amount} tickets for of id ${ticket._id}`);
-        const result = await updateTicketAmount(ticket._id.toString(), putData.ticket_amount);
+        const result = await updateTicketAmount(ticket._id.toString(), -putData.ticket_amount);
 
         if (result != StatusCodes.OK) {
             console.error("Failed updating ticket in DB");
@@ -178,7 +178,7 @@ export const purchaseTicket = async (req: Request, res: Response) => {
     catch (error) {
         // UNDO CHANGES
         console.error(error);
-        await updateTicketAmount(ticket._id.toString(), -putData.ticket_amount);
+        await updateTicketAmount(ticket._id.toString(), putData.ticket_amount);
         return;
     }
 

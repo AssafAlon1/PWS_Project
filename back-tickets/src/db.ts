@@ -70,7 +70,7 @@ export const updateTicketAmount = async (ticketId: string, purchaseAmount: numbe
     // This is done atomically (check amount and update if enough tickets are available)
     const result = await CSTicket.updateOne(
       { _id: ticketId, available: { $gte: purchaseAmount } },
-      { $inc: { available: -purchaseAmount } }
+      { $inc: { available: purchaseAmount } }
     ).exec();
 
     if (result.modifiedCount === 0) {
@@ -119,5 +119,5 @@ export const updateRefund = async (event_id: string, ticket_name: string, amount
     console.error("Ticket not found for event_id: ", event_id, " ticket_name: ", ticket_name);
     return StatusCodes.NOT_FOUND;
   }
-  return await updateTicketAmount(ticket._id.toString(), -amount);
+  return await updateTicketAmount(ticket._id.toString(), amount);
 }

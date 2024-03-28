@@ -1,16 +1,17 @@
 import React, { useEffect } from 'react';
 import { getFormattedDate, getFormattedTime } from "../../utils/formatting";
-import { Card, Container, Placeholder } from 'react-bootstrap';
+import { Button, Card, Container, Placeholder } from 'react-bootstrap';
 import { CSEvent, UserAction } from '../../types';
 import EventApi from '../../api/event';
 import ButtonWithTooltip from '../ButtonWithTooltip/ButtonWithTooltip';
 import MissingImage from "../../assets/MissingImage.png"
+import { ThreeSpanningSpinners } from '../SpinnerComponent/SpinnerComponent';
 
 
 const ActionDetails: React.FC<{ action: UserAction }> = ({ action }) => {
     const [isLoadingEvent, setIsLoadingEvent] = React.useState<boolean>(false);
     const [isRefundable, setIsRefundable] = React.useState<boolean>(false);
-    const [reasonNotRefundable, setReason] = React.useState<string>("");
+    const [reasonNotRefundable, setReason] = React.useState<string>("Loading...");
     const [eventDetails, setEventDetails] = React.useState<CSEvent | null>(null);
     const formattedDate = getFormattedDate(action.purchase_time);
     const handleRefund = () => {
@@ -23,6 +24,12 @@ const ActionDetails: React.FC<{ action: UserAction }> = ({ action }) => {
         let fetchedEvent;
         try {
             fetchedEvent = await EventApi.fetchEvent(action.event_id);
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            // With probability 50% throw error (TODO - remove)
+            if (Math.random() < 0.5) {
+                throw new Error("Error for testing purposes");
+            }
+
             if (!fetchedEvent) {
                 throw new Error("Event not found");
             }
@@ -30,6 +37,7 @@ const ActionDetails: React.FC<{ action: UserAction }> = ({ action }) => {
         catch {
             // TODO - Set error, suggest retry?
             setIsLoadingEvent(false);
+            setReason("Failed to fetch event information");
             return;
         }
         setEventDetails(fetchedEvent);
@@ -61,6 +69,37 @@ const ActionDetails: React.FC<{ action: UserAction }> = ({ action }) => {
         return <img src={MissingImage} className="card-img me-2" />
     }
 
+    const EventInformationCard = () => {
+        if (isLoadingEvent) {
+            return (
+                <Card className="me-2">
+                    <Card.Text>Loading event information...</Card.Text>
+                    <Card.Body className="direction-row">
+                        <ThreeSpanningSpinners />
+                    </Card.Body>
+                </Card>
+            );
+        }
+        if (!eventDetails) {
+            return (
+                <Card className="me-2">
+                    <Card.Body>
+                        <Card.Text>Failed fetching event information</Card.Text>
+                        <Button variant="light" onClick={updateEvent}>Retry</Button>
+                    </Card.Body>
+                </Card>
+            );
+        }
+        return (
+            <Card className="me-2">
+                <Card.Text>Event Category: {eventDetails?.category}</Card.Text>
+                <Card.Text>Date: {formattedStartDate + ((formattedEndDate == formattedStartDate) ? "" : " - " + formattedEndDate)}</Card.Text>
+                <Card.Text>Time: {formattedStartTime} - {formattedEndTime}</Card.Text>
+                <Card.Text>Location: {eventDetails?.location}</Card.Text>
+            </Card>
+        );
+    }
+
     const title = eventDetails ? eventDetails.title : action.event_id;
     const formattedStartDate = eventDetails?.start_date ? getFormattedDate(eventDetails.start_date) : "";
     const formattedEndDate = eventDetails?.end_date ? getFormattedDate(eventDetails.end_date) : "";
@@ -78,12 +117,7 @@ const ActionDetails: React.FC<{ action: UserAction }> = ({ action }) => {
             <Card.Body >
                 <Container className="direction-row">
                     <ImageComponent />
-                    <Card className="me-2">
-                        <Card.Text>Event Category: {eventDetails?.category}</Card.Text>
-                        <Card.Text>Date: {formattedStartDate + ((formattedEndDate == formattedStartDate) ? "" : " - " + formattedEndDate)}</Card.Text>
-                        <Card.Text>Time: {formattedStartTime} - {formattedEndTime}</Card.Text>
-                        <Card.Text>Location: {eventDetails?.location}</Card.Text>
-                    </Card>
+                    <EventInformationCard />
                     <Card>
                         <Card.Text>Tickets: {action.ticket_amount} x {action.ticket_name}</Card.Text>
                         <Card.Text>Bought at: {formattedDate}</Card.Text>

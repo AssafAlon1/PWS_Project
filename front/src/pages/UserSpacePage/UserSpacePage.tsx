@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { useNavigate } from "react-router-dom";
-import { Container } from 'react-bootstrap';
+import { Alert, Button, Card, Container } from 'react-bootstrap';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { ThreeSpanningSpinners } from '../../components/SpinnerComponent/SpinnerComponent';
 import { UserAction } from '../../types';
@@ -11,9 +11,10 @@ import { AuthContext } from '../../components/AuthProvider/AuthProvider';
 
 const UserSpacePage: React.FC = () => {
   const [userActions, setUserActions] = useState<UserAction[]>([]);
-  const [isLoading, setLoading] = useState<boolean>(false); // TODO - UTILIZE THIS!
-  const [hasMore, setHasMore] = useState<boolean>(false); // TODO - Change to true
-  const [displayError, setDisplayError] = useState<boolean>(false);
+  const [isLoading, setLoading] = useState<boolean>(false);
+  const [hasMore, setHasMore] = useState<boolean>(true);
+  const [displayErrorLoadMore, setDisplayErrorLoadMore] = useState<boolean>(false);
+  const [errorText, setErrorText] = useState<string>("");
 
   const navigate = useNavigate();
 
@@ -27,7 +28,9 @@ const UserSpacePage: React.FC = () => {
   const fetchMoreData = async () => {
     try {
       if (!username) {
-        throw Error("Username not found");
+        setErrorText("Username not found");
+        setHasMore(false);
+        return;
       }
       await new Promise(resolve => setTimeout(resolve, 1000)); // TODO - Remove
       const newActions = await UserActionApi.getUserActions(username, userActions.length, MAX_ACTIONS);
@@ -36,8 +39,7 @@ const UserSpacePage: React.FC = () => {
       }
       setUserActions(prevActions => [...prevActions, ...newActions]);
     } catch {
-      // TODO - Display alert instead of redirecting
-      setDisplayError(true);
+      setDisplayErrorLoadMore(true);
       setHasMore(false);
     }
   };
@@ -52,20 +54,14 @@ const UserSpacePage: React.FC = () => {
       // return navigate("/");
     }
     setUserActions([]);
-    // TODO - Set failed fetching actions to false
     let fetchedActions: UserAction[] = [];
     await new Promise(resolve => setTimeout(resolve, 500));
     try {
       fetchedActions = await UserActionApi.getUserActions(username, 0, MAX_ACTIONS) ?? [];
-      if (!fetchedActions) {
-        throw new Error(`Failed to fetch comments for user ${username}`);
-      }
     }
     catch (err) {
-      // TODO - Tone it down with all the try,catch,throw (just handle it in fetchComments and check for response value)
-      console.error(err);
       console.error(`Failed to fetch actions for user ${username}`);
-      // TODO - Set failed fetching actions to true
+      setErrorText("Failed to fetch actions.");
       fetchedActions = [];
     }
     if (fetchedActions.length < MAX_ACTIONS) {
@@ -75,7 +71,26 @@ const UserSpacePage: React.FC = () => {
     setLoading(false);
   }
 
+  const ErrorFetchingActions = () => {
+    if (errorText) {
+      return (
+        <Card>
+          <Card.Body>
+            <Card.Text>Failed fetching user actions</Card.Text>
+            <Button variant="light" onClick={updateActions}>Retry</Button>
+          </Card.Body>
+        </Card>
+      );
+    }
+    return null;
+  }
+
   const UserActions = () => {
+
+    if (errorText) {
+      return <Alert variant="danger">{errorText}</Alert>;
+    }
+
     let actionsArray;
     if (isLoading) {
       actionsArray = Array.from({ length: LOADING_AMOUNT }, (_, i) => <ActionPlaceholder key={i} />);
@@ -92,6 +107,7 @@ const UserSpacePage: React.FC = () => {
       );
     }
     return <Container style={{ paddingTop: '100px' }}>
+      <ErrorFetchingActions />
       <InfiniteScroll
         dataLength={userActions.length}
         next={fetchMoreData}
@@ -101,6 +117,12 @@ const UserSpacePage: React.FC = () => {
       >
         {actionsArray}
       </InfiniteScroll>
+      <Alert show={displayErrorLoadMore} variant="danger" onClose={() => setDisplayErrorLoadMore(false)} dismissible>
+        <Alert.Heading>Failed to event :(</Alert.Heading>
+        <p>
+          Something went wrong while trying to load more events. Please try refreshing the page.
+        </p>
+      </Alert>
     </Container>
   }
 

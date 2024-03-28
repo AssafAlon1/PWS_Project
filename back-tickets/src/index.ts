@@ -8,6 +8,7 @@ import { createTicket, createTickets, getALLTicketsByEventId, getAvailableTicket
 import { ALL_TICKET_PATH, TICKET_PATH } from './const.js';
 import { Request, Response, NextFunction } from 'express';
 import { PublisherChannel } from './publisher-channel.js';
+import { consumeMessages } from './consume-messages.js';
 
 dotenv.config();
 const dbUri = process.env.DB_CONNECTION_STRING;
@@ -22,6 +23,7 @@ if (!dbUri) {
 }
 
 // TODO - consume messages?
+consumeMessages();
 
 mongoose.set('strictQuery', true);
 await mongoose.connect(dbUri);

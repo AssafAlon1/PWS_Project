@@ -33,7 +33,7 @@ const SuccessPage: React.FC = () => {
             return <Card.Body>
                 <Card.Text>Order ID: {orderId}</Card.Text>
                 <Card.Text>{message}</Card.Text>
-                <Link to="/"><Button variant="primary">Return to Catalog</Button></Link>
+                <Link to="/"><Button variant="primary" onClick={handleReturnToCatalog}>Return to Catalog</Button></Link>
             </Card.Body>
         }
         else {
@@ -46,7 +46,7 @@ const SuccessPage: React.FC = () => {
 
             return <Card.Body>
                 <Card.Text>{message}</Card.Text>
-                <Link to="/"><Button variant="primary">Return to Catalog</Button></Link>
+                <Link to="/"><Button variant="primary" onClick={handleReturnToCatalog}>Return to Catalog</Button></Link>
             </Card.Body>
         }
     }

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Button, Card, Col, FloatingLabel, Form, Row } from 'react-bootstrap';
 import { SpanningSpinnner } from '../SpinnerComponent/SpinnerComponent';
 import { PaymentDetails } from '../../types';
@@ -30,12 +30,12 @@ const PaymentForm: React.FC<PaymentFormProps> = ({ purchaseTickets, isLoading, s
         });
     }
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-        updatePaymentDetails();
         event.preventDefault();
         const form = event.currentTarget;
         if (form.checkValidity() === false) {
             event.stopPropagation();
             setFormValidated(true);
+            console.log("Form invalid");
             return;
         }
         try {
@@ -69,6 +69,10 @@ const PaymentForm: React.FC<PaymentFormProps> = ({ purchaseTickets, isLoading, s
             {isLoading ? <SpanningSpinnner /> : "Buy Now!"}
         </Button>
     }
+
+    useEffect(() => {
+        updatePaymentDetails();
+    }, [creditCardNumber, cvv, cardholderName, year, month]);
 
 
     return (

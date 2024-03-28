@@ -1,6 +1,6 @@
 import axios, { isAxiosError } from "axios";
 
-import { APIStatus } from "../types";
+import { APIStatus, UserAction } from "../types";
 import { API_GATEWAY_URL } from "../const";
 import { getFormattedDateTime } from "../utils/formatting";
 
@@ -68,6 +68,18 @@ const RealUserActionApi = {
                 throw new Error("Failed to fetch user actions: " + error.response?.data.message); // TODO - Better handling?
             }
             throw new Error("Failed to fetch user actions"); // TODO - Better handling?
+        }
+    },
+
+    getUserActionByPurchaseId: async (purchaseId: string): Promise<UserAction> => {
+        try {
+            const response = await axiosInstance.get(`/api/user_actions/${purchaseId}`);
+            return response.data as UserAction;
+        } catch (error) {
+            if (isAxiosError(error)) {
+                throw new Error("Failed to fetch user action: " + error.response?.data.message); // TODO - Better handling?
+            }
+            throw new Error("Failed to fetch user action"); // TODO - Better handling?
         }
     }
 

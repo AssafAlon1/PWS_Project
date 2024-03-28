@@ -36,6 +36,8 @@ export const buyTickets = async (req: Request, res: Response) => {
     }
 }
 
+// TODO - verify (not necessarily here, but not in the front end)
+//        that the user that bought the tickets is the one asking to refund them
 export const refundTickets = async (req: Request, res: Response) => {
     console.log("PUT " + ACTIONS_PATH);
     try {
@@ -68,7 +70,7 @@ export const refundTickets = async (req: Request, res: Response) => {
             ticket_amount: refund_details.ticket_amount,
         };
         // TODO - refund with the order service
-        const refundResult = await axiosInstance.post('/api/refund',  refundInformation );
+        const refundResult = await axiosInstance.post('/api/refund', refundInformation);
         if (refundResult.status !== StatusCodes.OK) {
             throw Error("Failed to refund tickets.");
         }
@@ -152,3 +154,29 @@ export const getUserActions = async (req: Request, res: Response) => {
         res.status(StatusCodes.BAD_REQUEST).send({ message: "Bad Request." });
     }
 }
+
+// TODO - Only for the user that bought the tickets?
+export const getUserActionByPurchaseId = async (req: Request, res: Response) => {
+    console.log("GET " + `${ACTIONS_PATH}/:purchase_id`);
+    try {
+        // const username = req.query.username as string;
+        const purchase_id = req.params.purchase_id;
+        if (!purchase_id) {
+            console.error("Invalid parameters.")
+            throw Error("Invalid parameters.");
+        }
+
+        const action = await queryActionByPurchaseId(purchase_id);
+        if (action === null) {
+            return res.status(StatusCodes.NOT_FOUND).send({ message: "Action not found." });
+        }
+        console.log("Returning action ");
+        console.log(action);
+        res.status(StatusCodes.OK).send(action);
+    }
+    catch (error) {
+        console.error("Invalid parameters");
+        res.status(StatusCodes.BAD_REQUEST).send({ message: "Bad Request." });
+    }
+}
+

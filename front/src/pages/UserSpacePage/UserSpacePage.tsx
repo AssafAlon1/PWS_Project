@@ -96,7 +96,7 @@ const UserSpacePage: React.FC = () => {
       actionsArray = Array.from({ length: LOADING_AMOUNT }, (_, i) => <ActionPlaceholder key={i} />);
     }
     else {
-      actionsArray = userActions.map(action => <ActionDetails key={action.purchase_id} action={action} />);
+      actionsArray = userActions.map(action => <ActionDetails key={action.purchase_id} action={action} onRefund={() => navigate("/refund", { state: { purchase_id: action.purchase_id } })} />);
     }
     if (actionsArray.length === 0) {
       return (

@@ -66,6 +66,7 @@ const NavbarComponent: React.FC = () => {
                         <Nav.Link as={Link} to="/signup">signup</Nav.Link>
                         <Nav.Link as={Link} to="/login">login</Nav.Link>
                         <Nav.Link as={Link} to="/userspace">User Space</Nav.Link>
+                        <Nav.Link as={Link} to="/refund">Refunds</Nav.Link>
                     </Nav>
 
                     {context.user ? <>

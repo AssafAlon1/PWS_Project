@@ -12,7 +12,7 @@ import { AuthContext } from '../../components/AuthProvider/AuthProvider';
 const UserSpacePage: React.FC = () => {
   const [userActions, setUserActions] = useState<UserAction[]>([]);
   const [isLoading, setLoading] = useState<boolean>(false); // TODO - UTILIZE THIS!
-  const [hasMore, setHasMore] = useState<boolean>(true);
+  const [hasMore, setHasMore] = useState<boolean>(false); // TODO - Change to true
   const [displayError, setDisplayError] = useState<boolean>(false);
 
   const navigate = useNavigate();
@@ -26,6 +26,9 @@ const UserSpacePage: React.FC = () => {
   // Totally NOT stolen from CatalogPage
   const fetchMoreData = async () => {
     try {
+      if (!username) {
+        throw Error("Username not found");
+      }
       await new Promise(resolve => setTimeout(resolve, 1000)); // TODO - Remove
       const newActions = await UserActionApi.getUserActions(username, userActions.length, MAX_ACTIONS);
       if (newActions.length < MAX_ACTIONS) {
@@ -40,14 +43,18 @@ const UserSpacePage: React.FC = () => {
   };
 
   const updateActions = async () => {
+    setLoading(true);
     if (!username) {
       // TODO - suggest refresh or something?
+      console.log("!!NO USER");
+      setLoading(false);
       return;
       // return navigate("/");
     }
     setUserActions([]);
     // TODO - Set failed fetching actions to false
-    let fetchedActions: UserAction[];
+    let fetchedActions: UserAction[] = [];
+    await new Promise(resolve => setTimeout(resolve, 500));
     try {
       fetchedActions = await UserActionApi.getUserActions(username, 0, MAX_ACTIONS) ?? [];
       if (!fetchedActions) {
@@ -65,15 +72,16 @@ const UserSpacePage: React.FC = () => {
       setHasMore(false);
     }
     setUserActions(fetchedActions);
+    setLoading(false);
   }
 
-  const UserAction = () => {
+  const UserActions = () => {
     let actionsArray;
     if (isLoading) {
       actionsArray = Array.from({ length: LOADING_AMOUNT }, (_, i) => <ActionPlaceholder key={i} />);
     }
     else {
-      actionsArray = userActions.map(action => <ActionDetails key={action.purchaseId} action={action} />);
+      actionsArray = userActions.map(action => <ActionDetails key={action.purchase_id} action={action} />);
     }
     if (actionsArray.length === 0) {
       return (
@@ -83,6 +91,17 @@ const UserSpacePage: React.FC = () => {
         </Container>
       );
     }
+    return <Container style={{ paddingTop: '100px' }}>
+      <InfiniteScroll
+        dataLength={userActions.length}
+        next={fetchMoreData}
+        hasMore={hasMore}
+        style={{ overflowX: "hidden" }}
+        loader={<ThreeSpanningSpinners />}
+      >
+        {actionsArray}
+      </InfiniteScroll>
+    </Container>
   }
 
 
@@ -92,16 +111,9 @@ const UserSpacePage: React.FC = () => {
 
   return (
     <Container>
-      <InfiniteScroll
-        dataLength={userActions.length}
-        next={fetchMoreData}
-        hasMore={hasMore}
-        style={{ overflowX: "hidden" }}
-        loader={<ThreeSpanningSpinners />}
-      >
-        {/* something here */}
-        {userActions.map(action => <ActionDetails key={action.purchaseId} action={action} />)}
-      </InfiniteScroll>
+      <h1 style={{ position: 'relative' }}>{username?.toUpperCase()}'S USER SPACE</h1>
+      <hr />
+      <UserActions />
     </Container>
   );
 }

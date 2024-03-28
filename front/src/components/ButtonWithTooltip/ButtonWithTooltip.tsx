@@ -19,7 +19,7 @@ const ButtonWithTooltip: React.FC<ButtonWithTooltipProps> = ({ buttonContent, to
 
     const button = <Button disabled={isDisabled} variant="primary" onClick={buttonOnClick}>{buttonContent}</Button>;
     const overlay = isDisabled ? <OverlayTrigger
-        placement="right"
+        placement="bottom"
         delay={{ show: 50, hide: 50 }}
         overlay={renderTooltip}>
         <div>

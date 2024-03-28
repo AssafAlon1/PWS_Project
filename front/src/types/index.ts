@@ -48,10 +48,10 @@ export interface PaymentDetails {
 // TODO - add event name??
 export interface UserAction {
     username: string;
-    eventId: string;
-    purchaseId: string;
-    ticketName: string;
-    amount: number;
+    event_id: string;
+    purchase_id: string;
+    ticket_name: string;
+    ticket_amount: number;
     purchase_time: Date;
     refund_time?: Date;
 }

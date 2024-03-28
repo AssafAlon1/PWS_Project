@@ -10,6 +10,7 @@ import { PaymentDetails } from '../../types';
 const CheckoutPage: React.FC = () => {
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [displayError, setDisplayError] = useState<boolean>(false);
+    const [purchaseId, setPurchaseId] = useState<string>("");
     const { purchaseDetails, setPurchaseDetails } = usePurchaseDetails();
     const [paymentDetails, setPaymentDetails] = useState<PaymentDetails | null>(null);
     const navigate = useNavigate();
@@ -51,9 +52,13 @@ const CheckoutPage: React.FC = () => {
             if (!username) {
                 throw new Error("No user found");
             }
-            await TicketApi.purchaseTickets(purchaseDetails, paymentDetails, username);
+            const result = await TicketApi.purchaseTickets(purchaseDetails, paymentDetails, username);
+            if (result) {
+                setPurchaseId(result);
+            }
         }
         catch (err) {
+            console.error("Failed to purchase tickets");
             setIsLoading(false);
             setDisplayError(true);
             throw err;
@@ -78,7 +83,7 @@ const CheckoutPage: React.FC = () => {
                 ticket_amount: detailsForSuccess.ticket_amount,
                 ticket_name: detailsForSuccess.ticket_name,
                 price: detailsForSuccess.price,
-                orderId: 1234 // TODO - get from server
+                order_id: purchaseId
             }
         });
     }
@@ -100,6 +105,12 @@ const CheckoutPage: React.FC = () => {
         );
     }
 
+    useEffect(() => {
+        if (purchaseId) {
+            afterPurchaseRedirect();
+        }
+    }, [purchaseId, afterPurchaseRedirect]);
+
 
     return (
         <>
@@ -108,7 +119,6 @@ const CheckoutPage: React.FC = () => {
                 <Col>
                     <PaymentForm
                         purchaseTickets={performPurchase}
-                        afterSuccessfulPurchase={afterPurchaseRedirect}
                         isLoading={isLoading}
                         setPaymentDetails={setPaymentDetails}
                         price={price} />

@@ -1,6 +1,6 @@
 import axios, { isAxiosError } from "axios";
 
-import { APIStatus, PaymentDetails, PurchaseDetails, Ticket } from "../types";
+import { PaymentDetails, PurchaseDetails, Ticket } from "../types";
 import { API_GATEWAY_URL } from "../const";
 
 const axiosInstance = axios.create({ withCredentials: true, baseURL: API_GATEWAY_URL }); // TODO - withCredentials?
@@ -35,9 +35,9 @@ const RealTicketApi = {
                 ticket_name: purchaseDetails.ticket_name,
                 ...paymentDetails, username
             }
-            await axiosInstance.put('/api/ticket', putData);
+            const result = await axiosInstance.put('/api/ticket', putData);
             console.log("Completed purchase");
-            return APIStatus.Success;
+            return result.data.order_id
 
         } catch (error) {
             if (isAxiosError(error)) {
@@ -45,7 +45,6 @@ const RealTicketApi = {
             }
             throw new Error("Failed to purchase tickets"); // TODO - Better handling?
         }
-        // return "1234";
     },
 }
 

@@ -121,32 +121,32 @@ export const createTickets = async (req: Request, res: Response) => {
 // TODO - check updateEvent in back-events/src/routes.ts and replicate logic!
 export const purchaseTicket = async (req: Request, res: Response) => {
     console.log("PUT /api/ticket");
-    let putData;
+    let postData;
     let ticket;
     const publisherChannel: PublisherChannel = req.publisherChannel;
     try {
-        putData = req.body as PaymentInformation;
-        const { error } = paymentInformationSchema.validate(putData);
+        postData = req.body as PaymentInformation;
+        const { error } = paymentInformationSchema.validate(postData);
         if (error) {
             console.log(error);
             res.status(StatusCodes.BAD_REQUEST).send({ message: "Bad Request." });
             return;
         }
         // Get the wanted ticket
-        ticket = await queryTicketByName(putData.event_id, putData.ticket_name);
+        ticket = await queryTicketByName(postData.event_id, postData.ticket_name);
         if (!ticket) {
             console.error("Ticket not found");
             console.error(ticket);
             throw Error("Ticket not found.");
         }
         // TODO - Make sure we have enough tickets to sell or that they are reseved in the locked array for the user!
-        if (ticket.available < putData.ticket_amount) {
+        if (ticket.available < postData.ticket_amount) {
             console.error("Not enough tickets available.");
             throw Error("Not enough tickets available.");
         }
 
-        console.log(`>> Buying ${putData.ticket_amount} tickets for of id ${ticket._id}`);
-        const result = await updateTicketAmount(ticket._id.toString(), -putData.ticket_amount);
+        console.log(`>> Buying ${postData.ticket_amount} tickets for of id ${ticket._id}`);
+        const result = await updateTicketAmount(ticket._id.toString(), -postData.ticket_amount);
 
         if (result != StatusCodes.OK) {
             console.error("Failed updating ticket in DB");
@@ -162,25 +162,25 @@ export const purchaseTicket = async (req: Request, res: Response) => {
 
     try {
         // CREATE THE ORDER, AND UNDO CHANGES IF FAILED
-        const orderResult = await axiosInstance.post("/api/buy", putData);
+        const orderResult = await axiosInstance.post("/api/buy", postData);
         if (orderResult.status != StatusCodes.OK) {
             console.error("Failed buying ticket - Order API failed");
             throw Error("Failed buying ticket!");
         }
 
-        if (ticket.available === putData.ticket_amount) { // If we sold all tickets, send new cheapest ticket
-            const newCheapestTicket = await queryCheapestTicketsByEventID(putData.event_id); // could be null
+        if (ticket.available === postData.ticket_amount) { // If we sold all tickets, send new cheapest ticket
+            const newCheapestTicket = await queryCheapestTicketsByEventID(postData.event_id); // could be null
             await publisherChannel.sendEvent(JSON.stringify(newCheapestTicket));
         }
 
-        res.status(StatusCodes.OK).send({ message: "Ticket purchased" });
+        res.status(StatusCodes.OK).send({ order_id: orderResult.data.order_id });
     }
     catch (error) {
         // UNDO CHANGES
         // console.error(error);
         // TODO - when hammerhead returns 500 we don't handel it properly - can't try to purchase again...
         console.error("Failed buying ticket - Order API failed");
-        await updateTicketAmount(ticket._id.toString(), putData.ticket_amount);
+        await updateTicketAmount(ticket._id.toString(), postData.ticket_amount);
         console.error("Ticket purchase failed. Rolling back changes.");
         return;
     }

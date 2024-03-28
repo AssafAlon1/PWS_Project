@@ -6,13 +6,12 @@ import { PaymentDetails } from '../../types';
 
 interface PaymentFormProps {
     purchaseTickets: () => Promise<void>;
-    afterSuccessfulPurchase: () => void;
     isLoading: boolean;
     setPaymentDetails: (paymentDetails: PaymentDetails) => void;
     price: number;
 }
 
-const PaymentForm: React.FC<PaymentFormProps> = ({ purchaseTickets, afterSuccessfulPurchase, isLoading, setPaymentDetails, price }) => {
+const PaymentForm: React.FC<PaymentFormProps> = ({ purchaseTickets, isLoading, setPaymentDetails, price }) => {
 
     const [isFormValidated, setFormValidated] = useState<boolean>(false);
     const [year, setYear] = useState<number>(0);
@@ -41,7 +40,6 @@ const PaymentForm: React.FC<PaymentFormProps> = ({ purchaseTickets, afterSuccess
         }
         try {
             await purchaseTickets();
-            afterSuccessfulPurchase();
         }
         catch {
             // TODO - HANDLE THIS RIGHT (show an error in the page probably. Maybe a toast?)

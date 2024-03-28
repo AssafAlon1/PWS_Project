@@ -9,7 +9,13 @@ import { AuthContext } from "../AuthProvider/AuthProvider";
 import { AuthApi } from "../../api/auth";
 
 const shouldDisplayGoBackButton = (path: string) => {
-    return path === "/checkout" || path === "/error" || path.startsWith("/event") || path === "/userspace"; // TODO - This!!!
+    return [
+        "/checkout",
+        "/error",
+        "/event",
+        "/userspace",
+        "/refund"
+    ].includes(path) || path.startsWith("/event");
 }
 
 const NavbarComponent: React.FC = () => {

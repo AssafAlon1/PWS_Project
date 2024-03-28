@@ -6,19 +6,27 @@ import EventApi from '../../api/event';
 import ButtonWithTooltip from '../ButtonWithTooltip/ButtonWithTooltip';
 import MissingImage from "../../assets/MissingImage.png"
 import { ThreeSpanningSpinners } from '../SpinnerComponent/SpinnerComponent';
+import { useNavigate } from 'react-router-dom';
 
 interface ActionDetailsProps {
     action: UserAction;
-    onRefund: () => void;
     isLoadingRefund?: boolean;
+    onRefund?: () => void;
 }
 
-const ActionDetails: React.FC<ActionDetailsProps> = ({ action, onRefund, isLoadingRefund }) => {
+const ActionDetails: React.FC<ActionDetailsProps> = ({ action, isLoadingRefund, onRefund }) => {
     const [isLoadingEvent, setIsLoadingEvent] = React.useState<boolean>(false);
     const [isRefundable, setIsRefundable] = React.useState<boolean>(false);
     const [reasonNotRefundable, setReason] = React.useState<string>("Loading...");
     const [eventDetails, setEventDetails] = React.useState<CSEvent | null>(null);
     const formattedDate = getFormattedDate(action.purchase_time);
+
+    const navigate = useNavigate();
+
+    let handleRefund = onRefund;
+    if (!handleRefund) {
+        handleRefund = () => navigate("/refund", { state: { purchase_id: action.purchase_id } });
+    }
 
     const updateEvent = async () => {
         setIsLoadingEvent(true);
@@ -122,8 +130,8 @@ const ActionDetails: React.FC<ActionDetailsProps> = ({ action, onRefund, isLoadi
                         <Card.Text>Bought at: {formattedDate}</Card.Text>
                         <ButtonWithTooltip
                             buttonContent="Request Refund"
-                            buttonOnClick={onRefund}
-                            isDisabled={!isRefundable}
+                            buttonOnClick={handleRefund ?? (() => { })}
+                            isDisabled={!isRefundable || !handleRefund}
                             tooltipContent={reasonNotRefundable}
                             isLoading={isLoadingRefund} />
                     </Card>

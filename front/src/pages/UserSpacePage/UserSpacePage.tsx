@@ -16,10 +16,8 @@ const UserSpacePage: React.FC = () => {
   const [displayErrorLoadMore, setDisplayErrorLoadMore] = useState<boolean>(false);
   const [errorText, setErrorText] = useState<string>("");
 
-  const navigate = useNavigate();
-
   // Smaller screens will have less loading events
-  const LOADING_AMOUNT = window.innerWidth < 576 ? 2 : window.innerWidth < 992 ? 6 : 8;
+  const LOADING_AMOUNT = 2
 
   const authContext = useContext(AuthContext);
   const username = authContext.user;
@@ -86,7 +84,6 @@ const UserSpacePage: React.FC = () => {
   }
 
   const UserActions = () => {
-
     if (errorText) {
       return <Alert variant="danger">{errorText}</Alert>;
     }
@@ -96,7 +93,10 @@ const UserSpacePage: React.FC = () => {
       actionsArray = Array.from({ length: LOADING_AMOUNT }, (_, i) => <ActionPlaceholder key={i} />);
     }
     else {
-      actionsArray = userActions.map(action => <ActionDetails key={action.purchase_id} action={action} onRefund={() => navigate("/refund", { state: { purchase_id: action.purchase_id } })} />);
+      actionsArray = userActions.map(action => <ActionDetails
+        key={action.purchase_id}
+        action={action}
+      />);
     }
     if (actionsArray.length === 0) {
       return (

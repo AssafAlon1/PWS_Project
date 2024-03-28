@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Form, Button, FloatingLabel, Alert } from 'react-bootstrap';
+import { Form, Button, FloatingLabel, Alert, Container } from 'react-bootstrap';
 import ButtonWithTooltip from '../../components/ButtonWithTooltip/ButtonWithTooltip';
 import { UserAction } from '../../types';
 import UserActionApi from '../../api/userAction';
@@ -70,7 +70,7 @@ const RefundPage: React.FC = () => {
     }, [statePurchaseId]);
 
     return (
-        <>
+        <Container style={{ minWidth: "660px" }}>
             <h1>Refund Page</h1>
             <ButtonWithTooltip
                 tooltipContent="Visit your User Space to find it."
@@ -80,18 +80,28 @@ const RefundPage: React.FC = () => {
             />
             <hr />
             <Form>
-                <Form.Group controlId="purchaseId" className="mb-2 direction-row">
-                    <FloatingLabel label="Purchase ID">
-                        <Form.Control type="text" value={purchaseId} onChange={handlePurchaseIdChange} placeholder="Purchase ID" />
-                    </FloatingLabel>
-                </Form.Group>
-
-                <Button disabled={isLoading} onClick={updateUserAction}>Find Purchase Details</Button>
+                <div style={{ display: "flex", justifyContent: "center" }} className="mb-2 direction-row">
+                    <Form.Group controlId="purchaseId" className="me-2">
+                        <FloatingLabel label="Purchase ID">
+                            <Form.Control
+                                style={{ minWidth: "400px" }}
+                                type="text"
+                                value={purchaseId}
+                                onChange={handlePurchaseIdChange}
+                                placeholder="Purchase ID" />
+                        </FloatingLabel>
+                    </Form.Group>
+                    <Button
+                        style={{}}
+                        disabled={isLoading}
+                        onClick={updateUserAction}>
+                        Find Purchase Details
+                    </Button>
+                </div>
                 {userAction && <ActionDetails action={userAction} onRefund={handleRefund} isLoadingRefund={isLoading} />}
             </Form>
             <Alert variant="danger" show={errorText !== ""} onClose={() => setErrorText("")} dismissible>{errorText}</Alert>
-
-        </>
+        </Container>
     );
 };
 

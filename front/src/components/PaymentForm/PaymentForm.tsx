@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Button, Card, Col, FloatingLabel, Form, Row } from 'react-bootstrap';
 import { SpanningSpinnner } from '../SpinnerComponent/SpinnerComponent';
 import { PaymentDetails } from '../../types';
@@ -6,13 +6,12 @@ import { PaymentDetails } from '../../types';
 
 interface PaymentFormProps {
     purchaseTickets: () => Promise<void>;
-    afterSuccessfulPurchase: () => void;
     isLoading: boolean;
     setPaymentDetails: (paymentDetails: PaymentDetails) => void;
     price: number;
 }
 
-const PaymentForm: React.FC<PaymentFormProps> = ({ purchaseTickets, afterSuccessfulPurchase, isLoading, setPaymentDetails, price }) => {
+const PaymentForm: React.FC<PaymentFormProps> = ({ purchaseTickets, isLoading, setPaymentDetails, price }) => {
 
     const [isFormValidated, setFormValidated] = useState<boolean>(false);
     const [year, setYear] = useState<number>(0);
@@ -31,17 +30,16 @@ const PaymentForm: React.FC<PaymentFormProps> = ({ purchaseTickets, afterSuccess
         });
     }
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-        updatePaymentDetails();
         event.preventDefault();
         const form = event.currentTarget;
         if (form.checkValidity() === false) {
             event.stopPropagation();
             setFormValidated(true);
+            console.log("Form invalid");
             return;
         }
         try {
             await purchaseTickets();
-            afterSuccessfulPurchase();
         }
         catch {
             // TODO - HANDLE THIS RIGHT (show an error in the page probably. Maybe a toast?)
@@ -71,6 +69,10 @@ const PaymentForm: React.FC<PaymentFormProps> = ({ purchaseTickets, afterSuccess
             {isLoading ? <SpanningSpinnner /> : "Buy Now!"}
         </Button>
     }
+
+    useEffect(() => {
+        updatePaymentDetails();
+    }, [creditCardNumber, cvv, cardholderName, year, month]);
 
 
     return (

@@ -12,6 +12,7 @@ import { SignUpPage } from '../../pages/SignupPage/SignupPage'
 import AuthProvider from '../AuthProvider/AuthProvider'
 import PrivateRoute from '../PrivateRoute/PrivateRoute'
 import UserSpacePage from '../../pages/UserSpacePage/UserSpacePage'
+import RefundPage from '../../pages/RefundPage/RefundPage'
 
 function CSRouter() {
 
@@ -34,6 +35,9 @@ function CSRouter() {
                     </Route>
                     <Route element={<PrivateRoute />}>
                         <Route path="/userspace" element={<UserSpacePage />} />
+                    </Route>
+                    <Route element={<PrivateRoute />}>
+                        <Route path="/refund" element={<RefundPage />} />
                     </Route>
                     <Route path="/login" element={<LoginPage />} />
                     <Route path="/signup" element={<SignUpPage />} />

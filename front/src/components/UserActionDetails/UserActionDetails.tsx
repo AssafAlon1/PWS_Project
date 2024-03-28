@@ -6,17 +6,26 @@ import EventApi from '../../api/event';
 import ButtonWithTooltip from '../ButtonWithTooltip/ButtonWithTooltip';
 import MissingImage from "../../assets/MissingImage.png"
 import { ThreeSpanningSpinners } from '../SpinnerComponent/SpinnerComponent';
+import { useNavigate } from 'react-router-dom';
 
+interface ActionDetailsProps {
+    action: UserAction;
+    isLoadingRefund?: boolean;
+    onRefund?: () => void;
+}
 
-const ActionDetails: React.FC<{ action: UserAction }> = ({ action }) => {
+const ActionDetails: React.FC<ActionDetailsProps> = ({ action, isLoadingRefund, onRefund }) => {
     const [isLoadingEvent, setIsLoadingEvent] = React.useState<boolean>(false);
     const [isRefundable, setIsRefundable] = React.useState<boolean>(false);
     const [reasonNotRefundable, setReason] = React.useState<string>("Loading...");
     const [eventDetails, setEventDetails] = React.useState<CSEvent | null>(null);
     const formattedDate = getFormattedDate(action.purchase_time);
-    const handleRefund = () => {
-        // TODO - implement
-        return null;
+
+    const navigate = useNavigate();
+
+    let handleRefund = onRefund;
+    if (!handleRefund) {
+        handleRefund = () => navigate("/refund", { state: { purchase_id: action.purchase_id } });
     }
 
     const updateEvent = async () => {
@@ -105,11 +114,9 @@ const ActionDetails: React.FC<{ action: UserAction }> = ({ action }) => {
     const formattedEndDate = eventDetails?.end_date ? getFormattedDate(eventDetails.end_date) : "";
     const formattedStartTime = eventDetails?.start_date ? getFormattedTime(eventDetails.start_date) : "";
     const formattedEndTime = eventDetails?.end_date ? getFormattedTime(eventDetails.end_date) : "";
-    // TODO - Tooltip button when disabled
     return (
         <Card className="mb-2">
             <Card.Header>
-                {/* TODO - need event name!! */}
                 <Card.Title>
                     {title}
                 </Card.Title>
@@ -123,9 +130,10 @@ const ActionDetails: React.FC<{ action: UserAction }> = ({ action }) => {
                         <Card.Text>Bought at: {formattedDate}</Card.Text>
                         <ButtonWithTooltip
                             buttonContent="Request Refund"
-                            buttonOnClick={() => handleRefund()}
-                            isDisabled={!isRefundable}
-                            tooltipContent={reasonNotRefundable} />
+                            buttonOnClick={handleRefund ?? (() => { })}
+                            isDisabled={!isRefundable || !handleRefund}
+                            tooltipContent={reasonNotRefundable}
+                            isLoading={isLoadingRefund} />
                     </Card>
                 </Container>
                 <Card.Text>{eventDetails?.description}</Card.Text>

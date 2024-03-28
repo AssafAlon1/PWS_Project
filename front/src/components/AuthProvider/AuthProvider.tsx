@@ -43,9 +43,7 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             return;
         }
         const closestEvent = await UserActionApi.getUserClosestEvent(user);
-        if (closestEvent) {
-            setNextEvent(closestEvent);
-        }
+        setNextEvent(closestEvent);
     }
 
     useEffect(() => {

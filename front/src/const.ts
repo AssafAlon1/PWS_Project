@@ -3,14 +3,14 @@ export const MAX_COMMENTS = 10;
 export const MAX_ACTIONS = 5;
 
 export const VALID_CATEGORIES = [
-    "Charity%20Event",
+    "Charity Event",
     "Concert",
     "Conference",
     "Convention",
     "Exhibition",
     "Festival",
-    "Product%20Launch",
-    "Sports%20Event"
+    "Product Launch",
+    "Sports Event"
 ]
 
 export const API_GATEWAY_URL = "http://localhost:3000";

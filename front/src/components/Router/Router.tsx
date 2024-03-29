@@ -13,7 +13,7 @@ import AuthProvider from '../AuthProvider/AuthProvider'
 import PrivateRoute from '../PrivateRoute/PrivateRoute'
 import UserSpacePage from '../../pages/UserSpacePage/UserSpacePage'
 import RefundPage from '../../pages/RefundPage/RefundPage'
-
+import NewEventPage from '../../pages/NewEventPage/NewEventPage'
 function CSRouter() {
 
     return (
@@ -39,6 +39,8 @@ function CSRouter() {
                     <Route element={<PrivateRoute />}>
                         <Route path="/refund" element={<RefundPage />} />
                     </Route>
+                    {/* TODO - add privileged route! */}
+                    <Route path="/newevent" element={<NewEventPage />} />
                     <Route path="/login" element={<LoginPage />} />
                     <Route path="/signup" element={<SignUpPage />} />
                     <Route path="/error" element={<ErrorPage />} />

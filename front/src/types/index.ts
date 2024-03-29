@@ -22,7 +22,7 @@ export interface CSEventCreationReqeust {
     end_date: Date;
     location: string;
     image?: string;
-    tickets: {name: string, total: number, price: number}[];
+    tickets: { name: string, total: number, price: number }[];
 }
 
 export interface Comment {
@@ -56,8 +56,6 @@ export interface PaymentDetails {
     charge: number;
 }
 
-// This will change...
-// TODO - add event name??
 export interface UserAction {
     username: string;
     event_id: string;

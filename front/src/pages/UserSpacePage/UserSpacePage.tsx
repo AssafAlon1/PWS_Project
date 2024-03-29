@@ -32,7 +32,6 @@ const UserSpacePage: React.FC = () => {
         setHasMore(false);
         return;
       }
-      await new Promise(resolve => setTimeout(resolve, 1000)); // TODO - Remove
       const newActions: UserAction[] = await UserActionApi.getUserActions(username, userActions.length, MAX_ACTIONS);
       if (newActions.length < MAX_ACTIONS) {
         setHasMore(false);
@@ -54,7 +53,6 @@ const UserSpacePage: React.FC = () => {
       console.log("!!NO USER");
       setLoading(false);
       return;
-      // return navigate("/");
     }
     setUserActions([]);
     let fetchedActions: UserAction[] = [];

@@ -15,7 +15,6 @@ import { ThreeSpanningSpinners } from '../../components/SpinnerComponent/Spinner
 import CommentsComponent from '../../components/CommentsComponent/CommentsComponent';
 import { CATALOG_PATH, CHECKOUT_PATH, ERROR_PATH, NOTFOUND_PATH } from '../../paths';
 
-// TODO - extract some components to other files?
 const EventDetails: React.FC = () => {
     const [event, setEvent] = useState<CSEvent | null>(null);
     const [tickets, setTickets] = useState<Ticket[] | null>(null);
@@ -76,7 +75,7 @@ const EventDetails: React.FC = () => {
 
     useEffect(() => {
         updateEvent();
-        updateTickets(); // TODO - separate this? How harsh do we want to be?
+        updateTickets();
     }, [eventId]);
 
     const TitleComponent = () => {
@@ -162,14 +161,11 @@ const EventDetails: React.FC = () => {
                 </Card.Body>
             </Card>
             <Card.Body>
-                {/* TODO - better loading */}
-                <Card.Text>{event ? event.description : "Loading..."}</Card.Text>
-                {/* <Button onClick={() => { navigate("/") }}>Return to Catalog</Button> */}
+                <Card.Text>{event ? event.description : <ThreeSpanningSpinners/>}</Card.Text>
             </Card.Body>
         </Card>
     }
 
-    // TODO - Consider extracting BuyTicketComponent, BuyTicketsComponent to a separate file
     const BuyTicketComponent: React.FC<{ name: string, price: number, amountLeft: number }> = ({ name, price, amountLeft }) => {
         const [ticketAmount, setTicketAmount] = useState<number>(0);
 

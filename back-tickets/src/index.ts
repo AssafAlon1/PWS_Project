@@ -22,7 +22,6 @@ if (!dbUri) {
   process.exit(1);
 }
 
-// TODO - consume messages?
 consumeMessages();
 
 mongoose.set('strictQuery', true);

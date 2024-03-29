@@ -2,9 +2,10 @@ import { Request, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
 
 import { BUY_PATH, PAYMENT_PROVIDER_URL, REFUND_PATH } from "./const.js";
-import { PaymentInformation, RefundInformation, paymentInformationSchema } from './types.js';
+import { PaymentInformation, RefundInformation, paymentInformationSchema, refundInformationSchema } from './types.js';
 import axios from 'axios';
 import { PublisherChannel } from './publisher-channel.js';
+import Joi from 'joi';
 
 // const axiosInstance = axios.create({ withCredentials: true, baseURL: PAYMER_PROVIDER_URL });
 const axiosPayment = axios.create({ baseURL: PAYMENT_PROVIDER_URL });
@@ -50,19 +51,17 @@ export const refundTickets = async (req: Request, res: Response) => {
         const postData = req.body as RefundInformation;
         const publisherChannel: PublisherChannel = req.publisherChannel;
 
-        // TODO - validate postData indeed has the properties of RefundInformation using JOI
-        if (!postData.purchase_id) {
-            console.error("Missing required fields.")
+        const { error } = refundInformationSchema.validate(postData);
+
+        if (error) {
+            console.error("Missing required fields.");
+            console.error(error);
             res.status(StatusCodes.BAD_REQUEST).send({ message: "Missing required fields." });
             return;
         }
 
-        const refund_result = await axiosPayment.post("/_functions/refund", { orderId: postData.purchase_id });
-        // TODO - redundant??
-        if (refund_result.status !== StatusCodes.OK) {
-            res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({ message: "Internal Server Error" });
-            return;
-        }
+        await axiosPayment.post("/_functions/refund", { orderId: postData.purchase_id });
+
         const refundData = {
             event_id: postData.event_id,
             ticket_name: postData.ticket_name,

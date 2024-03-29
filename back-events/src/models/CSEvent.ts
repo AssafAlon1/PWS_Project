@@ -2,8 +2,6 @@ import mongoose, { InferSchemaType, Types } from "mongoose";
 import Joi from "joi";
 import { VALID_CATEGORIES } from "../const.js";
 
-// TODO - add cheapest ticket num, cheapest price, totalAvaliableTickets
-// TODO - remove ticket array
 const mongooseEventSchema = new mongoose.Schema({
   _id: { type: Types.ObjectId, required: false, auto: true },
   title: { type: String, required: true },

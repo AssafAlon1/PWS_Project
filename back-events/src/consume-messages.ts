@@ -2,10 +2,29 @@ import * as amqp from 'amqplib';
 import dotenv from 'dotenv';
 import { BUY_TICKETS_EXCHANGE, BUY_TICKETS_QUEUE, COMMENT_EXCHANGE, COMMENT_QUEUE, REFUND_TICKETS_EXCHANGE, REFUND_TICKETS_QUEUE, TICKET_INFO_EXCHANGE, TICKET_INFO_QUEUE } from './const.js';
 import { plusCommentCount, updateAvailableTickets, updateCheapesstTicket } from './db.js';
+import Joi from "joi";
 
 dotenv.config();
 
 const RABBITMQ_URL = process.env.RABBITMQ_URL || "amqp://localhost";
+
+
+const cheapestTicketSchema = Joi.object({
+    eventId: Joi.string().required(),
+    name: Joi.string().required(),
+    price: Joi.number().required(),
+});
+
+const buyTicketSchema = Joi.object({
+    purchase_id: Joi.string().required(),
+    event_id: Joi.string().required(),
+    ticket_amount: Joi.number().integer().required(),
+});
+
+const refundTicketSchema = Joi.object({
+    event_id: Joi.string().required(),
+    ticket_amount: Joi.number().integer().required(),
+});
 
 export const consumeMessages = async () => {
     try {
@@ -38,11 +57,15 @@ export const consumeMessages = async () => {
 
         await channel.consume(TICKET_INFO_QUEUE, async (msg) => {
             console.log("TICKET_INFO_QUEUE");
-            // TODO - JOI (here and there and everywhere)
-            // TODO - handle null (meaning no ticket available for the event)
+            // TODO - handle null (meaning no ticket available for the event) // What did you mean by this Alina?
             const cheapest_ticket = JSON.parse(msg.content.toString());
-            if (!cheapest_ticket) { // TODO - did you want to handle it another way Alina?
-                console.log(`Comsumer >>> received message: null for ticket info x_x`);
+
+
+            const { error } = cheapestTicketSchema.validate(cheapest_ticket);
+            if (error) {
+                console.log(`Comsumer >>> received invalid message x_x`);
+                console.log(error.message);
+                channel.ack(msg);
                 return;
             }
 
@@ -54,8 +77,14 @@ export const consumeMessages = async () => {
         await channel.consume(BUY_TICKETS_QUEUE, async (msg) => {
             console.log("BUY_TICKETS_QUEUE");
             const order_data = JSON.parse(msg.content.toString());
-            console.log(`Comsumer >>> received message: ${order_data.purchase_id} for buying tickets`);
-            // TODO - update ticket count
+            const { error } = buyTicketSchema.validate(order_data);
+            if (error) {
+                console.log(`Comsumer >>> received invalid message x_x`);
+                channel.ack(msg);
+                return;
+            }
+            console.log(`Comsumer >>> received buy message: ${order_data.purchase_id} for buying tickets`);
+
             await updateAvailableTickets(order_data.event_id, -order_data.ticket_amount);
             channel.ack(msg);
         });
@@ -63,8 +92,13 @@ export const consumeMessages = async () => {
         await channel.consume(REFUND_TICKETS_QUEUE, async (msg) => {
             console.log("REFUND_TICKETS_QUEUE");
             const refund_data = JSON.parse(msg.content.toString());
+            const { error } = refundTicketSchema.validate(refund_data);
+            if (error) {
+                console.log(`Comsumer >>> received invalid message x_x`);
+                channel.ack(msg);
+                return;
+            }
             console.log(`Comsumer >>> received message for refunding tickets for event ${refund_data.event_id}`);
-            // TODO - update ticket count
             await updateAvailableTickets(refund_data.event_id, refund_data.ticket_amount);
             channel.ack(msg);
         });

@@ -164,7 +164,7 @@ export const purchaseTicket = async (req: Request, res: Response) => {
         // CREATE THE ORDER, AND UNDO CHANGES IF FAILED
         const orderResult = await axiosInstance.post("/api/buy", postData);
         if (orderResult.status != StatusCodes.OK) {
-            console.error("Failed buying ticket - Order API failed");
+            console.error("I believe this code is unreachable. Can you see me?");
             throw Error("Failed buying ticket!");
         }
 
@@ -182,6 +182,7 @@ export const purchaseTicket = async (req: Request, res: Response) => {
         console.error("Failed buying ticket - Order API failed");
         await updateTicketAmount(ticket._id.toString(), postData.ticket_amount);
         console.error("Ticket purchase failed. Rolling back changes.");
+        res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({ message: "Internal Server Error" });
         return;
     }
 

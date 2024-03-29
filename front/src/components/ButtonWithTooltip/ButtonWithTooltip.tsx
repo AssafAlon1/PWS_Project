@@ -7,11 +7,13 @@ interface ButtonWithTooltipProps {
     buttonContent: string;
     tooltipContent: string;
     isDisabled: boolean;
-    buttonOnClick: () => void;
+    buttonOnClick?: () => void;
     isLoading?: boolean;
+    buttonType?: "submit" | "reset" | "button";
+    placement?: "top" | "right" | "bottom" | "left";
 }
 
-const ButtonWithTooltip: React.FC<ButtonWithTooltipProps> = ({ buttonContent, tooltipContent, isDisabled, buttonOnClick, isLoading }) => {
+const ButtonWithTooltip: React.FC<ButtonWithTooltipProps> = ({ buttonContent, tooltipContent, isDisabled, buttonOnClick, isLoading, buttonType, placement }) => {
 
     const renderTooltip = (props: React.ComponentProps<typeof Tooltip>) => (
         <Tooltip id="button-tooltip" {...props}>
@@ -19,7 +21,12 @@ const ButtonWithTooltip: React.FC<ButtonWithTooltipProps> = ({ buttonContent, to
         </Tooltip>
     );
 
-    const button = <Button disabled={isDisabled} variant="primary" onClick={buttonOnClick}>{buttonContent}</Button>;
+    let button;
+    if (buttonType) {
+        button = <Button disabled={isDisabled} variant="primary" type={buttonType}>{buttonContent}</Button>;
+    } else {
+        button = <Button disabled={isDisabled} variant="primary" onClick={buttonOnClick}>{buttonContent}</Button>;
+    }
 
     if (isLoading) {
         return <Button disabled={true} variant="primary" onClick={buttonOnClick}>
@@ -27,14 +34,17 @@ const ButtonWithTooltip: React.FC<ButtonWithTooltipProps> = ({ buttonContent, to
         </Button>
     }
 
-    const overlay = isDisabled ? <OverlayTrigger
-        placement="bottom"
-        delay={{ show: 50, hide: 50 }}
-        overlay={renderTooltip}>
-        <div>
-            {button}
-        </div>
-    </OverlayTrigger> : button;
-    return overlay;
+    if (isDisabled) {
+        return <OverlayTrigger
+            placement={placement ?? "bottom"}
+            delay={{ show: 50, hide: 50 }}
+            overlay={renderTooltip}>
+            <div>
+                {button}
+            </div>
+        </OverlayTrigger>
+    }
+
+    return button;
 }
 export default ButtonWithTooltip;

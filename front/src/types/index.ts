@@ -13,6 +13,18 @@ export interface CSEvent {
     comment_count: number;
 }
 
+export interface CSEventCreationReqeust {
+    title: string;
+    category: string;
+    description: string;
+    organizer: string;
+    start_date: Date;
+    end_date: Date;
+    location: string;
+    image?: string;
+    tickets: {name: string, total: number, price: number}[];
+}
+
 export interface Comment {
     eventId: string;
     content: string;

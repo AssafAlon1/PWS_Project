@@ -1,11 +1,12 @@
 
 import React, { useState } from 'react';
 import { Form, Button, FloatingLabel, Container } from 'react-bootstrap';
-import Card from 'react-bootstrap/Card';
-import Row from 'react-bootstrap/Row';
-import Col from 'react-bootstrap/Col';
+import { Alert, Card, Col, Row } from 'react-bootstrap';
 import { VALID_CATEGORIES } from '../../const';
 import './NewEventPage.css';
+import EventApi from '../../api/event';
+import { CSEventCreationReqeust } from '../../types';
+import ButtonWithTooltip from '../../components/ButtonWithTooltip/ButtonWithTooltip';
 
 interface NewTicket {
     name: string;
@@ -14,12 +15,15 @@ interface NewTicket {
 }
 
 const NewEventPage: React.FC = () => {
-    // const [isFormValidated, setFormValidated] = useState<boolean>(false);
-    const [eventName, setEventName] = useState<string>('');
-    const [catagory, setCatagory] = useState<string>('');
-    const [description, setDescription] = useState<string>('');
-    const [orginaizer, setOrginaizer] = useState<string>('');
-    const [imageURL, setImageURL] = useState<string>('');
+    const [isFormValidated, setFormValidated] = useState<boolean>(false);
+    const [displayError, setDisplayError] = useState<boolean>(false);
+    
+    const [eventName, setEventName] = useState<string>("");
+    const [catagory, setCatagory] = useState<string>("");
+    const [description, setDescription] = useState<string>("");
+    const [location, setLocation] = useState<string>("");
+    const [orginaizer, setOrginaizer] = useState<string>("");
+    const [imageURL, setImageURL] = useState<string>("");
 
     const [startDate, setStartDate] = useState<string>(new Date().toISOString().split('T')[0]);
     const [endDate, setEndDate] = useState<string>(new Date().toISOString().split('T')[0]);
@@ -37,6 +41,10 @@ const NewEventPage: React.FC = () => {
 
     const handleOrginaizerChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setOrginaizer(e.target.value);
+    }
+
+    const handleLocationChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setLocation(e.target.value);
     }
 
     const handleImageURLChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -64,10 +72,11 @@ const NewEventPage: React.FC = () => {
     }
 
     const addTicket = (ticket: NewTicket): boolean => {
-        if (ticket.name === '' ||
-            ticket.price <= 0 ||
+        if (ticket.name === "" ||
+            ticket.price < 0 ||
             ticket.quantity <= 0 ||
             tickets.some(t => t.name === ticket.name)) {
+            // TODO - Show error message
             alert("Invalid ticket (make sure ticket name is unique)");
             return false;
         }
@@ -75,8 +84,43 @@ const NewEventPage: React.FC = () => {
         return true
     }
 
+    const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
+        const form = event.currentTarget;
+        if (form.checkValidity() === false) {
+            event.stopPropagation();
+            setFormValidated(true);
+            console.log("Form invalid");
+            setDisplayError(true);
+            return;
+        }
+        try {
+            const eventCreationRequest: CSEventCreationReqeust = {
+                title: eventName,
+                category: catagory,
+                description: description,
+                organizer: orginaizer,
+                start_date: new Date(startDate + 'T' + startTime),
+                end_date: new Date(endDate + 'T' + endTime),
+                location: location,
+                tickets: tickets.map(t => ({ name: t.name, total: t.quantity, price: t.price }))
+            }
+
+            if (imageURL != "") {
+                eventCreationRequest.image = imageURL;
+            }
+            console.log(eventCreationRequest);
+            const result = await EventApi.createEvent(eventCreationRequest);
+            alert("Event created successfully! ID: " + result); // TODO: Redirect to Catalog
+        }
+        catch (error) {
+            console.log(error);
+            setDisplayError(true);
+        }
+    }
+
     const TicketMiniForm: React.FC<{ addTicket: (ticket: NewTicket) => boolean }> = ({ addTicket }) => {
-        const [ticketName, setTicketName] = useState<string>('');
+        const [ticketName, setTicketName] = useState<string>("");
         const [ticketPrice, setTicketPrice] = useState<number>(0);
         const [ticketQuantity, setTicketQuantity] = useState<number>(0);
 
@@ -92,14 +136,9 @@ const NewEventPage: React.FC = () => {
             setTicketQuantity(Number(e.target.value));
         }
 
-        const isDisabled = ticketName === '' || ticketPrice <= 0 || ticketQuantity <= 0;
+        const isDisabled = ticketName === "" || ticketPrice < 0 || ticketQuantity <= 0;
 
-        // const handleSubmit = () => {
-        //     if (isDisabled) {
-        //         return;
-        //     }
-        //     onClickTicket();
-        // }
+        
 
         const onClickTicket = () => {
             const result = addTicket({
@@ -110,21 +149,20 @@ const NewEventPage: React.FC = () => {
             if (!result) {
                 return;
             }
-            setTicketName('');
+            setTicketName("");
             setTicketPrice(0);
             setTicketQuantity(0);
         }
 
         return (
             <Card>
-                <Form.Group controlId="formTicketName" className="mb-2">
+                <div className="mb-2">
                     <Row>
                         <Col>
-                            <Form.Label>Ticket Name</Form.Label>
+                            <label>Ticket Name</label>
                         </Col>
                         <Col>
-                            <Form.Control
-                                required
+                            <input
                                 type="text"
                                 placeholder="Ticket name"
                                 value={ticketName}
@@ -132,15 +170,14 @@ const NewEventPage: React.FC = () => {
                             />
                         </Col>
                     </Row>
-                </Form.Group>
-                <Form.Group controlId="formTicketPrice" className="mb-2">
+                </div>
+                <div className="mb-2">
                     <Row>
                         <Col>
-                            <Form.Label>Ticket Price</Form.Label>
+                            <label>Ticket Price</label>
                         </Col>
                         <Col>
-                            <Form.Control
-                                required
+                            <input
                                 type="number"
                                 placeholder="Enter ticket price"
                                 value={ticketPrice}
@@ -148,15 +185,14 @@ const NewEventPage: React.FC = () => {
                             />
                         </Col>
                     </Row>
-                </Form.Group>
-                <Form.Group controlId="formTicketQuantity" className="mb-2">
+                </div>
+                <div className="mb-2">
                     <Row>
                         <Col>
-                            <Form.Label>Ticket Quantity</Form.Label>
+                            <label>Ticket Quantity</label>
                         </Col>
                         <Col>
-                            <Form.Control
-                                required
+                            <input
                                 type="number"
                                 placeholder="Enter ticket quantity"
                                 value={ticketQuantity}
@@ -164,12 +200,12 @@ const NewEventPage: React.FC = () => {
                             />
                         </Col>
                     </Row>
-                </Form.Group>
+                </div>
                 <Col>
-                    <Button variant="primary" disabled={isDisabled} onClick={onClickTicket}>Add Ticket</Button>
+                    <Button disabled={isDisabled} onClick={onClickTicket}>Add Ticket</Button>
                 </Col>
             </Card>
-        )
+        );
     }
 
     const TicketDetails = ({ ticket, onRemove }: { ticket: NewTicket, onRemove: () => void }) => {
@@ -198,8 +234,8 @@ const NewEventPage: React.FC = () => {
     return (
         <>
             <h1>New Event</h1>
-            <Form>
-            {/* <Form noValidate validated={isFormValidated} onSubmit={handleSubmit}> */}
+            {/* <Form> */}
+            <Form noValidate validated={isFormValidated} onSubmit={handleSubmit}>
                 <Row>
                     <Col>
                         <Form.Group controlId="formEventName" className="mb-2">
@@ -238,6 +274,7 @@ const NewEventPage: React.FC = () => {
                                     placeholder="Enter event description"
                                     value={description}
                                     onChange={handleDescriptionChange} />
+                                <Form.Control.Feedback type="invalid">Event description must be non-empty and in English</Form.Control.Feedback>
                             </FloatingLabel>
                         </Form.Group>
 
@@ -251,6 +288,21 @@ const NewEventPage: React.FC = () => {
                                     value={orginaizer}
                                     onChange={handleOrginaizerChange}
                                 />
+                                <Form.Control.Feedback type="invalid">Event orginaizer must be non-empty and in English</Form.Control.Feedback>
+                            </FloatingLabel>
+                        </Form.Group>
+
+                        <Form.Group controlId="formEventLcation" className="mb-2">
+                            <FloatingLabel label="Event Location">
+                                <Form.Control
+                                    required
+                                    type="text"
+                                    pattern='^[a-zA-Z\s\-0-9]+$'
+                                    placeholder="Enter event location"
+                                    value={location}
+                                    onChange={handleLocationChange}
+                                />
+                                <Form.Control.Feedback type="invalid">Event location must be non-empty and in English</Form.Control.Feedback>
                             </FloatingLabel>
                         </Form.Group>
 
@@ -259,8 +311,10 @@ const NewEventPage: React.FC = () => {
                                 <Form.Control
                                     required
                                     type="date"
+                                    isInvalid={new Date(startDate) < new Date(new Date().toISOString().split('T')[0])}
                                     value={startDate}
                                     onChange={handleStartDateChange} />
+                                <Form.Control.Feedback type="invalid">Start date must be in the future</Form.Control.Feedback>
                             </FloatingLabel>
                         </Form.Group>
 
@@ -269,8 +323,10 @@ const NewEventPage: React.FC = () => {
                                 <Form.Control
                                     required
                                     type="date"
+                                    isInvalid={new Date(startDate) > new Date(endDate)}
                                     value={endDate}
                                     onChange={handleEndDateChange} />
+                                <Form.Control.Feedback type="invalid">End date must be after start date</Form.Control.Feedback>
                             </FloatingLabel>
                         </Form.Group>
 
@@ -280,8 +336,10 @@ const NewEventPage: React.FC = () => {
                                 <Form.Control
                                     required
                                     type="time"
+                                    isInvalid={new Date(startDate + 'T' + startTime) < new Date()}
                                     value={startTime}
                                     onChange={handleStartTimeChange} />
+                                <Form.Control.Feedback type="invalid">Start time must be in the future</Form.Control.Feedback>
                             </FloatingLabel>
                         </Form.Group>
 
@@ -290,8 +348,10 @@ const NewEventPage: React.FC = () => {
                                 <Form.Control
                                     required
                                     type="time"
+                                    isInvalid={new Date(startDate + 'T' + startTime) > new Date(endDate + 'T' + endTime)}
                                     value={endTime}
                                     onChange={handleEndTimeChange} />
+                                <Form.Control.Feedback type="invalid">End time must be after start time</Form.Control.Feedback>
                             </FloatingLabel>
                         </Form.Group>
 
@@ -300,7 +360,6 @@ const NewEventPage: React.FC = () => {
                                 <Form.Control
                                     type="text"
                                     placeholder="Enter event image URL (Optional)"
-                                    value={imageURL}
                                     onChange={handleImageURLChange}
                                 />
                             </FloatingLabel>
@@ -337,12 +396,26 @@ const NewEventPage: React.FC = () => {
 
                 <Row className="mt-3">
                     <Col>
-                        <Button variant="primary" type="submit" disabled={tickets.length === 0}>
+                        <ButtonWithTooltip
+                            buttonContent="Create Event"
+                            tooltipContent="Event must have at least one ticket"
+                            isDisabled={tickets.length === 0}
+                            buttonType="submit"
+                            placement="top"
+                        />
+
+                        {/* <Button variant="primary" type="submit" disabled={tickets.length === 0}>
                             Create Event
-                        </Button>
+                        </Button> */}
                     </Col>
                 </Row>
             </Form > 
+            <Alert show={displayError} variant="danger" onClose={() => setDisplayError(false)} dismissible>
+                <Alert.Heading>Failed to create event</Alert.Heading>
+                <p>
+                    Something went wrong while trying to create the event. Please try again.
+                </p>
+            </Alert>
         </>
     );
 };

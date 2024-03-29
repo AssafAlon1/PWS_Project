@@ -1,5 +1,5 @@
 import axios, { isAxiosError } from "axios";
-import { CSEvent } from "../types";
+import { CSEvent, CSEventCreationReqeust } from "../types";
 import { API_GATEWAY_URL } from "../const";
 // import { getUserEventIds } from "./userAction";
 
@@ -44,6 +44,14 @@ const RealEventApi = {
             return response.data;
         } catch (error) {
             throw new Error("Failed to fetch all events"); // TODO - Better handling?
+        }
+    },
+    createEvent: async (event: CSEventCreationReqeust): Promise<string> => {
+        try {
+            const response = await axiosInstance.post("/api/event", event);
+            return response.data._id; // Created event ID
+        } catch (error) {
+            throw new Error("Failed to create event"); // TODO - Better handling?
         }
     },
 

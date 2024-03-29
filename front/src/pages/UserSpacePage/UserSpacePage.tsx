@@ -1,16 +1,18 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { useNavigate } from "react-router-dom";
 import { Alert, Button, Card, Container } from 'react-bootstrap';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { ThreeSpanningSpinners } from '../../components/SpinnerComponent/SpinnerComponent';
 import { UserAction } from '../../types';
 import UserActionApi from '../../api/userAction';
+import EventApi from '../../api/event';
 import { MAX_ACTIONS } from '../../const';
 import ActionDetails, { ActionPlaceholder } from '../../components/UserActionDetails/UserActionDetails';
 import { AuthContext } from '../../components/AuthProvider/AuthProvider';
+import { CSEvent } from '../../types';
 
 const UserSpacePage: React.FC = () => {
   const [userActions, setUserActions] = useState<UserAction[]>([]);
+  const [userEvents, setUserEvents] = useState<(CSEvent | null)[]>([]);
   const [isLoading, setLoading] = useState<boolean>(false);
   const [hasMore, setHasMore] = useState<boolean>(true);
   const [displayErrorLoadMore, setDisplayErrorLoadMore] = useState<boolean>(false);
@@ -31,11 +33,14 @@ const UserSpacePage: React.FC = () => {
         return;
       }
       await new Promise(resolve => setTimeout(resolve, 1000)); // TODO - Remove
-      const newActions = await UserActionApi.getUserActions(username, userActions.length, MAX_ACTIONS);
+      const newActions: UserAction[] = await UserActionApi.getUserActions(username, userActions.length, MAX_ACTIONS);
       if (newActions.length < MAX_ACTIONS) {
         setHasMore(false);
       }
+      // TODO - Make sure the UI is nice and comfy when one fetch fails (for a single event)
+      const newEvents = await Promise.all(newActions.map(action => EventApi.fetchEvent(action.event_id)));
       setUserActions(prevActions => [...prevActions, ...newActions]);
+      setUserEvents(prevEvents => [...prevEvents, ...newEvents]);
     } catch {
       setDisplayErrorLoadMore(true);
       setHasMore(false);
@@ -53,19 +58,24 @@ const UserSpacePage: React.FC = () => {
     }
     setUserActions([]);
     let fetchedActions: UserAction[] = [];
+    let fetchedEvents: (CSEvent | null)[] = [];
     await new Promise(resolve => setTimeout(resolve, 500));
     try {
       fetchedActions = await UserActionApi.getUserActions(username, 0, MAX_ACTIONS) ?? [];
+      // TODO - seprate try?
+      fetchedEvents = await Promise.all(fetchedActions.map(action => EventApi.fetchEvent(action.event_id)));
     }
     catch (err) {
       console.error(`Failed to fetch actions for user ${username}`);
       setErrorText("Failed to fetch actions.");
       fetchedActions = [];
+      fetchedEvents = [];
     }
     if (fetchedActions.length < MAX_ACTIONS) {
       setHasMore(false);
     }
     setUserActions(fetchedActions);
+    setUserEvents(fetchedEvents);
     setLoading(false);
   }
 
@@ -93,10 +103,16 @@ const UserSpacePage: React.FC = () => {
       actionsArray = Array.from({ length: LOADING_AMOUNT }, (_, i) => <ActionPlaceholder key={i} />);
     }
     else {
-      actionsArray = userActions.map(action => <ActionDetails
-        key={action.purchase_id}
-        action={action}
-      />);
+      actionsArray = userActions.map((action, index) => {
+        const csevent = userEvents[index];
+        return (
+          <ActionDetails
+          key={action.purchase_id}
+          action={action}
+          csevent={csevent}
+          />
+        );
+      });
     }
     if (actionsArray.length === 0) {
       return (
@@ -118,7 +134,7 @@ const UserSpacePage: React.FC = () => {
         {actionsArray}
       </InfiniteScroll>
       <Alert show={displayErrorLoadMore} variant="danger" onClose={() => setDisplayErrorLoadMore(false)} dismissible>
-        <Alert.Heading>Failed to event :(</Alert.Heading>
+        <Alert.Heading>Failed to user :(</Alert.Heading>
         <p>
           Something went wrong while trying to load more events. Please try refreshing the page.
         </p>

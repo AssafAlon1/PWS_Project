@@ -8,6 +8,7 @@ import { Button, Card, Placeholder } from 'react-bootstrap';
 import MissingImage from "../../assets/MissingImage.png"
 import { useNavigate } from "react-router-dom";
 import { getFormattedDate } from "../../utils/formatting";
+import { EVENT_PATH } from "../../paths";
 
 const EventDetails: React.FC<{ event: CSEvent }> = ({ event }) => {
 
@@ -31,7 +32,7 @@ const EventDetails: React.FC<{ event: CSEvent }> = ({ event }) => {
                 <Card.Text>{event.category}</Card.Text>
                 <Card.Text>From ${event.cheapest_ticket_price}</Card.Text>
                 <Card.Text>{event.total_available_tickets} tickets available</Card.Text>
-                <Button variant="primary" onClick={() => navigate("/events/" + event._id)}>Purchase Tickets</Button>
+                <Button variant="primary" onClick={() => navigate(EVENT_PATH + "/" + event._id)}>Purchase Tickets</Button>
             </Card.Body>
         </Card>
     );

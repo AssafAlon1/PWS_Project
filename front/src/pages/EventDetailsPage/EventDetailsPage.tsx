@@ -13,6 +13,7 @@ import EventApi from '../../api/event';
 import TicketApi from '../../api/ticket';
 import { ThreeSpanningSpinners } from '../../components/SpinnerComponent/SpinnerComponent';
 import CommentsComponent from '../../components/CommentsComponent/CommentsComponent';
+import { CATALOG_PATH, CHECKOUT_PATH, ERROR_PATH, NOTFOUND_PATH } from '../../paths';
 
 // TODO - extract some components to other files?
 const EventDetails: React.FC = () => {
@@ -38,17 +39,17 @@ const EventDetails: React.FC = () => {
 
         if (!eventId) {
             // I believe it should be impossible to get here, but just in case...
-            return navigate("/");
+            return navigate(CATALOG_PATH);
         }
         let fetchedEvent;
         try {
             fetchedEvent = await EventApi.fetchEvent(eventId);
         }
         catch {
-            return navigate("/error", { state: { message: `Failed to fetch event ${eventId}` } });
+            return navigate(ERROR_PATH, { state: { message: `Failed to fetch event ${eventId}` } });
         }
         if (!fetchedEvent) {
-            navigate("/notfound", { state: { message: `Event ${eventId} not found` } });
+            navigate(NOTFOUND_PATH, { state: { message: `Event ${eventId} not found` } });
         }
         setEvent(fetchedEvent);
     }
@@ -56,7 +57,7 @@ const EventDetails: React.FC = () => {
     const updateTickets = async () => {
         if (!eventId) {
             // I believe it should be impossible to get here, but just in case...
-            return navigate("/");
+            return navigate(CATALOG_PATH);
         }
         setTickets(null);
         let fetchedTickets: Ticket[];
@@ -182,7 +183,7 @@ const EventDetails: React.FC = () => {
 
         const onClickBuyNow = () => {
             setPurchaseDetails(ticketPurchaseDetails);
-            navigate("/checkout");
+            navigate(CHECKOUT_PATH);
         }
 
         return (

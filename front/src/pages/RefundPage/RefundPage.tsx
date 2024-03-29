@@ -5,6 +5,7 @@ import { UserAction } from '../../types';
 import UserActionApi from '../../api/userAction';
 import ActionDetails from '../../components/UserActionDetails/UserActionDetails';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { SUCCESS_PATH } from '../../paths';
 
 const RefundPage: React.FC = () => {
     const [purchaseId, setPurchaseId] = useState<string>("");
@@ -52,7 +53,7 @@ const RefundPage: React.FC = () => {
             console.log(encodedPurchaseId);
             await UserActionApi.refundPurchase(purchaseId);
             setLoading(false);
-            navigate("/success", { state: { message: "Refund was successful!", operationType: "refund", order_id: purchaseId } })
+            navigate(SUCCESS_PATH, { state: { message: "Refund was successful!", operationType: "refund", order_id: purchaseId } })
         }
         catch (error) {
             console.error("Failed to refund purchase");
@@ -98,7 +99,7 @@ const RefundPage: React.FC = () => {
                         Find Purchase Details
                     </Button>
                 </div>
-                {userAction && <ActionDetails action={userAction} onRefund={handleRefund} isLoadingRefund={isLoading} />}
+                {userAction && <ActionDetails action={userAction} onRefund={handleRefund} isLoadingRefund={isLoading} csevent={null} />}
             </Form>
             <Alert variant="danger" show={errorText !== ""} onClose={() => setErrorText("")} dismissible>{errorText}</Alert>
         </Container>

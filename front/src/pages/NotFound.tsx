@@ -1,5 +1,6 @@
 import { Button } from "react-bootstrap";
 import { Link, useLocation } from "react-router-dom";
+import { CATALOG_PATH } from "../paths";
 
 export default function NotFound() {
     const location = useLocation();
@@ -8,7 +9,7 @@ export default function NotFound() {
         <div>
             <h1>Error 404 - Page not found</h1>
             <p>{message}</p>
-            <Link to="/"><Button variant="primary">Return to Catalog</Button></Link>
+            <Link to={CATALOG_PATH}><Button variant="primary">Return to Catalog</Button></Link>
 
         </div>
     )

@@ -6,6 +6,7 @@ import { usePurchaseDetails } from '../../components/PurchaseDetailsContext/Purc
 import TicketApi from '../../api/ticket';
 import { AuthContext } from '../../components/AuthProvider/AuthProvider';
 import { PaymentDetails } from '../../types';
+import { ERROR_PATH, SUCCESS_PATH } from '../../paths';
 
 const CheckoutPage: React.FC = () => {
     const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -20,13 +21,13 @@ const CheckoutPage: React.FC = () => {
 
     useEffect(() => {
         if (!areDetailsProvided) {
-            navigate("/error", { state: { message: "No purchase details found" } });
+            navigate(ERROR_PATH, { state: { message: "No purchase details found" } });
         }
     }, [areDetailsProvided, purchaseDetails, navigate]);
 
     const performPurchase = async () => {
         if (!areDetailsProvided) {
-            navigate("/error", { state: { message: "No purchase details found" } });
+            navigate(ERROR_PATH, { state: { message: "No purchase details found" } });
             return;
         }
         let username;
@@ -39,7 +40,7 @@ const CheckoutPage: React.FC = () => {
         }
         // TODO - Take an additional look at this
         if (!username) {
-            navigate("/error", { state: { message: "No user found" } });
+            navigate(ERROR_PATH, { state: { message: "No user found" } });
             return;
         }
         console.log("About to purchase tickets");
@@ -77,7 +78,7 @@ const CheckoutPage: React.FC = () => {
         setPurchaseDetails(null);
 
         console.log("Redirecting after purchase");
-        navigate("/success", {
+        navigate(SUCCESS_PATH, {
             state: {
                 event_name: detailsForSuccess.event_name,
                 ticket_amount: detailsForSuccess.ticket_amount,

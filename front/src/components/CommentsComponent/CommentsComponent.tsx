@@ -2,13 +2,14 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Alert, Button, Card, Container } from 'react-bootstrap';
 
-import { CSEvent, Comment } from '../../types';
+import { Comment } from '../../types';
 import AddCommentForm from '../../components/AddCommentForm/AddCommentForm';
 import CommentApi from '../../api/comment';
 import CommentComponent from '../../components/CommentComponent/CommentComponent';
 import { ThreeSpanningSpinners } from '../../components/SpinnerComponent/SpinnerComponent';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { MAX_COMMENTS } from '../../const';
+import { CATALOG_PATH } from '../../paths';
 
 interface CommentsComponentProps {
     eventId: string | undefined;
@@ -27,7 +28,7 @@ const CommentsComponent: React.FC<CommentsComponentProps> = ({ eventId, comment_
     const updateComments = async () => {
         if (!eventId) {
             // I believe it should be impossible to get here, but just in case...
-            return navigate("/");
+            return navigate(CATALOG_PATH);
         }
         setComments(null);
         setFailedFetchingComments(false);

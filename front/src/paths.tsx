@@ -1,0 +1,11 @@
+const base = "/PWS_Project";
+export const CATALOG_PATH = base + "/";
+export const LOGIN_PATH = base + "/login";
+export const SIGNUP_PATH = base + "/signup";
+export const EVENT_PATH = base + "/events";
+export const CHECKOUT_PATH = base + "/checkout";
+export const REFUND_PATH = base + "/refund";
+export const USERSPACE_PATH = base + "/userspace";
+export const ERROR_PATH = base + "/error";
+export const NOTFOUND_PATH = base + "/notfound";
+export const SUCCESS_PATH = base + "/success";

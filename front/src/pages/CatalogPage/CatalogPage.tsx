@@ -8,6 +8,7 @@ import EventApi from '../../api/event';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { ThreeSpanningSpinners } from '../../components/SpinnerComponent/SpinnerComponent';
 import { MAX_EVENTS_IN_PAGE } from '../../const';
+import { ERROR_PATH } from '../../paths';
 
 
 const CatalogPage: React.FC = () => {
@@ -88,7 +89,7 @@ const CatalogPage: React.FC = () => {
         // TODO - Maybe 401 handling?
       }
       catch {
-        navigate("/error", { state: { message: "Failed to fetch events" } });
+        navigate(ERROR_PATH, { state: { message: "Failed to fetch events" } });
       }
       finally {
         setLoading(false);

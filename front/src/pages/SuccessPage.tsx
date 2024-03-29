@@ -2,6 +2,7 @@ import React, { useContext } from 'react';
 import { Button, Card } from 'react-bootstrap';
 import { Link, useLocation } from 'react-router-dom';
 import { AuthContext } from '../components/AuthProvider/AuthProvider';
+import { CATALOG_PATH } from '../paths';
 
 const SuccessPage: React.FC = () => {
     const location = useLocation();
@@ -26,14 +27,14 @@ const SuccessPage: React.FC = () => {
                 <Card.Text>Tickets: {ticketQuantity} x {ticketName}</Card.Text>
                 <Card.Text>Total: ${ticketPrice * ticketQuantity}</Card.Text>
                 <Card.Text>{message}</Card.Text>
-                <Link to="/"><Button variant="primary" onClick={handleReturnToCatalog}>Return to Catalog</Button></Link>
+                <Link to={CATALOG_PATH}><Button variant="primary" onClick={handleReturnToCatalog}>Return to Catalog</Button></Link>
             </Card.Body>
         }
         else if (operationType == "refund" && orderId) { // TODO - More info
             return <Card.Body>
                 <Card.Text>Order ID: {orderId}</Card.Text>
                 <Card.Text>{message}</Card.Text>
-                <Link to="/"><Button variant="primary" onClick={handleReturnToCatalog}>Return to Catalog</Button></Link>
+                <Link to={CATALOG_PATH}><Button variant="primary" onClick={handleReturnToCatalog}>Return to Catalog</Button></Link>
             </Card.Body>
         }
         else {
@@ -46,7 +47,7 @@ const SuccessPage: React.FC = () => {
 
             return <Card.Body>
                 <Card.Text>{message}</Card.Text>
-                <Link to="/"><Button variant="primary" onClick={handleReturnToCatalog}>Return to Catalog</Button></Link>
+                <Link to={CATALOG_PATH}><Button variant="primary" onClick={handleReturnToCatalog}>Return to Catalog</Button></Link>
             </Card.Body>
         }
     }

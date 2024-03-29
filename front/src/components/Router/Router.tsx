@@ -14,6 +14,8 @@ import PrivateRoute from '../PrivateRoute/PrivateRoute'
 import UserSpacePage from '../../pages/UserSpacePage/UserSpacePage'
 import RefundPage from '../../pages/RefundPage/RefundPage'
 import NewEventPage from '../../pages/NewEventPage/NewEventPage'
+import { CATALOG_PATH, CHECKOUT_PATH, ERROR_PATH, EVENT_PATH, LOGIN_PATH, REFUND_PATH, SIGNUP_PATH, SUCCESS_PATH, USERSPACE_PATH } from '../../paths'
+
 function CSRouter() {
 
     return (
@@ -22,28 +24,28 @@ function CSRouter() {
                 <NavbarComponent />
                 <Routes>
                     <Route element={<PrivateRoute />}>
-                        <Route path="/" element={<CatalogPage />} />
+                        <Route path={CATALOG_PATH} element={<CatalogPage />} />
                     </Route>
                     <Route element={<PrivateRoute />}>
-                        <Route path="/events/:eventId" element={<EventDetails />} />
+                        <Route path={EVENT_PATH + "/:eventId"} element={<EventDetails />} />
                     </Route>
                     <Route element={<PrivateRoute />}>
-                        <Route path="/checkout" element={<CheckoutPage />} />
+                        <Route path={CHECKOUT_PATH} element={<CheckoutPage />} />
                     </Route>
                     <Route element={<PrivateRoute />}>
-                        <Route path="/success" element={<SuccessPage />} />
+                        <Route path={SUCCESS_PATH} element={<SuccessPage />} />
                     </Route>
                     <Route element={<PrivateRoute />}>
-                        <Route path="/userspace" element={<UserSpacePage />} />
+                        <Route path={USERSPACE_PATH} element={<UserSpacePage />} />
                     </Route>
                     <Route element={<PrivateRoute />}>
-                        <Route path="/refund" element={<RefundPage />} />
+                        <Route path={REFUND_PATH} element={<RefundPage />} />
                     </Route>
                     {/* TODO - add privileged route! */}
                     <Route path="/newevent" element={<NewEventPage />} />
-                    <Route path="/login" element={<LoginPage />} />
-                    <Route path="/signup" element={<SignUpPage />} />
-                    <Route path="/error" element={<ErrorPage />} />
+                    <Route path={LOGIN_PATH} element={<LoginPage />} />
+                    <Route path={SIGNUP_PATH} element={<SignUpPage />} />
+                    <Route path={ERROR_PATH } element={<ErrorPage />} />
                     <Route path="*" element={<NotFound />} />
                 </Routes>
             </AuthProvider>

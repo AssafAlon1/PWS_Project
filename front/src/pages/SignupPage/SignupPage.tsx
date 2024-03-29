@@ -6,6 +6,7 @@ import { ErrorMessage } from '../../components/error/error';
 import { Loader } from '../../components/loader/loader';
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from '../../components/AuthProvider/AuthProvider';
+import { CATALOG_PATH, LOGIN_PATH } from '../../paths';
 
 export const SignUpPage: React.FC = () => {
   const [username, setUsername] = useState<string>('');
@@ -34,7 +35,7 @@ export const SignUpPage: React.FC = () => {
     setIsLoading(false);
 
     if (res === APIStatus.Success) {
-      navigate("/login");
+      navigate(LOGIN_PATH);
       return;
     }
     // Handle other APIStatus - set proper error message (see SignUpErrorMessages)
@@ -50,12 +51,12 @@ export const SignUpPage: React.FC = () => {
   };
 
   const handleLogin = () => {
-    navigate("/login");
+    navigate(LOGIN_PATH);
   };
 
   useEffect(() => {
     if (auth.user) {
-      navigate("/");
+      navigate(CATALOG_PATH);
     }
   }, []);
 

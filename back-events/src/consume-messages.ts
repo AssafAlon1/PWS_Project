@@ -38,8 +38,14 @@ export const consumeMessages = async () => {
 
         await channel.consume(TICKET_INFO_QUEUE, async (msg) => {
             console.log("TICKET_INFO_QUEUE");
+            // TODO - JOI (here and there and everywhere)
             // TODO - handle null (meaning no ticket available for the event)
             const cheapest_ticket = JSON.parse(msg.content.toString());
+            if (!cheapest_ticket) { // TODO - did you want to handle it another way Alina?
+                console.log(`Comsumer >>> received message: null for ticket info x_x`);
+                return;
+            }
+
             console.log(`Comsumer >>> received message: ${cheapest_ticket.eventId} for ticket info`);
             await updateCheapesstTicket(cheapest_ticket.eventId, cheapest_ticket.name, cheapest_ticket.price);
             channel.ack(msg);

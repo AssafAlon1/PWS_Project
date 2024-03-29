@@ -63,12 +63,12 @@ export const updateTicket = async (ticketData: ICSTicket): Promise<number> => {
 }
 
 // Will be used for buying and refunding tickets
-export const updateTicketAmount = async (ticketId: string, purchaseAmount: number): Promise<number> => {
+export const updateTicketAmount = async (ticketId: string, increaseAmount: number): Promise<number> => {
   try {
     // This is done atomically (check amount and update if enough tickets are available)
     const result = await CSTicket.updateOne(
-      { _id: ticketId, available: { $gte: purchaseAmount } },
-      { $inc: { available: purchaseAmount } }
+      { _id: ticketId, available: { $gte: -increaseAmount } },
+      { $inc: { available: increaseAmount } }
     ).exec();
 
     if (result.modifiedCount === 0) {
@@ -79,7 +79,7 @@ export const updateTicketAmount = async (ticketId: string, purchaseAmount: numbe
     return StatusCodes.OK;
   }
   catch (err) {
-    console.error("Failed to update ticket amount for ticket with id: ", ticketId + " and purchaseAmount: ", purchaseAmount);
+    console.error("Failed to update ticket amount for ticket with id: ", ticketId + " and purchaseAmount: ", increaseAmount);
     return StatusCodes.INTERNAL_SERVER_ERROR;
   }
 }

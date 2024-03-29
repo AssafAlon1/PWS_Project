@@ -10,11 +10,12 @@ import { useNavigate } from 'react-router-dom';
 
 interface ActionDetailsProps {
     action: UserAction;
+    csevent: CSEvent | null;
     isLoadingRefund?: boolean;
     onRefund?: () => void;
 }
 
-const ActionDetails: React.FC<ActionDetailsProps> = ({ action, isLoadingRefund, onRefund }) => {
+const ActionDetails: React.FC<ActionDetailsProps> = ({ action, csevent, isLoadingRefund, onRefund }) => {
     const [isLoadingEvent, setIsLoadingEvent] = React.useState<boolean>(false);
     const [isRefundable, setIsRefundable] = React.useState<boolean>(false);
     const [reasonNotRefundable, setReason] = React.useState<string>("Loading...");
@@ -30,21 +31,22 @@ const ActionDetails: React.FC<ActionDetailsProps> = ({ action, isLoadingRefund, 
 
     const updateEvent = async () => {
         setIsLoadingEvent(true);
+
+        if (csevent) {
+            setEventDetails(csevent);
+            setIsLoadingEvent(false);
+            return;
+        }
+
         let fetchedEvent;
         try {
             fetchedEvent = await EventApi.fetchEvent(action.event_id);
-            await new Promise(resolve => setTimeout(resolve, 1000));
-            // With probability 50% throw error (TODO - remove)
-            if (Math.random() < 0.5) {
-                throw new Error("Error for testing purposes");
-            }
 
             if (!fetchedEvent) {
                 throw new Error("Event not found");
             }
         }
         catch {
-            // TODO - Set error, suggest retry?
             setIsLoadingEvent(false);
             setReason("Failed to fetch event information");
             return;
@@ -128,6 +130,7 @@ const ActionDetails: React.FC<ActionDetailsProps> = ({ action, isLoadingRefund, 
                     <Card>
                         <Card.Text>Tickets: {action.ticket_amount} x {action.ticket_name}</Card.Text>
                         <Card.Text>Bought at: {formattedDate}</Card.Text>
+                        {action.refund_time && <Card.Text>Refunded at: {getFormattedDate(action.refund_time)}</Card.Text>}
                         <ButtonWithTooltip
                             buttonContent="Request Refund"
                             buttonOnClick={handleRefund ?? (() => { })}

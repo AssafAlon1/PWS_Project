@@ -99,7 +99,7 @@ const RefundPage: React.FC = () => {
                         Find Purchase Details
                     </Button>
                 </div>
-                {userAction && <ActionDetails action={userAction} onRefund={handleRefund} isLoadingRefund={isLoading} />}
+                {userAction && <ActionDetails action={userAction} onRefund={handleRefund} isLoadingRefund={isLoading} csevent={null} />}
             </Form>
             <Alert variant="danger" show={errorText !== ""} onClose={() => setErrorText("")} dismissible>{errorText}</Alert>
         </Container>

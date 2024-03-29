@@ -49,12 +49,12 @@ const PaymentForm: React.FC<PaymentFormProps> = ({ purchaseTickets, isLoading, s
 
     const YearOptions = () => {
         const currentYear = new Date().getFullYear() % 100; // Mod to discard the first two digits
-        const years = Array.from(new Array(10), (val, index) => currentYear + index);
+        const years = Array.from(new Array(10), (_, index) => currentYear + index);
         return years.map((year, index) => <option key={index}>{year}</option>);
     }
 
     const MonthOptions = () => {
-        const months = Array.from(new Array(12), (val, index) => index + 1);
+        const months = Array.from(new Array(12), (_, index) => index + 1);
         return months.map((month, index) => <option key={index} value={month}>{month < 10 ? "0" : ""}{month}</option>);
     }
 

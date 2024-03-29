@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Alert, Button, Card, Container } from 'react-bootstrap';
 
-import { CSEvent, Comment } from '../../types';
+import { Comment } from '../../types';
 import AddCommentForm from '../../components/AddCommentForm/AddCommentForm';
 import CommentApi from '../../api/comment';
 import CommentComponent from '../../components/CommentComponent/CommentComponent';

@@ -7,6 +7,7 @@ import { Loader } from '../../components/loader/loader';
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from '../../components/AuthProvider/AuthProvider';
 import { useEffect } from 'react';
+import { CATALOG_PATH, SIGNUP_PATH } from '../../paths';
 
 
 export const LoginPage: React.FC = () => {
@@ -39,7 +40,7 @@ export const LoginPage: React.FC = () => {
     if (res === APIStatus.Success) {
       auth.setUser(providedUsername);
       console.log("Logged in as: ", auth.user);
-      navigate("/");
+      navigate(CATALOG_PATH);
       return;
     }
     // Handle other APIStatus - set proper error message (see LoginErrorMessages)
@@ -58,12 +59,12 @@ export const LoginPage: React.FC = () => {
   };
 
   const handleSignUp = () => {
-    navigate("/signup");
+    navigate(SIGNUP_PATH);
   };
 
   useEffect(() => {
     if (auth.user) {
-      navigate("/");
+      navigate(CATALOG_PATH);
     }
   }, []);
 

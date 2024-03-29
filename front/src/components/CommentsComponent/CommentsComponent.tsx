@@ -9,6 +9,7 @@ import CommentComponent from '../../components/CommentComponent/CommentComponent
 import { ThreeSpanningSpinners } from '../../components/SpinnerComponent/SpinnerComponent';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { MAX_COMMENTS } from '../../const';
+import { CATALOG_PATH } from '../../paths';
 
 interface CommentsComponentProps {
     eventId: string | undefined;
@@ -27,7 +28,7 @@ const CommentsComponent: React.FC<CommentsComponentProps> = ({ eventId, comment_
     const updateComments = async () => {
         if (!eventId) {
             // I believe it should be impossible to get here, but just in case...
-            return navigate("/");
+            return navigate(CATALOG_PATH);
         }
         setComments(null);
         setFailedFetchingComments(false);

@@ -3,6 +3,7 @@ import { AuthApi } from '../../api/auth';
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import UserActionApi from "../../api/userAction";
+import { LOGIN_PATH } from "../../paths";
 
 interface AuthContextProps {
     user: string | null;
@@ -33,7 +34,7 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         }
         else {
             setUser(null);
-            navigate("/login");
+            navigate(LOGIN_PATH);
             return false;
         }
     }

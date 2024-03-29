@@ -1,6 +1,7 @@
 import React from 'react';
 import { Button } from 'react-bootstrap';
 import { Link, useLocation } from 'react-router-dom';
+import { CATALOG_PATH } from '../paths';
 
 const ErrorPage: React.FC = () => {
     const location = useLocation();
@@ -9,7 +10,7 @@ const ErrorPage: React.FC = () => {
         <div className="container">
             <h1>ERROR</h1>
             <p>{message}</p>
-            <Link to="/"><Button variant="primary">Return to Catalog</Button></Link>
+            <Link to={CATALOG_PATH}><Button variant="primary">Return to Catalog</Button></Link>
         </div>
     );
 };

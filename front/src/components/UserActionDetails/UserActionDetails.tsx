@@ -7,6 +7,7 @@ import ButtonWithTooltip from '../ButtonWithTooltip/ButtonWithTooltip';
 import MissingImage from "../../assets/MissingImage.png"
 import { ThreeSpanningSpinners } from '../SpinnerComponent/SpinnerComponent';
 import { useNavigate } from 'react-router-dom';
+import { REFUND_PATH } from '../../paths';
 
 interface ActionDetailsProps {
     action: UserAction;
@@ -25,7 +26,7 @@ const ActionDetails: React.FC<ActionDetailsProps> = ({ action, isLoadingRefund, 
 
     let handleRefund = onRefund;
     if (!handleRefund) {
-        handleRefund = () => navigate("/refund", { state: { purchase_id: action.purchase_id } });
+        handleRefund = () => navigate(REFUND_PATH, { state: { purchase_id: action.purchase_id } });
     }
 
     const updateEvent = async () => {

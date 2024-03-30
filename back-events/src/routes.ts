@@ -177,8 +177,6 @@ export const updateEvent = async (req: Request, res: Response) => {
   putData = req.body as Partial<ICSEvent>;
   const { error } = await updateEventSchema.validate(putData); // make sure only start and end times are updated
   if(error){
-    console.log("You can't update this!", error);
-    console.log(req.body);
     res.status(StatusCodes.BAD_REQUEST).send({ message: "Cannot update this!" });
     return;
   }

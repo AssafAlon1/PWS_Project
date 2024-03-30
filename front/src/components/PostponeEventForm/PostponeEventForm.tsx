@@ -23,16 +23,8 @@ const PostponeEventForm: React.FC<{ csEvent: CSEvent | null, refetchEvent: () =>
 
             setStartTime(startDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false }));
             setEndTime(endDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false }));
-
-            
             setStartDate((csEvent.start_date).toString().split('T')[0]);
             setEndDate((csEvent.end_date).toString().split('T')[0]);
-            // setStartTime(new Date(csEvent.start_date).toString().split('T')[1].substring(0, 5));
-            // setEndTime(new Date (csEvent.end_date).toString().split('T')[1].substring(0, 5));
-            console.log(csEvent.start_date);
-            console.log(csEvent.end_date);
-            // setStartTime(new Date(csEvent.start_date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
-            // setEndTime(new Date(csEvent.end_date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
         }
     }, [csEvent]);
 
@@ -55,15 +47,10 @@ const PostponeEventForm: React.FC<{ csEvent: CSEvent | null, refetchEvent: () =>
         const newStartDate = new Date(startDate + 'T' + startTime);
         const newEndDate = new Date(endDate + 'T' + endTime);
         try {
-            const result = await EventApi.postponeEvent(csEvent._id, newStartDate, newEndDate);
-            console.log(result);
+            await EventApi.postponeEvent(csEvent._id, newStartDate, newEndDate);
             setPostponeStatus("SUCCESS");
-            // updateEvent();
-            // navigate to succes page
         } catch (error) {
-            alert("ERROR 37");
-            console.error(error);
-            // navigate(ERROR_PATH, { state: { message: `Failed to postpone event ${eventId}` } });
+            setPostponeStatus("ERROR");
         }
     }
 

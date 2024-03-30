@@ -3,11 +3,13 @@ import "./Navbar.css";
 
 import logoutIcon from "/src/assets/logout.svg";
 import backIcon from "/src/assets/back.svg";
+import backOfficeIcon from "/src/assets/back-office.svg";
+import frontDeskIcon from "/src/assets/front-desk.svg";
 import React, { useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { AuthContext } from "../AuthProvider/AuthProvider";
 import { AuthApi } from "../../api/auth";
-import { CATALOG_PATH, CHECKOUT_PATH, ERROR_PATH, EVENT_PATH, LOGIN_PATH, NEW_EVENT_PATH, REFUND_PATH, SIGNUP_PATH, USERSPACE_PATH } from "../../paths";
+import { CATALOG_PATH, CHECKOUT_PATH, ERROR_PATH, EVENT_PATH, LOGIN_PATH, NEW_EVENT_PATH, REFUND_PATH, USERSPACE_PATH } from "../../paths";
 import { UserRole } from "../../const";
 
 const shouldDisplayGoBackButton = (path: string) => {
@@ -43,7 +45,6 @@ const NavbarComponent: React.FC = () => {
         return <></>
     }
 
-
     const onLogoutClick = async () => {
         await AuthApi.logout();
         context.setUser("");
@@ -60,7 +61,18 @@ const NavbarComponent: React.FC = () => {
         </Button>
     }
 
-
+    const ToggleBackOfficeButton = () => {
+        if (context.role > UserRole.Worker) {
+            return <></>
+        }
+        return <Button variant="light"
+            onClick={() => context.setBackOffice(!context.isBackOffice)}>
+            <div className="horizontal-layout">
+                <img src={context.isBackOffice ? frontDeskIcon : backOfficeIcon} alt="toggle-back-office" />
+                <p className="nav-element">{context.isBackOffice ? "Front Desk" : "Back Office"}</p>
+            </div>
+        </Button>
+    }
 
     return (
         <>
@@ -68,13 +80,13 @@ const NavbarComponent: React.FC = () => {
                 <Container>
                     <Navbar.Brand as={Link} to={CATALOG_PATH}>CS Events</Navbar.Brand>
                     <Nav className="me-auto">
-                        <Nav.Link as={Link} to={SIGNUP_PATH}>signup</Nav.Link>
-                        <Nav.Link as={Link} to={LOGIN_PATH}>login</Nav.Link>
+                        <ToggleBackOfficeButton/>
                         {/* <Nav.Link as={Link} to={ERROR_PATH}>error</Nav.Link> */}
-                        {context.isBackOffice ? <></> : <Nav.Link as={Link} to={USERSPACE_PATH}>User Space</Nav.Link>}
-                        {context.isBackOffice ? <></> : <Nav.Link as={Link} to={REFUND_PATH}>Refunds</Nav.Link>}
-                        {context.role <= UserRole.Manager ? <Nav.Link as={Link} to={NEW_EVENT_PATH}>Create Event</Nav.Link> : <></>}
-                        
+                        {!context.isBackOffice && <Nav.Link as={Link} to={USERSPACE_PATH}>User Space</Nav.Link>}
+                        {!context.isBackOffice && <Nav.Link as={Link} to={REFUND_PATH}>Refunds</Nav.Link>}
+
+                        {(context.isBackOffice && context.role <= UserRole.Manager) && <Nav.Link as={Link} to={NEW_EVENT_PATH}>Create Event</Nav.Link>}
+
                     </Nav>
 
                     {context.user ? <>

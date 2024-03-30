@@ -1,5 +1,5 @@
 import './CatalogPage.css';
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { useNavigate } from "react-router-dom";
 import { CSEvent } from '../../types';
 import EventDetails, { EventPlaceholder } from "../../components/CatalogEventDetails/CatalogEventDetails";
@@ -7,8 +7,9 @@ import { Alert, Col, Container, Row } from 'react-bootstrap';
 import EventApi from '../../api/event';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { ThreeSpanningSpinners } from '../../components/SpinnerComponent/SpinnerComponent';
-import { MAX_EVENTS_IN_PAGE } from '../../const';
+import { MAX_EVENTS_IN_PAGE, UserRole } from '../../const';
 import { ERROR_PATH } from '../../paths';
+import { AuthContext } from '../../components/AuthProvider/AuthProvider';
 
 
 const CatalogPage: React.FC = () => {
@@ -19,6 +20,7 @@ const CatalogPage: React.FC = () => {
   const [displayError, setDisplayError] = useState<boolean>(false);
 
   const navigate = useNavigate();
+  const context = useContext(AuthContext);
 
   // Smaller screens will have less loading events
   const LOADING_AMOUNT = window.innerWidth < 576 ? 2 : window.innerWidth < 992 ? 6 : 8;
@@ -26,13 +28,18 @@ const CatalogPage: React.FC = () => {
   const fetchMoreData = async () => {
     try {
       await new Promise(resolve => setTimeout(resolve, 1000)); // TODO - Remove
-      const newEvents = await EventApi.fetchEvents(events.length, MAX_EVENTS_IN_PAGE);
+      let newEvents: CSEvent[] = [];
+      if(context.isBackOffice && context.role <= UserRole.Worker){
+        newEvents = await EventApi.fetchAllEvents(events.length, MAX_EVENTS_IN_PAGE);
+      }
+      else{
+        newEvents = await EventApi.fetchEvents(events.length, MAX_EVENTS_IN_PAGE);
+      }
       if (newEvents.length < MAX_EVENTS_IN_PAGE) {
         setHasMore(false);
       }
       setEvents(prevEvents => [...prevEvents, ...newEvents]);
     } catch {
-      // TODO - Display alert instead of redirecting
       setDisplayError(true);
       setHasMore(false);
     }
@@ -81,7 +88,13 @@ const CatalogPage: React.FC = () => {
   useEffect(() => {
     const updateEvents = async () => {
       try {
-        const fetchedEvents = await EventApi.fetchEvents(0, MAX_EVENTS_IN_PAGE);
+        let fetchedEvents: CSEvent[] = [];
+        if(context.isBackOffice && context.role <= UserRole.Worker){
+          fetchedEvents = await EventApi.fetchAllEvents(0, MAX_EVENTS_IN_PAGE);
+        }
+        else{
+          fetchedEvents = await EventApi.fetchEvents(0, MAX_EVENTS_IN_PAGE);
+        }
         setEvents(fetchedEvents);
         if (fetchedEvents.length < MAX_EVENTS_IN_PAGE) {
           setHasMore(false);
@@ -96,7 +109,7 @@ const CatalogPage: React.FC = () => {
       }
     }
     updateEvents();
-  }, []);
+  }, [context.isBackOffice]);
 
   return (
     <Container>

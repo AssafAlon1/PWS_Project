@@ -92,12 +92,6 @@ const EventDetails: React.FC = () => {
         }
         return <img src={MissingImage} className="card-img" />
     }
-    // const ImageComponent = () => {
-    //     if (event) {
-    //         return <Card.Img src={event.image ?? MissingImage} />
-    //     }
-    //     return <Card.Img src={MissingImage} />
-    // }
 
     const PricingAndAvailabilityComponent = () => {
         if (event) {

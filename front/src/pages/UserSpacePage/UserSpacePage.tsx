@@ -117,6 +117,7 @@ const UserSpacePage: React.FC = () => {
         <Container>
           <h2>Looks like you haven't made any purchases yet...</h2>
           <h3>Go get some tickets!</h3>
+          <img style={{ borderRadius: "20px" }} src="https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExdW9hbDB2enZpOGFnNGk3eGRmemJ1anIxOXI1c3VhMjJpdmY0ZjBxbyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/8GjxwxtZWS29xlJnUH/giphy.gif" alt="Tickets GIF" />
         </Container>
       );
     }

@@ -134,39 +134,39 @@ export const createEvent = async (req: Request, res: Response) => {
 };
 
 // TODO - Legacy, may remove
-export const createTicketlessEvent = async (req: Request, res: Response) => {
-  try {
-    const postData = req.body as ICSEvent;
+// export const createTicketlessEvent = async (req: Request, res: Response) => {
+//   try {
+//     const postData = req.body as ICSEvent;
 
-    if (postData._id) {
-      throw Error("_id is an automatically generated field.");
-    }
+//     if (postData._id) {
+//       throw Error("_id is an automatically generated field.");
+//     }
 
-    // Validate the event data
-    const { value, error } = eventSchema.validate(postData, { abortEarly: false, allowUnknown: true, presence: 'required' });
+//     // Validate the event data
+//     const { value, error } = eventSchema.validate(postData, { abortEarly: false, allowUnknown: true, presence: 'required' });
 
-    if (error) {
-      throw Error("Bad Request.");
-    }
+//     if (error) {
+//       throw Error("Bad Request.");
+//     }
 
-    const insertResult = await insertEvent(value);
+//     const insertResult = await insertEvent(value);
 
-    if (insertResult == StatusCodes.BAD_REQUEST) {
-      throw Error("Bad Request.")
-    }
+//     if (insertResult == StatusCodes.BAD_REQUEST) {
+//       throw Error("Bad Request.")
+//     }
 
-    if (insertResult == StatusCodes.INTERNAL_SERVER_ERROR) {
-      res.status(StatusCodes.INTERNAL_SERVER_ERROR).send("Internal server error");
-      return;
-    }
+//     if (insertResult == StatusCodes.INTERNAL_SERVER_ERROR) {
+//       res.status(StatusCodes.INTERNAL_SERVER_ERROR).send("Internal server error");
+//       return;
+//     }
 
-    res.status(StatusCodes.CREATED).send({ _id: insertResult });
-  }
-  catch (error) {
-    res.status(StatusCodes.BAD_REQUEST).send("Bad Request");
-    return;
-  }
-};
+//     res.status(StatusCodes.CREATED).send({ _id: insertResult });
+//   }
+//   catch (error) {
+//     res.status(StatusCodes.BAD_REQUEST).send("Bad Request");
+//     return;
+//   }
+// };
 
 export const updateEvent = async (req: Request, res: Response) => {
   console.log("PUT /api/event/:eventId/postpone");

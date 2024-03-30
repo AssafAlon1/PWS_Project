@@ -2,12 +2,12 @@ import mongoose from "mongoose";
 import { Request, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
 
-import { insertTicket, insertTickets, queryAllTicketsByEventID, queryAvailableTicketsByEventID, queryCheapestTicketsByEventID, queryTicketByName, updateTicketAmount } from "./db.js";
-import { ICSTicket, ticketSchema } from "./models/CSTicket.js";
+import { insertTickets, lockTickets, queryAllTicketsByEventID, queryAvailableTicketsByEventID, queryCheapestTicketsByEventID, queryTicketByName, updateTicketAmount } from "./db.js";
+import { ICSTicket, lockRequestSchema, lockSchema, ticketSchema } from "./models/CSTicket.js";
 import { MAX_TICKET_LIMIT, ORDER_API_URL } from "./const.js";
 import { PublisherChannel } from "./publisher-channel.js";
 import axios from 'axios';
-import { PaymentInformation, paymentInformationSchema } from "./types.js";
+import { LockInformation, PaymentInformation, paymentInformationSchema } from "./types.js";
 
 const axiosInstance = axios.create({ withCredentials: true, baseURL: ORDER_API_URL });
 
@@ -47,42 +47,6 @@ export const getAvailableTicketsByEventId = async (req: Request, res: Response) 
     res.status(StatusCodes.OK).send(data);
 }
 
-// TODO - Remove?
-// export const createTicket = async (req: Request, res: Response) => {
-//     console.log("POST /api/ticket");
-//     try {
-//         const postData = req.body as ICSTicket;
-//         postData.available = postData.total; // Added
-
-//         if (postData._id) {
-//             throw Error("_id is an automatically generated field.");
-//         }
-
-//         // Validate the ticket data
-//         const { value, error } = ticketSchema.validate(postData, { abortEarly: false, allowUnknown: true, presence: 'required' });
-
-//         if (error) {
-//             throw Error("Bad Request.");
-//         }
-
-//         const insertResult = await insertTicket(postData);
-
-//         if (insertResult == StatusCodes.BAD_REQUEST) {
-//             throw Error("Bad Request.")
-//         }
-
-//         if (insertResult == StatusCodes.INTERNAL_SERVER_ERROR) {
-//             res.status(StatusCodes.INTERNAL_SERVER_ERROR).send("Internal server error");
-//             return;
-//         }
-
-//         res.status(StatusCodes.CREATED).send({ ticket_id: insertResult });
-//     }
-//     catch (error) {
-//         res.status(StatusCodes.BAD_REQUEST).send({ message: "Bad Request." });
-//     }
-// }
-
 export const createTickets = async (req: Request, res: Response) => {
     console.log("POST /api/tickets");
     try {
@@ -92,7 +56,7 @@ export const createTickets = async (req: Request, res: Response) => {
             throw Error("No tickets provided.");
         }
 
-        postData.map(ticket => ticket.available = ticket.total); // Added
+        postData.map(ticket => ticket.available = ticket.total);
         // Validate the ticket data
         const validationResults = postData.map(ticket => ticketSchema.validate(ticket, { abortEarly: false, allowUnknown: true, presence: 'required' }));
         const errors = validationResults.filter(result => result.error);
@@ -119,7 +83,8 @@ export const createTickets = async (req: Request, res: Response) => {
     }
 }
 
-// TODO - check updateEvent in back-events/src/routes.ts and replicate logic!
+// TODO - CHANGE LOGIC AFTER LOCKING IS DONE
+// TODO - update events via rabbit ticket was purchased only if lock is NOT viable
 export const purchaseTicket = async (req: Request, res: Response) => {
     console.log("PUT /api/ticket");
     let postData;
@@ -140,6 +105,12 @@ export const purchaseTicket = async (req: Request, res: Response) => {
             console.error(ticket);
             throw Error("Ticket not found.");
         }
+
+        // TODO - Assaf's master plan to handle race conditions 0_0
+        const doesUserHaveLock: boolean = ticket.locked.find(lock => lock.username === postData.username && lock.quantity === postData.ticket_amount && lock.lockedExpires > Date.now());
+        // TODO - CONTINUE FROM HERE.
+
+
         // TODO - Make sure we have enough tickets to sell or that they are reseved in the locked array for the user!
         if (ticket.available < postData.ticket_amount) {
             console.error("Not enough tickets available.");
@@ -176,7 +147,7 @@ export const purchaseTicket = async (req: Request, res: Response) => {
             // basically if we don't have a cheapest ticket - it means we don't have any tickets left at all.. theoretically, can just NOT sent the message
             if (newCheapestTicket === null) {
                 // TODO - just return?;
-                newCheapestTicket = { eventId: postData.event_id, name: "No tickets available", price: 0, total: 0};
+                newCheapestTicket = { eventId: postData.event_id, name: "No tickets available", price: 0, total: 0, locked: []};
             }
             await publisherChannel.sendEvent(JSON.stringify(newCheapestTicket));
         }
@@ -194,4 +165,37 @@ export const purchaseTicket = async (req: Request, res: Response) => {
         return;
     }
 
+}
+
+// TODO - update events via rabbit ticket was locked
+// TODO - update events via rabbit ticket was unlocked
+// (Make sure not to update the same ticket twice. Like, onece when locked, and another time when purchased)
+export const lockTicket = async (req: Request, res: Response) => {
+    console.log("PUT /api/ticket/lock");
+    let postData;
+    let ticket;
+    try {
+        postData = req.body as LockInformation;
+        const { error } = lockRequestSchema.validate(postData);
+        if (error) {
+            res.status(StatusCodes.BAD_REQUEST).send({ message: "Bad Request." });
+            return;
+        }        
+
+        console.log(`>> Locking ${postData.ticket_amount} tickets for of id ${ticket._id}`);
+        const result = await lockTickets(postData.event_id, postData.ticket_name, postData.quantity, postData.username);
+
+        if (result != StatusCodes.OK) {
+            console.error("Failed updating ticket in DB");
+            res.status(StatusCodes.INTERNAL_SERVER_ERROR).send("Internal server error");
+            return;
+        }
+    }
+    catch (error) {
+        console.error("Encountered error while purchasing ticket: ", error);
+        res.status(StatusCodes.BAD_REQUEST).send({ message: "Bad Request." });
+        return;
+    }
+
+    res.status(StatusCodes.OK).send({ message: "Ticket locked." });
 }

@@ -25,4 +25,9 @@ export type PaymentInformation = {
     ticket_amount: number;
 }
 
-
+export type LockInformation = {
+    username: string;
+    eventId: string;
+    ticketName: string;
+    quantity: number;
+}

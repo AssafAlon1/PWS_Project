@@ -14,6 +14,7 @@ import TicketApi from '../../api/ticket';
 import { ThreeSpanningSpinners } from '../../components/SpinnerComponent/SpinnerComponent';
 import CommentsComponent from '../../components/CommentsComponent/CommentsComponent';
 import { CATALOG_PATH, CHECKOUT_PATH, ERROR_PATH, NOTFOUND_PATH } from '../../paths';
+
 import { AuthContext } from '../../components/AuthProvider/AuthProvider';
 import PostponeEventForm from '../../components/PostponeEventForm/PostponeEventForm';
 import { UserRole } from '../../const';
@@ -108,7 +109,7 @@ const EventDetails: React.FC = () => {
                 <Card className="event-block">
                     <Card.Body>
                         <Card.Text>{event?.category}</Card.Text>
-                        <Card.Text>From ${event.cheapest_ticket_price}</Card.Text>
+                        { !authContext.isBackOffice && <Card.Text>From ${event.cheapest_ticket_price}</Card.Text>}
                         <Card.Text>{event.total_available_tickets} tickets available</Card.Text>
                     </Card.Body>
                 </Card>
@@ -182,6 +183,7 @@ const EventDetails: React.FC = () => {
 
     const BuyTicketComponent: React.FC<{ name: string, price: number, amountLeft: number }> = ({ name, price, amountLeft }) => {
         const [ticketAmount, setTicketAmount] = useState<number>(0);
+        const [error, setError] = useState<string>("");
 
         const ticketPurchaseDetails: PurchaseDetails = {
             event_id: eventId ?? "0",
@@ -191,8 +193,20 @@ const EventDetails: React.FC = () => {
             price: price
         }
 
-        const onClickBuyNow = () => {
+        const onClickBuyNow = async () => {
+            setError("");
+            if (!eventId || !authContext || !authContext.user) {
+                setError("Error: Missing event id or user information");
+                return;
+            }
             setPurchaseDetails(ticketPurchaseDetails);
+            const lockRes = await TicketApi.lockTickets(eventId, ticketPurchaseDetails.ticket_name, ticketAmount, authContext.user);
+            if (!lockRes) {
+                //  TODO - handle error  
+                setError("Error: Failed locking ticket");
+                return;
+            }
+
             navigate(CHECKOUT_PATH);
         }
 
@@ -208,8 +222,9 @@ const EventDetails: React.FC = () => {
                     <div className="direction-row">
                         <input disabled={amountLeft <= 0} className="tickets-amount" type="number" value={ticketAmount} onChange={(event) => setTicketAmount(Number(event.target.value))} />
                         <ButtonWithTooltip
-                            buttonContent="Buy Now!"
-                            tooltipContent={ticketAmount <= 0 ? "Cannot buy less than 1 ticket" : "Not enough tickets left"}
+                            buttonContent={error ? "Error" : "Buy Now!"}
+                            tooltipContent={error ? error : (ticketAmount <= 0 ? "Cannot buy less than 1 ticket" : "Not enough tickets left")}
+                            variant={error ? "danger" : "primary"}
                             isDisabled={ticketAmount <= 0 || ticketAmount > amountLeft}
                             buttonOnClick={onClickBuyNow}
                         />

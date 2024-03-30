@@ -1,15 +1,34 @@
 import mongoose, { InferSchemaType, Types } from "mongoose";
 import Joi from "joi";
 
-// TODO - add available tickets, switch quantity for total tickets
-// TODO - add locked array
+const mongooseLockSchema = new mongoose.Schema({
+    username: { type: String, required: true },
+    quantity: { type: Number, required: true },
+    expires: { type: Date, required: true },
+});
+
+export const lockSchema = Joi.object({
+    username: Joi.string().required(),
+    quantity: Joi.number().integer().min(0).required(),
+    expires: Joi.date().required(),
+});
+
+export const lockRequestSchema = Joi.object({
+    username: Joi.string().required(),
+    quantity: Joi.number().integer().min(0).required(),
+    expires: Joi.date().required(),
+    eventId: Joi.string().required(),
+    ticketName: Joi.string().required(),
+});
+
 const mongooseTicketSchema = new mongoose.Schema({
     _id: { type: Types.ObjectId, required: false, auto: true },
     eventId: { type: String, required: true },
     name: { type: String, required: true },
-    available: { type: Number, required: false },
+    available: { type: Number, required: true },
     total: { type: Number, required: true },
-    price: { type: Number, required: true }
+    price: { type: Number, required: true },
+    locked: { type: [mongooseLockSchema], required: false, default: []}, // TODO - is dis oki?
 });
 
 export const ticketSchema = Joi.object({
@@ -18,6 +37,7 @@ export const ticketSchema = Joi.object({
     available: Joi.number().integer().min(0),
     total: Joi.number().integer().min(0).required(),
     price: Joi.number().min(0).required(),
+    locked: Joi.array().items(lockSchema).required().default([]),
 });
 
 export type ICSTicket = InferSchemaType<typeof mongooseTicketSchema>;

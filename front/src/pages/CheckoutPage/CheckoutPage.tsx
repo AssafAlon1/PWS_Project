@@ -128,6 +128,7 @@ const CheckoutPage: React.FC = () => {
                     <OrderSummaryComponent />
                 </Col>
             </Row>
+            {/* TODO - INDICATION IF TICKETS RAN OUT */}
             <Alert show={displayError} variant="danger" onClose={() => setDisplayError(false)} dismissible>
                 <Alert.Heading>Failed to purchase tickets</Alert.Heading>
                 <p>

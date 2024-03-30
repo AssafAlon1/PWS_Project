@@ -89,6 +89,9 @@ const getRequiredRole = (req: Request): UserRole => {
   if (url.match(/^\/api\/ticket$/) && req.method === "PUT") { // purchase ticket
     return UserRole["Guest"];
   }
+  if (url.match(/^\/api\/ticket\/[^\/]+$/) && req.method === "PUT") { // lock ticket
+    return UserRole["Guest"];
+  }
 
   // The events microservice handles it
   // if (url.match(/^\/api\/tickets$/) && req.method === "POST") { // create all tickets as part of creating an event

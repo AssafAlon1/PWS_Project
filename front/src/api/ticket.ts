@@ -64,6 +64,26 @@ const RealTicketApi = {
             throw new Error("Failed to purchase tickets"); // TODO - Better handling?
         }
     },
+
+    lockTickets: async (eventId: string, ticketName: string, ticketAmount: number, username: string) => {
+        try {
+            const putData = {
+                eventId: eventId,
+                ticketName: ticketName,
+                quantity: ticketAmount,
+                username: username
+            }
+            const result = await axiosInstance.put(`/api/ticket/${eventId}`, putData);
+            console.log("Completed lock");
+            return result.data.order_id
+
+        } catch (error) {
+            if (isAxiosError(error)) {
+                throw new Error("Failed to lock tickets: " + error.response?.data.message); // TODO - Better handling?
+            }
+            throw new Error("Failed to lock tickets"); // TODO - Better handling?
+        }
+    },
 }
 
 // import { MockTicketApi } from "./mock";

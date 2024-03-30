@@ -60,10 +60,11 @@ export const getEventById = async (req: Request, res: Response) => {
     return;
   }
 
+  if (!req.keepSensitiveInfo) {
+    delete data.comment_count;
+  }
+
   if (data) {
-    if (!req.keepCommentCount) {
-      delete data.comment_count;
-    }
     res.status(StatusCodes.OK).send(data);
   } else {
     res.status(StatusCodes.NOT_FOUND).send({ message: "Event not found." });

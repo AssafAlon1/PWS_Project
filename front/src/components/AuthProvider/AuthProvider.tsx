@@ -52,6 +52,8 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
     const updateNextEvent = async () => {
         if (!user) {
+            setNextEvent(null);
+            setRole(UserRole.Unauthenticated);
             return;
         }
         const closestEvent = await UserActionApi.getUserClosestEvent(user);

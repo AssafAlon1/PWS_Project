@@ -37,7 +37,7 @@ const NavbarComponent: React.FC = () => {
     }
 
     const NextEvent = () => {
-        if (context.nextEvent) {
+        if (context.nextEvent && !context.isBackOffice) {
             return (
                 <Button variant="success" disabled={true}>Next event: {context.nextEvent}</Button>
             );
@@ -48,6 +48,8 @@ const NavbarComponent: React.FC = () => {
     const onLogoutClick = async () => {
         await AuthApi.logout();
         context.setUser("");
+        context.updateNextEvent();
+        context.setBackOffice(false);
         navigate(LOGIN_PATH);
     }
 
@@ -65,8 +67,14 @@ const NavbarComponent: React.FC = () => {
         if (context.role > UserRole.Worker) {
             return <></>
         }
+        
+        const onClick = () => {
+            context.setBackOffice(!context.isBackOffice);
+            navigate(CATALOG_PATH);
+        }
+
         return <Button variant="light"
-            onClick={() => context.setBackOffice(!context.isBackOffice)}>
+            onClick={onClick}>
             <div className="horizontal-layout">
                 <img src={context.isBackOffice ? frontDeskIcon : backOfficeIcon} alt="toggle-back-office" />
                 <p className="nav-element">{context.isBackOffice ? "Front Desk" : "Back Office"}</p>

@@ -83,6 +83,9 @@ const getRequiredRole = (req: Request): UserRole => {
   if (url.match(/^\/api\/ticket\/all\/[^\/]+$/) && req.method == "GET") { // get all tickets for event 
     return UserRole["Guest"];
   }
+  if (url.match(/^\/api\/ticket\/all\/backoffice\/[^\/]+$/) && req.method == "GET") { // get all tickets for event - back office
+    return UserRole["Worker"];
+  }
   if (url.match(/^\/api\/ticket$/) && req.method === "PUT") { // purchase ticket
     return UserRole["Guest"];
   }

@@ -38,11 +38,15 @@ app.use(cors({
   credentials: true,  // Frontend needs to send cookies with requests
 }));
 
+function keepSensitiveInfo(req: Request, res: Response, next: NextFunction) {
+  req.keepSensitiveInfo = true;
+  next();
+}
+
 // TODO - add routes
 app.get(`${ALL_TICKET_PATH}/:eventId`, getALLTicketsByEventId);
-app.get(`${TICKET_PATH}/:eventId`, getAvailableTicketsByEventId); // Currently not used - maybe for BO?
+app.get(`${ALL_TICKET_PATH}/backoffice/:eventId`, keepSensitiveInfo, getALLTicketsByEventId);
 
-// app.post(`${TICKET_PATH}`, createTicket); // TODO - Remove?
 app.post(`${TICKET_PATH}s`, createTickets);
 
 // Middleware to attach publisherChannel to the request

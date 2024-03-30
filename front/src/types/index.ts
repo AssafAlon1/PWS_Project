@@ -10,7 +10,7 @@ export interface CSEvent {
     cheapest_ticket_name?: string;
     cheapest_ticket_price: number;
     total_available_tickets: number;
-    comment_count: number;
+    comment_count?: number; // Only for back office
 }
 
 export interface CSEventCreationReqeust {
@@ -36,7 +36,7 @@ export interface Ticket {
     eventId: string;
     name: string;
     available: number;
-    total: number;
+    total?: number; // Only for back office
     price: number;
 }
 

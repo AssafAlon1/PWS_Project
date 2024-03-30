@@ -32,6 +32,14 @@ const RealEventApi = {
             throw new Error("Failed to fetch event "); // TODO - Better handling?
         }
     },
+    fetchBackOfficeEvent: async (eventId: string): Promise<CSEvent | null> => {
+        try {
+            const response = await axiosInstance.get(`/api/event/backoffice/${eventId}`);
+            return response.data;
+        } catch (error) {
+            throw new Error("Failed to fetch back office events"); // TODO - Better handling?
+        }
+    },
     fetchAllEvents: async (skip?: number, limit?: number): Promise<CSEvent[]> => {
         try {
             const response = await axiosInstance.get("/api/event/all", {

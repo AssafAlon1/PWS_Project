@@ -46,21 +46,16 @@ app.use(cors({
   credentials: true,  // Frontend needs to send cookies with requests
 }));
 
-// function attachPublisherChannel(req: Request, res: Response, next: NextFunction) {
-//   req.publisherChannel = publisherChannel;
-//   next();
-// }
-// app.post(COMMENT_PATH, attachPublisherChannel, createComment);
 
-function keepCommentCount(req: Request, res: Response, next: NextFunction) {
-  req.keepCommentCount = true;
+function keepSensitiveInfo(req: Request, res: Response, next: NextFunction) {
+  req.keepSensitiveInfo = true;
   next();
 }
 
-app.get(`${EVENT_PATH}/backoffice/:eventId`, keepCommentCount, getEventById); 
 app.get(EVENT_PATH, getUpcomingAvailableEvents); // Added for the frontend - only fetch events with available tickets
 app.get(`${EVENT_PATH}/all`, getUpcomingEvents); // Gets ALL events (even those who have no tickets left)
 app.get(`${EVENT_PATH}/:eventId`, getEventById);
+app.get(`${EVENT_PATH}/backoffice/:eventId`, keepSensitiveInfo, getEventById); 
 app.get("/api/closest_event", getClosestEvent); // !! NOTE: this is NOT exposed to the API Gateway (therefore it's OK that it shares the same path as the user-actions service)
 
 app.post(EVENT_PATH, createEvent);

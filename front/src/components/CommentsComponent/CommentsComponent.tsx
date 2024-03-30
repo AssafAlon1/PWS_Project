@@ -13,10 +13,9 @@ import { CATALOG_PATH } from '../../paths';
 
 interface CommentsComponentProps {
     eventId: string | undefined;
-    comment_count: number; // TODO - REMOVE AFTER BACK OFFICE
 }
 
-const CommentsComponent: React.FC<CommentsComponentProps> = ({ eventId, comment_count }) => {
+const CommentsComponent: React.FC<CommentsComponentProps> = ({ eventId }) => {
     const [comments, setComments] = useState<Comment[] | null>(null);
     const [failedFetchingComments, setFailedFetchingComments] = useState<boolean>(false);
 
@@ -74,25 +73,28 @@ const CommentsComponent: React.FC<CommentsComponentProps> = ({ eventId, comment_
             setHasMore(false);
         }
     };
-    let body;
-    if (failedFetchingComments) {
-        body = <Card.Body>
-            <Card.Text>Failed fetching comments information</Card.Text>
-            <Button variant="light" onClick={updateComments}>Retry</Button>
 
-        </Card.Body>
-    } else if (comments === null) {
-        body = <Card.Body>
-            <Card.Text><ThreeSpanningSpinners /></Card.Text>
-        </Card.Body>
-    } else if (comments.length === 0) {
+    const CommentsBody = () => {
+        if (failedFetchingComments) {
+            return <Card.Body>
+                <Card.Text>Failed fetching comments information</Card.Text>
+                <Button variant="light" onClick={updateComments}>Retry</Button>
+
+            </Card.Body>
+        }
+        if (comments === null) {
+            return <Card.Body>
+                <Card.Text><ThreeSpanningSpinners /></Card.Text>
+            </Card.Body>
+        }
+        if (comments.length === 0) {
+            return <Card.Body>
+                <AddCommentForm eventId={eventId ?? ""} updateComments={updateComments} />
+                <hr />
+                <Card.Subtitle>Be the first to comment!</Card.Subtitle>
+            </Card.Body>
+        }
         return <Card.Body>
-            <AddCommentForm eventId={eventId ?? ""} updateComments={updateComments} />
-            <hr />
-            <Card.Subtitle>Be the first to comment!</Card.Subtitle>
-        </Card.Body>
-    } else {
-        body = <Card.Body>
             <AddCommentForm eventId={eventId ?? ""} updateComments={updateComments} />
             <hr />
             <Container>
@@ -121,13 +123,9 @@ const CommentsComponent: React.FC<CommentsComponentProps> = ({ eventId, comment_
     return (
         <Card>
             <Card.Header>
-                <Card.Title>
-                    Comments:
-                </Card.Title>
-                {/* TODO !!!!!! - Remove this when back office goes live */}
-                <Card.Subtitle>(Total comments: {comment_count})</Card.Subtitle>
+                <Card.Title>Comments:</Card.Title>
             </Card.Header>
-            {body}
+            <CommentsBody />
         </Card>
     );
 }

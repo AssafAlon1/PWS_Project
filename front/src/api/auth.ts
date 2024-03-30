@@ -1,13 +1,13 @@
 import axios from "axios";
 import { APIStatus } from "../types";
+import { API_GATEWAY_URL } from "../const";
 
 interface Credentials {
     username: string;
     password: string;
 }
 
-const APIUrl = 'http://localhost:3000'; // TODO - Change this to the server URL
-const axiosInst = axios.create({ withCredentials: true, baseURL: APIUrl })
+const axiosInst = axios.create({ withCredentials: true, baseURL: API_GATEWAY_URL })
 
 export const AuthApi = {
     login: async ({ username, password }: Credentials): Promise<APIStatus> => {

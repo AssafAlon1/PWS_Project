@@ -13,4 +13,5 @@ export const VALID_CATEGORIES = [
     "Sports Event"
 ]
 
-export const API_GATEWAY_URL = "http://localhost:3000";
+// export const API_GATEWAY_URL = "http://localhost:3000";
+export const API_GATEWAY_URL = "https://pws-project-o1sy.onrender.com";

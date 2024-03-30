@@ -4,8 +4,8 @@ import dotenv from 'dotenv';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import { consumeMessages } from './consume-messages.js';
-import { ACTIONS_PATH, CLOSEST_EVENT_PATH, REFUND_OPTIONS_PATH } from './const.js';
-import { getClosestEvent, getNonRefundedPurchases, getUserActionByPurchaseId, getUserActions, refundTickets } from './routes.js';
+import { ACTIONS_PATH, CLOSEST_EVENT_PATH } from './const.js';
+import { getClosestEvent, getUserActionByPurchaseId, getUserActions, refundTickets } from './routes.js';
 
 dotenv.config();
 
@@ -33,13 +33,10 @@ app.use(cors({
     credentials: true,  // Frontend needs to send cookies with requests
 }));
 
-// app.post(ACTIONS_PATH, buyTickets); // TODO - Replace with rabbit
 app.put(ACTIONS_PATH, refundTickets);
 app.get(ACTIONS_PATH, getUserActions)
 app.get(`${ACTIONS_PATH}/:purchase_id`, getUserActionByPurchaseId)
 app.get(CLOSEST_EVENT_PATH, getClosestEvent);
-app.get(REFUND_OPTIONS_PATH, getNonRefundedPurchases);
-
 
 app.listen(port, () => {
     console.log(`Server running! port ${port}`);

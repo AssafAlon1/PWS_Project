@@ -9,3 +9,4 @@ export const USERSPACE_PATH = base + "/userspace";
 export const ERROR_PATH = base + "/error";
 export const NOTFOUND_PATH = base + "/notfound";
 export const SUCCESS_PATH = base + "/success";
+export const NEW_EVENT_PATH = base + "/newevent";

@@ -1,19 +1,20 @@
 import axios from "axios";
 import { APIStatus } from "../types";
+import { API_GATEWAY_URL } from "../const";
 
 interface Credentials {
     username: string;
     password: string;
 }
 
-const APIUrl = 'http://localhost:3000'; // TODO - Change this to the server URL
-const axiosInst = axios.create({ withCredentials: true, baseURL: APIUrl })
+const axiosInst = axios.create({ withCredentials: true, baseURL: API_GATEWAY_URL })
 
 export const AuthApi = {
     login: async ({ username, password }: Credentials): Promise<APIStatus> => {
         try {
             // Make a request to the server to login
             await axiosInst.post('/api/login', { username, password });
+            console.log("Logged in as: ", username);
             return APIStatus.Success;
         } catch (e) {
             return handleError(e);
@@ -38,14 +39,12 @@ export const AuthApi = {
             return handleError(e);
         }
     },
-    getUserName: async (): Promise<string | APIStatus> => {
+    getUserInfo: async (): Promise<{username: string, role: number} | null> => {
         try {
-            // Make a request to the server to get the username
-            const response = await axiosInst.get('/api/username');
-            // return the username
-            return response.data.username;
+            const response = await axiosInst.get('/api/userinfo');
+            return response.data;
         } catch (e) {
-            return handleError(e);
+            return null;
         }
     },
 };

@@ -2,8 +2,6 @@ import mongoose, { InferSchemaType, Types } from "mongoose";
 import Joi from "joi";
 import { VALID_CATEGORIES } from "../const.js";
 
-// TODO - add cheapest ticket num, cheapest price, totalAvaliableTickets
-// TODO - remove ticket array
 const mongooseEventSchema = new mongoose.Schema({
   _id: { type: Types.ObjectId, required: false, auto: true },
   title: { type: String, required: true },
@@ -59,6 +57,25 @@ export const JoiEventCreationRequestSchema = Joi.object({
   location: Joi.string(),
   image: Joi.string().optional(),
   tickets: Joi.array().items(ticketSchema).min(1),
+});
+
+export const updateEventSchema = Joi.object({
+  _id: Joi.object().forbidden(),
+  title: Joi.string().forbidden(),
+  comment_count: Joi.number().forbidden(),
+  cheapest_ticket_name: Joi.string().forbidden(),
+  cheapest_ticket_price: Joi.number().forbidden(),
+  total_available_tickets: Joi.number().forbidden(),
+  description: Joi.string().forbidden(),
+  location: Joi.string().forbidden(),
+  image_url: Joi.string().forbidden(),
+  category: Joi.string().forbidden(),
+  start_date: Joi.date().iso().required(),
+  end_date: Joi.date().iso().when('start_date', {
+    is: Joi.exist(),
+    then: Joi.date().iso().greater(Joi.ref('start_date')),
+    otherwise: Joi.date().iso()
+  }),
 });
 
 export type ICSEvent = InferSchemaType<typeof mongooseEventSchema>;

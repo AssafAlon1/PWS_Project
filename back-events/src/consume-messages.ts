@@ -2,10 +2,29 @@ import * as amqp from 'amqplib';
 import dotenv from 'dotenv';
 import { BUY_TICKETS_EXCHANGE, BUY_TICKETS_QUEUE, COMMENT_EXCHANGE, COMMENT_QUEUE, REFUND_TICKETS_EXCHANGE, REFUND_TICKETS_QUEUE, TICKET_INFO_EXCHANGE, TICKET_INFO_QUEUE } from './const.js';
 import { plusCommentCount, updateAvailableTickets, updateCheapesstTicket } from './db.js';
+import Joi from "joi";
 
 dotenv.config();
 
 const RABBITMQ_URL = process.env.RABBITMQ_URL || "amqp://localhost";
+
+
+const cheapestTicketSchema = Joi.object({
+    eventId: Joi.string().required(),
+    name: Joi.string().required(),
+    price: Joi.number().required(),
+});
+
+const buyTicketSchema = Joi.object({
+    purchase_id: Joi.string().required(),
+    event_id: Joi.string().required(),
+    ticket_amount: Joi.number().integer().required(),
+}).unknown(true);
+
+const refundTicketSchema = Joi.object({
+    event_id: Joi.string().required(),
+    ticket_amount: Joi.number().integer().required(),
+}).unknown(true);
 
 export const consumeMessages = async () => {
     try {
@@ -29,36 +48,50 @@ export const consumeMessages = async () => {
         await channel.bindQueue(REFUND_TICKETS_QUEUE, REFUND_TICKETS_EXCHANGE, '');
 
         await channel.consume(COMMENT_QUEUE, async (msg) => {
-            console.log("COMMENT_QUEUE");
             const eventId = msg.content.toString();
-            console.log(`Comsumer >>> received message: ${eventId} for comments`);
+            console.log(`[COMMENT] >>> received message: ${eventId} for comments`);
             await plusCommentCount(eventId);
             channel.ack(msg);
         });
 
         await channel.consume(TICKET_INFO_QUEUE, async (msg) => {
-            console.log("TICKET_INFO_QUEUE");
-            // TODO - handle null (meaning no ticket available for the event)
             const cheapest_ticket = JSON.parse(msg.content.toString());
-            console.log(`Comsumer >>> received message: ${cheapest_ticket.eventId} for ticket info`);
+            const { error } = cheapestTicketSchema.validate(cheapest_ticket);
+            if (error) {
+                console.log(`[TICKET] >>> received invalid message x_x`);
+                console.log(error.message);
+                channel.ack(msg);
+                return;
+            }
+
+            console.log(`[TICKET] >>> received message: ${cheapest_ticket.eventId} for ticket info`);
             await updateCheapesstTicket(cheapest_ticket.eventId, cheapest_ticket.name, cheapest_ticket.price);
             channel.ack(msg);
         });
 
         await channel.consume(BUY_TICKETS_QUEUE, async (msg) => {
-            console.log("BUY_TICKETS_QUEUE");
             const order_data = JSON.parse(msg.content.toString());
-            console.log(`Comsumer >>> received message: ${order_data.purchase_id} for buying tickets`);
-            // TODO - update ticket count
+            const { error } = buyTicketSchema.validate(order_data);
+            if (error) {
+                console.log(`[BUY] >>> received invalid message x_x`);
+                channel.ack(msg);
+                return;
+            }
+            console.log(`[BUY] >>> received buy message: ${order_data.purchase_id} for buying tickets`);
+
             await updateAvailableTickets(order_data.event_id, -order_data.ticket_amount);
             channel.ack(msg);
         });
 
         await channel.consume(REFUND_TICKETS_QUEUE, async (msg) => {
-            console.log("REFUND_TICKETS_QUEUE");
             const refund_data = JSON.parse(msg.content.toString());
-            console.log(`Comsumer >>> received message for refunding tickets for event ${refund_data.event_id}`);
-            // TODO - update ticket count
+            const { error } = refundTicketSchema.validate(refund_data);
+            if (error) {
+                console.log(`[REFUND] >>> received invalid message x_x`);
+                channel.ack(msg);
+                return;
+            }
+            console.log(`[REFUND] >>> received message for refunding tickets for event ${refund_data.event_id}`);
             await updateAvailableTickets(refund_data.event_id, refund_data.ticket_amount);
             channel.ack(msg);
         });

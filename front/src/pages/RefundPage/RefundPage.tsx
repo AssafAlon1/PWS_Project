@@ -5,7 +5,7 @@ import { UserAction } from '../../types';
 import UserActionApi from '../../api/userAction';
 import ActionDetails from '../../components/UserActionDetails/UserActionDetails';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { SUCCESS_PATH } from '../../paths';
+import { SUCCESS_PATH, USERSPACE_PATH } from '../../paths';
 
 const RefundPage: React.FC = () => {
     const [purchaseId, setPurchaseId] = useState<string>("");
@@ -76,8 +76,8 @@ const RefundPage: React.FC = () => {
             <ButtonWithTooltip
                 tooltipContent="Visit your User Space to find it."
                 buttonContent="I don't know my purchase ID"
-                buttonOnClick={() => { }}
-                isDisabled={true}
+                buttonOnClick={() => { navigate(USERSPACE_PATH) }}
+                isDisabled={false}
             />
             <hr />
             <Form>

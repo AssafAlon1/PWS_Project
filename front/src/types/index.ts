@@ -10,7 +10,19 @@ export interface CSEvent {
     cheapest_ticket_name?: string;
     cheapest_ticket_price: number;
     total_available_tickets: number;
-    comment_count: number;
+    comment_count?: number; // Only for back office
+}
+
+export interface CSEventCreationReqeust {
+    title: string;
+    category: string;
+    description: string;
+    organizer: string;
+    start_date: Date;
+    end_date: Date;
+    location: string;
+    image?: string;
+    tickets: { name: string, total: number, price: number }[];
 }
 
 export interface Comment {
@@ -24,7 +36,7 @@ export interface Ticket {
     eventId: string;
     name: string;
     available: number;
-    total: number;
+    total?: number; // Only for back office
     price: number;
 }
 
@@ -44,8 +56,6 @@ export interface PaymentDetails {
     charge: number;
 }
 
-// This will change...
-// TODO - add event name??
 export interface UserAction {
     username: string;
     event_id: string;

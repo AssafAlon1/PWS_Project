@@ -4,7 +4,7 @@ import dotenv from 'dotenv';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 
-import { createTicket, createTickets, getALLTicketsByEventId, getAvailableTicketsByEventId, purchaseTicket } from './routes.js';
+import { createTickets, getALLTicketsByEventId, getAvailableTicketsByEventId, purchaseTicket } from './routes.js';
 import { ALL_TICKET_PATH, TICKET_PATH } from './const.js';
 import { Request, Response, NextFunction } from 'express';
 import { PublisherChannel } from './publisher-channel.js';
@@ -22,7 +22,6 @@ if (!dbUri) {
   process.exit(1);
 }
 
-// TODO - consume messages?
 consumeMessages();
 
 mongoose.set('strictQuery', true);
@@ -39,11 +38,15 @@ app.use(cors({
   credentials: true,  // Frontend needs to send cookies with requests
 }));
 
+function keepSensitiveInfo(req: Request, res: Response, next: NextFunction) {
+  req.keepSensitiveInfo = true;
+  next();
+}
+
 // TODO - add routes
 app.get(`${ALL_TICKET_PATH}/:eventId`, getALLTicketsByEventId);
-app.get(`${TICKET_PATH}/:eventId`, getAvailableTicketsByEventId); // Currently not used - maybe for BO?
+app.get(`${ALL_TICKET_PATH}/backoffice/:eventId`, keepSensitiveInfo, getALLTicketsByEventId);
 
-app.post(`${TICKET_PATH}`, createTicket);
 app.post(`${TICKET_PATH}s`, createTickets);
 
 // Middleware to attach publisherChannel to the request

@@ -55,28 +55,6 @@ export const queryUserClosestEvent = async (username: string): Promise<{ eventTi
     }
 }
 
-export const queryNonRefundedPurchases = async (username: string): Promise<IUserAction[] | number> => {
-    try {
-        return await UserAction.find({ username: username, refund_time: { $exists: false } });
-    }
-    catch (error) {
-        console.error("Error getting non-refunded purchases for user " + username);
-        return StatusCodes.INTERNAL_SERVER_ERROR;
-    }
-}
-
-// TODO - remove?
-export const isPurchaseRefunded = async (purchaseId: string): Promise<boolean> => {
-    try {
-        const userAction = await UserAction.findOne({ purchase_id: purchaseId });
-        return userAction && userAction.refund_time !== undefined;
-    }
-    catch (error) {
-        console.error("Error checking if purchase " + purchaseId + " is refunded.");
-        return false;
-    }
-}
-
 export const queryActionByPurchaseId = async (purchaseId: string): Promise<IUserAction | null> => {
     try {
         const userAction = await UserAction.findOne({ purchase_id: purchaseId });

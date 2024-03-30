@@ -47,40 +47,41 @@ export const getAvailableTicketsByEventId = async (req: Request, res: Response) 
     res.status(StatusCodes.OK).send(data);
 }
 
-export const createTicket = async (req: Request, res: Response) => {
-    console.log("POST /api/ticket");
-    try {
-        const postData = req.body as ICSTicket;
-        postData.available = postData.total; // Added
+// TODO - Remove?
+// export const createTicket = async (req: Request, res: Response) => {
+//     console.log("POST /api/ticket");
+//     try {
+//         const postData = req.body as ICSTicket;
+//         postData.available = postData.total; // Added
 
-        if (postData._id) {
-            throw Error("_id is an automatically generated field.");
-        }
+//         if (postData._id) {
+//             throw Error("_id is an automatically generated field.");
+//         }
 
-        // Validate the ticket data
-        const { value, error } = ticketSchema.validate(postData, { abortEarly: false, allowUnknown: true, presence: 'required' });
+//         // Validate the ticket data
+//         const { value, error } = ticketSchema.validate(postData, { abortEarly: false, allowUnknown: true, presence: 'required' });
 
-        if (error) {
-            throw Error("Bad Request.");
-        }
+//         if (error) {
+//             throw Error("Bad Request.");
+//         }
 
-        const insertResult = await insertTicket(postData);
+//         const insertResult = await insertTicket(postData);
 
-        if (insertResult == StatusCodes.BAD_REQUEST) {
-            throw Error("Bad Request.")
-        }
+//         if (insertResult == StatusCodes.BAD_REQUEST) {
+//             throw Error("Bad Request.")
+//         }
 
-        if (insertResult == StatusCodes.INTERNAL_SERVER_ERROR) {
-            res.status(StatusCodes.INTERNAL_SERVER_ERROR).send("Internal server error");
-            return;
-        }
+//         if (insertResult == StatusCodes.INTERNAL_SERVER_ERROR) {
+//             res.status(StatusCodes.INTERNAL_SERVER_ERROR).send("Internal server error");
+//             return;
+//         }
 
-        res.status(StatusCodes.CREATED).send({ ticket_id: insertResult });
-    }
-    catch (error) {
-        res.status(StatusCodes.BAD_REQUEST).send({ message: "Bad Request." });
-    }
-}
+//         res.status(StatusCodes.CREATED).send({ ticket_id: insertResult });
+//     }
+//     catch (error) {
+//         res.status(StatusCodes.BAD_REQUEST).send({ message: "Bad Request." });
+//     }
+// }
 
 export const createTickets = async (req: Request, res: Response) => {
     console.log("POST /api/tickets");
@@ -164,12 +165,19 @@ export const purchaseTicket = async (req: Request, res: Response) => {
         // CREATE THE ORDER, AND UNDO CHANGES IF FAILED
         const orderResult = await axiosInstance.post("/api/buy", postData);
         if (orderResult.status != StatusCodes.OK) {
-            console.error("Failed buying ticket - Order API failed");
+            console.error("I believe this code is unreachable. Can you see me?");
             throw Error("Failed buying ticket!");
         }
 
-        if (ticket.available === postData.ticket_amount) { // If we sold all tickets, send new cheapest ticket
-            const newCheapestTicket = await queryCheapestTicketsByEventID(postData.event_id); // could be null
+        // If we sold all tickets, send new cheapest ticket
+        if (ticket.available === postData.ticket_amount) {
+            let newCheapestTicket = await queryCheapestTicketsByEventID(postData.event_id);
+
+            // basically if we don't have a cheapest ticket - it means we don't have any tickets left at all.. theoretically, can just NOT sent the message
+            if (newCheapestTicket === null) {
+                // TODO - just return?;
+                newCheapestTicket = { eventId: postData.event_id, name: "No tickets available", price: 0, total: 0};
+            }
             await publisherChannel.sendEvent(JSON.stringify(newCheapestTicket));
         }
 
@@ -182,6 +190,7 @@ export const purchaseTicket = async (req: Request, res: Response) => {
         console.error("Failed buying ticket - Order API failed");
         await updateTicketAmount(ticket._id.toString(), postData.ticket_amount);
         console.error("Ticket purchase failed. Rolling back changes.");
+        res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({ message: "Internal Server Error" });
         return;
     }
 

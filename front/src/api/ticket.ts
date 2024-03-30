@@ -8,10 +8,10 @@ const axiosInstance = axios.create({ withCredentials: true, baseURL: API_GATEWAY
 // TODO - rename to TicketApi
 const RealTicketApi = {
 
-    fetchAvailableTickets: async (eventId: string, skip?: number, limit?: number): Promise<Ticket[] | null> => {
+    fetchTickets: async (eventId: string, skip?: number, limit?: number): Promise<Ticket[] | null> => {
         console.log("fetchAvailableTickets for eventID: ", eventId);
         try {
-            const response = await axiosInstance.get(`/api/ticket/all/${eventId}`, { // Updated to fetch all tickets for an event
+            const response = await axiosInstance.get(`/api/ticket/all/${eventId}`, {
                 params: {
                     skip,
                     limit
@@ -25,10 +25,28 @@ const RealTicketApi = {
             throw new Error("Failed to fetch tickets"); // TODO - Better handling?
         }
     },
+
+    fetchBackOfficeTickets: async (eventId: string, skip?: number, limit?: number): Promise<Ticket[] | null> => {
+        console.log("fetchBackOfficeTickets for eventID: ", eventId);
+        try {
+            const response = await axiosInstance.get(`/api/ticket/all/backoffice/${eventId}`, {
+                params: {
+                    skip,
+                    limit
+                }
+            });
+            return response.data;
+        } catch (error) {
+            if (isAxiosError(error)) {
+                throw new Error("Failed to fetch tickets: " + error.response?.data.message); // TODO - Better handling?
+            }
+            throw new Error("Failed to fetch tickets"); // TODO - Better handling?
+        }
+    },
+
     purchaseTickets: async (purchaseDetails: PurchaseDetails, paymentDetails: PaymentDetails, username: string) => {
         // TODO - implement lock!
         try {
-            // This is disgusting but doing it in a better way will require precious time of my life
             const putData = {
                 event_id: purchaseDetails.event_id,
                 ticket_amount: purchaseDetails.ticket_amount,

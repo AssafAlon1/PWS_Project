@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import UserActionApi from "../../api/userAction";
 import { LOGIN_PATH } from "../../paths";
+import { UserRole } from "../../const";
 
 interface AuthContextProps {
     user: string | null;
@@ -11,6 +12,9 @@ interface AuthContextProps {
     nextEvent: string | null;
     updateNextEvent: () => void; // TODO - CSEvent?
     updateLoggedIn: () => Promise<boolean>;
+    role: number;
+    isBackOffice: boolean;
+    setBackOffice: (value: boolean) => void;
 }
 
 export const AuthContext = createContext<AuthContextProps>({
@@ -19,21 +23,28 @@ export const AuthContext = createContext<AuthContextProps>({
     nextEvent: null,
     updateNextEvent: () => { },
     updateLoggedIn: async () => false,
+    role: UserRole.Unauthenticated,
+    isBackOffice: false,
+    setBackOffice: () => { },
 });
 
 const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const [user, setUser] = useState<string | null>(null);
     const [nextEvent, setNextEvent] = useState<string | null>(null); // TODO - CSEvent
+    const [role, setRole] = useState<number>(0);
     const navigate = useNavigate();
+    const [isBackOffice, setBackOffice] = useState<boolean>(false);
 
     const updateLoggedIn = async (): Promise<boolean> => {
-        const result = await AuthApi.getUserName();
-        if (typeof result === "string") {
-            setUser(result);
+        const result = await AuthApi.getUserInfo();
+        if (result && result.role != undefined && result.username && result.role !== UserRole.Unauthenticated) {
+            setUser(result.username);
+            setRole(result.role);
             return true;
         }
         else {
             setUser(null);
+            setRole(UserRole.Unauthenticated);
             navigate(LOGIN_PATH);
             return false;
         }
@@ -41,6 +52,8 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
     const updateNextEvent = async () => {
         if (!user) {
+            setNextEvent(null);
+            setRole(UserRole.Unauthenticated);
             return;
         }
         const closestEvent = await UserActionApi.getUserClosestEvent(user);
@@ -55,7 +68,7 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }, [user]);
 
     return (
-        <AuthContext.Provider value={{ user, setUser, nextEvent, updateNextEvent, updateLoggedIn }}>
+        <AuthContext.Provider value={{ user, setUser, nextEvent, updateNextEvent, updateLoggedIn, role, isBackOffice, setBackOffice }}>
             {children}
         </AuthContext.Provider>
     );

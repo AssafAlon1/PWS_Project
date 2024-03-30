@@ -3,6 +3,7 @@ import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
+import { Request, Response, NextFunction } from 'express';
 
 import {
   getEventById,
@@ -41,20 +42,26 @@ app.use(cookieParser());
 let origin = process.env.ORIGIN;
 app.use(cors({
   origin: origin,
-  methods: ['GET', 'POST'], // TODO - PUT, DELETE?
+  methods: ['GET', 'POST', 'PUT'], // TODO - PUT, DELETE?
   credentials: true,  // Frontend needs to send cookies with requests
 }));
 
 
+function keepSensitiveInfo(req: Request, res: Response, next: NextFunction) {
+  req.keepSensitiveInfo = true;
+  next();
+}
+
 app.get(EVENT_PATH, getUpcomingAvailableEvents); // Added for the frontend - only fetch events with available tickets
-app.get(`${EVENT_PATH}/all`, getUpcomingEvents); // chenged path for BO use
+app.get(`${EVENT_PATH}/all`, getUpcomingEvents); // Gets ALL events (even those who have no tickets left)
 app.get(`${EVENT_PATH}/:eventId`, getEventById);
+app.get(`${EVENT_PATH}/backoffice/:eventId`, keepSensitiveInfo, getEventById); 
 app.get("/api/closest_event", getClosestEvent); // !! NOTE: this is NOT exposed to the API Gateway (therefore it's OK that it shares the same path as the user-actions service)
 
 app.post(EVENT_PATH, createEvent);
 app.post(`${EVENT_PATH}/ticketless`, createTicketlessEvent); // TODO - legacy, may remove
 
-// TODO - Update event? Delete event (I think this is not required?)
+app.put(`${EVENT_PATH}/:eventId/postpone`, updateEvent);
 
 app.listen(port, () => {
   console.log(`Server running! port ${port}`);

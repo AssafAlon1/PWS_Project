@@ -31,3 +31,10 @@ export const paymentInformationSchema = Joi.object({
     ticket_name: Joi.string().required(),
     ticket_amount: Joi.number().integer().min(1).required(),
 });
+
+export const refundInformationSchema = Joi.object({
+    purchase_id: Joi.string().required(),
+    event_id: Joi.string().required(),
+    ticket_name: Joi.string().required(),
+    ticket_amount: Joi.number().integer().min(1).required(),
+});

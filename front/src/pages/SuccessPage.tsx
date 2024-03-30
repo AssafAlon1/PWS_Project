@@ -13,6 +13,7 @@ const SuccessPage: React.FC = () => {
     const ticketName = location.state?.ticket_name;
     const ticketPrice = location.state?.price;
     const orderId = location.state?.order_id;
+    const createdEventId = location.state?.created_event_id;
 
     const CardBody = () => {
         const authContext = useContext(AuthContext); // Is this OK? We need to update the next event after purchase...
@@ -37,14 +38,15 @@ const SuccessPage: React.FC = () => {
                 <Link to={CATALOG_PATH}><Button variant="primary" onClick={handleReturnToCatalog}>Return to Catalog</Button></Link>
             </Card.Body>
         }
-        else {
-            console.log("OperationType: ", operationType)
-            console.log("EventName: ", eventName);
-            console.log("TicketQuantity: ", ticketQuantity);
-            console.log("TicketName: ", ticketName);
-            console.log("TicketPrice: ", ticketPrice);
-            console.log("OrderID: ", orderId);
-
+        else if (operationType == "create" && createdEventId) {
+            return <Card.Body>
+                <Card.Text>Event ID: {createdEventId}</Card.Text>
+                <Card.Text>{message}</Card.Text>
+                <Link to={CATALOG_PATH}><Button variant="primary" onClick={handleReturnToCatalog}>Return to Catalog</Button></Link>
+            </Card.Body>
+        }
+        else { // Souldn't get here
+            console.log("Uhmmm... Why are you HERE?");
             return <Card.Body>
                 <Card.Text>{message}</Card.Text>
                 <Link to={CATALOG_PATH}><Button variant="primary" onClick={handleReturnToCatalog}>Return to Catalog</Button></Link>
@@ -52,11 +54,12 @@ const SuccessPage: React.FC = () => {
         }
     }
 
+    const title = operationType == "purchase" ? "Purchase Successful!" : (operationType == "refund" ? "Refund Successful!" : "Event Creation Successful!");
     return (
         <>
             <Card border="success">
                 <Card.Header>
-                    <Card.Title>{operationType == "purchase" ? "Purchase Successful!" : "Refund Successful!"}</Card.Title>
+                    <Card.Title>{title}</Card.Title>
                 </Card.Header>
                 <CardBody />
             </Card>

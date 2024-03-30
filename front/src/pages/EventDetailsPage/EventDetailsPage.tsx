@@ -1,8 +1,8 @@
 import './EventDetailsPage.css';
 
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Button, Card, Placeholder } from 'react-bootstrap';
+import { Button, Card, Col, Placeholder, Row } from 'react-bootstrap';
 
 import MissingImage from "../../assets/MissingImage.png"
 import { CSEvent, PurchaseDetails, Ticket } from '../../types';
@@ -14,18 +14,17 @@ import TicketApi from '../../api/ticket';
 import { ThreeSpanningSpinners } from '../../components/SpinnerComponent/SpinnerComponent';
 import CommentsComponent from '../../components/CommentsComponent/CommentsComponent';
 import { CATALOG_PATH, CHECKOUT_PATH, ERROR_PATH, NOTFOUND_PATH } from '../../paths';
+import { AuthContext } from '../../components/AuthProvider/AuthProvider';
+import PostponeEventForm from '../../components/PostponeEventForm/PostponeEventForm';
+import { UserRole } from '../../const';
 
-// TODO - extract some components to other files?
 const EventDetails: React.FC = () => {
     const [event, setEvent] = useState<CSEvent | null>(null);
     const [tickets, setTickets] = useState<Ticket[] | null>(null);
 
-    // > Note about the failedFetchingComments state ^^^
-    // > The tickets don't have a similar state because we can tell that the fetch failed if we
-    // > receive back an empty array (since all events must have at least 1 ticket type).
-
     const { eventId } = useParams();
     const navigate = useNavigate();
+    const authContext = useContext(AuthContext);
     const { purchaseDetails, setPurchaseDetails } = usePurchaseDetails();
 
     // Reset purchase details when the component is loaded
@@ -43,7 +42,12 @@ const EventDetails: React.FC = () => {
         }
         let fetchedEvent;
         try {
-            fetchedEvent = await EventApi.fetchEvent(eventId);
+            if (authContext.isBackOffice) {
+                fetchedEvent = await EventApi.fetchBackOfficeEvent(eventId);
+            }
+            else {
+                fetchedEvent = await EventApi.fetchEvent(eventId);
+            }
         }
         catch {
             return navigate(ERROR_PATH, { state: { message: `Failed to fetch event ${eventId}` } });
@@ -62,7 +66,11 @@ const EventDetails: React.FC = () => {
         setTickets(null);
         let fetchedTickets: Ticket[];
         try {
-            fetchedTickets = await TicketApi.fetchAvailableTickets(eventId) ?? [];
+            if (authContext.isBackOffice) {
+                fetchedTickets = await TicketApi.fetchBackOfficeTickets(eventId) ?? [];
+            } else {
+                fetchedTickets = await TicketApi.fetchTickets(eventId) ?? [];
+            }
             if (!fetchedTickets) {
                 throw new Error(`Failed to fetch tickets for event ${eventId}`);
             }
@@ -76,7 +84,7 @@ const EventDetails: React.FC = () => {
 
     useEffect(() => {
         updateEvent();
-        updateTickets(); // TODO - separate this? How harsh do we want to be?
+        updateTickets();
     }, [eventId]);
 
     const TitleComponent = () => {
@@ -93,12 +101,6 @@ const EventDetails: React.FC = () => {
         }
         return <img src={MissingImage} className="card-img" />
     }
-    // const ImageComponent = () => {
-    //     if (event) {
-    //         return <Card.Img src={event.image ?? MissingImage} />
-    //     }
-    //     return <Card.Img src={MissingImage} />
-    // }
 
     const PricingAndAvailabilityComponent = () => {
         if (event) {
@@ -106,8 +108,8 @@ const EventDetails: React.FC = () => {
                 <Card className="event-block">
                     <Card.Body>
                         <Card.Text>{event?.category}</Card.Text>
-                        <Card.Text>From $20</Card.Text>
-                        <Card.Text>1000 tickets available</Card.Text>
+                        <Card.Text>From ${event.cheapest_ticket_price}</Card.Text>
+                        <Card.Text>{event.total_available_tickets} tickets available</Card.Text>
                     </Card.Body>
                 </Card>
             )
@@ -150,6 +152,17 @@ const EventDetails: React.FC = () => {
     }
 
     const MainInformationComponent = () => {
+        let descriptionAndMaybeCommentCount;
+        if (authContext.isBackOffice) {
+            descriptionAndMaybeCommentCount = <Row>
+                <Col><Card.Text>{event ? event.description : <ThreeSpanningSpinners />}</Card.Text></Col>
+                <Col><Card.Text>Comments: {event ? event.comment_count : "0"}</Card.Text></Col>
+            </Row>
+        }
+        else {
+            descriptionAndMaybeCommentCount = <Card.Text>{event ? event.description : <ThreeSpanningSpinners />}</Card.Text>
+        }
+
         return <Card className="event-details mb-4">
             <Card.Header>
                 <TitleComponent />
@@ -162,14 +175,11 @@ const EventDetails: React.FC = () => {
                 </Card.Body>
             </Card>
             <Card.Body>
-                {/* TODO - better loading */}
-                <Card.Text>{event ? event.description : "Loading..."}</Card.Text>
-                {/* <Button onClick={() => { navigate("/") }}>Return to Catalog</Button> */}
+                {descriptionAndMaybeCommentCount}
             </Card.Body>
         </Card>
     }
 
-    // TODO - Consider extracting BuyTicketComponent, BuyTicketsComponent to a separate file
     const BuyTicketComponent: React.FC<{ name: string, price: number, amountLeft: number }> = ({ name, price, amountLeft }) => {
         const [ticketAmount, setTicketAmount] = useState<number>(0);
 
@@ -209,48 +219,81 @@ const EventDetails: React.FC = () => {
         );
     }
 
-    const BuyTicketsComponent = () => {
-        const hasTicketsFetchFailed = Array.isArray(tickets) && tickets.length === 0;
-        let bodyContent;
-        if (hasTicketsFetchFailed) {
-            bodyContent = <Card.Body>
-                <Card.Text>Failed fetching tickets information</Card.Text>
-                <Button variant="light" onClick={updateTickets}>Retry</Button>
-            </Card.Body>
-        } else if (tickets === null) {
-            bodyContent = <Card.Body>
-                <Card.Text><ThreeSpanningSpinners /></Card.Text>
-            </Card.Body>
-        } else {
-            bodyContent = tickets.map((ticket, index) => {
-                return <BuyTicketComponent key={index} name={ticket.name} price={ticket.price} amountLeft={ticket.available} />
+    const PresentTicketComponent: React.FC<{ name: string, price: number, amountLeft: number, totalAmount: number }> = ({ name, price, amountLeft, totalAmount }) => {
+        return (
+            <Card className={`ticket-card ${amountLeft <= 0 ? "gray" : ""}`}>
+                <Card.Header>
+                    <b>{name}</b>
+                </Card.Header>
+                <Card.Body>
+                    <Card.Text>Price: <b>${price}</b></Card.Text>
+                    <Card.Text>Sold: <b>{totalAmount - amountLeft}</b>/{totalAmount}</Card.Text>
+                </Card.Body>
+            </Card>
+        );
+    }
+
+    const TicketsComponent = () => {
+        const TicketBody = () => {
+            const hasTicketsFetchFailed = Array.isArray(tickets) && tickets.length === 0;
+            if (hasTicketsFetchFailed) {
+                return <Card.Body>
+                    <Card.Text>Failed fetching tickets information</Card.Text>
+                    <Button variant="light" onClick={updateTickets}>Retry</Button>
+                </Card.Body>
+            }
+            if (tickets === null) {
+                return <Card.Body>
+                    <Card.Text><ThreeSpanningSpinners /></Card.Text>
+                </Card.Body>;
+            }
+            if (authContext.isBackOffice) {
+                return tickets.map((ticket, index) => {
+                    return <PresentTicketComponent key={index}
+                        name={ticket.name}
+                        price={ticket.price}
+                        amountLeft={ticket.available}
+                        totalAmount={ticket.total || 0} />
+                });
+            }
+            // Front Desk
+            return tickets.map((ticket, index) => {
+                return <BuyTicketComponent
+                    key={index}
+                    name={ticket.name}
+                    price={ticket.price}
+                    amountLeft={ticket.available} />
             });
         }
 
         return (
             <Card className="mb-4">
                 <Card.Header>
-                    <Card.Title>Buy Tickets:</Card.Title>
+                    {authContext.isBackOffice && <Card.Title>Tickets:</Card.Title>}
+                    {!authContext.isBackOffice && <Card.Title>Buy Tickets:</Card.Title>}
                 </Card.Header>
                 <Card.Body className="direction-row">
-                    {bodyContent}
+                    <TicketBody />
                 </Card.Body>
             </Card>
         );
     }
 
 
-    return (
-        <>
-            <MainInformationComponent />
-            <BuyTicketsComponent />
+
+    return <>
+        <MainInformationComponent />
+        <TicketsComponent />
+        {!authContext.isBackOffice &&
             <CommentsComponent
-                comment_count={event?.comment_count ?? 0}
                 eventId={eventId}
             />
-        </>
-
-    );
+        }
+        {
+            ( authContext.isBackOffice && authContext.role <= UserRole.Manager) &&
+            <PostponeEventForm csEvent={event} refetchEvent={updateEvent} />
+        }
+    </>
 };
 
 export default EventDetails;

@@ -1,6 +1,6 @@
 import "./CatalogEventDetails.css"
 
-import React from 'react';
+import React, { useContext } from 'react';
 
 import { CSEvent } from '../../types';
 import { Button, Card, Placeholder } from 'react-bootstrap';
@@ -9,13 +9,35 @@ import MissingImage from "../../assets/MissingImage.png"
 import { useNavigate } from "react-router-dom";
 import { getFormattedDate } from "../../utils/formatting";
 import { EVENT_PATH } from "../../paths";
+import { AuthContext } from "../AuthProvider/AuthProvider";
+import { UserRole } from "../../const";
 
 const EventDetails: React.FC<{ event: CSEvent }> = ({ event }) => {
 
     const navigate = useNavigate();
+    const context = useContext(AuthContext);
 
     const formattedDate = getFormattedDate(event.start_date);
 
+    const PurchaseButton = () => {
+        return (
+            <Button variant="primary" onClick={() => navigate(EVENT_PATH + "/" + event._id)}>Purchase Tickets</Button>
+        );
+    }
+
+    const CheckDetailsButton = () => {
+        return (
+            <Button variant="primary" onClick={() => navigate(EVENT_PATH + "/" + event._id)}>Check details</Button>
+        );
+    }
+
+    const EnterEventRealmButton = () => {
+        if (context.isBackOffice && context.role <= UserRole.Worker) {
+            return <CheckDetailsButton />
+        } else {
+            return <PurchaseButton />
+        }
+    }
 
     return (
         <Card>
@@ -32,7 +54,7 @@ const EventDetails: React.FC<{ event: CSEvent }> = ({ event }) => {
                 <Card.Text>{event.category}</Card.Text>
                 <Card.Text>From ${event.cheapest_ticket_price}</Card.Text>
                 <Card.Text>{event.total_available_tickets} tickets available</Card.Text>
-                <Button variant="primary" onClick={() => navigate(EVENT_PATH + "/" + event._id)}>Purchase Tickets</Button>
+                <EnterEventRealmButton/>
             </Card.Body>
         </Card>
     );

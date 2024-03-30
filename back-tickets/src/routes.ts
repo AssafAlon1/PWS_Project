@@ -47,40 +47,41 @@ export const getAvailableTicketsByEventId = async (req: Request, res: Response) 
     res.status(StatusCodes.OK).send(data);
 }
 
-export const createTicket = async (req: Request, res: Response) => {
-    console.log("POST /api/ticket");
-    try {
-        const postData = req.body as ICSTicket;
-        postData.available = postData.total; // Added
+// TODO - Remove?
+// export const createTicket = async (req: Request, res: Response) => {
+//     console.log("POST /api/ticket");
+//     try {
+//         const postData = req.body as ICSTicket;
+//         postData.available = postData.total; // Added
 
-        if (postData._id) {
-            throw Error("_id is an automatically generated field.");
-        }
+//         if (postData._id) {
+//             throw Error("_id is an automatically generated field.");
+//         }
 
-        // Validate the ticket data
-        const { value, error } = ticketSchema.validate(postData, { abortEarly: false, allowUnknown: true, presence: 'required' });
+//         // Validate the ticket data
+//         const { value, error } = ticketSchema.validate(postData, { abortEarly: false, allowUnknown: true, presence: 'required' });
 
-        if (error) {
-            throw Error("Bad Request.");
-        }
+//         if (error) {
+//             throw Error("Bad Request.");
+//         }
 
-        const insertResult = await insertTicket(postData);
+//         const insertResult = await insertTicket(postData);
 
-        if (insertResult == StatusCodes.BAD_REQUEST) {
-            throw Error("Bad Request.")
-        }
+//         if (insertResult == StatusCodes.BAD_REQUEST) {
+//             throw Error("Bad Request.")
+//         }
 
-        if (insertResult == StatusCodes.INTERNAL_SERVER_ERROR) {
-            res.status(StatusCodes.INTERNAL_SERVER_ERROR).send("Internal server error");
-            return;
-        }
+//         if (insertResult == StatusCodes.INTERNAL_SERVER_ERROR) {
+//             res.status(StatusCodes.INTERNAL_SERVER_ERROR).send("Internal server error");
+//             return;
+//         }
 
-        res.status(StatusCodes.CREATED).send({ ticket_id: insertResult });
-    }
-    catch (error) {
-        res.status(StatusCodes.BAD_REQUEST).send({ message: "Bad Request." });
-    }
-}
+//         res.status(StatusCodes.CREATED).send({ ticket_id: insertResult });
+//     }
+//     catch (error) {
+//         res.status(StatusCodes.BAD_REQUEST).send({ message: "Bad Request." });
+//     }
+// }
 
 export const createTickets = async (req: Request, res: Response) => {
     console.log("POST /api/tickets");

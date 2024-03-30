@@ -43,7 +43,7 @@ export const getUpcomingAvailableEvents = async (req: Request, res: Response) =>
 }
 
 export const getEventById = async (req: Request, res: Response) => {
-  console.log("GET /api/event/:eventId")
+  console.log("GET /api/event/:eventId OR /api/event/backoffice/:eventId");
   const id = req.params.eventId;
   // If the provided ID is not a valid mongoDB identifier, it cannot be in the DB (saves a query).
   if (!mongoose.Types.ObjectId.isValid(id)) {
@@ -61,6 +61,9 @@ export const getEventById = async (req: Request, res: Response) => {
   }
 
   if (data) {
+    if (!req.keepCommentCount) {
+      delete data.comment_count;
+    }
     res.status(StatusCodes.OK).send(data);
   } else {
     res.status(StatusCodes.NOT_FOUND).send({ message: "Event not found." });

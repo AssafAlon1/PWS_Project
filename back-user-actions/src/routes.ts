@@ -1,9 +1,9 @@
 import { Request, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
 
-import { addRefundTicketsAction, queryUserClosestEvent, queryNonRefundedPurchases, addBuyTicketsAction, isPurchaseRefunded, queryActionByPurchaseId, queryAllUserActions } from './db.js';
+import { addRefundTicketsAction, queryUserClosestEvent, addBuyTicketsAction, queryActionByPurchaseId, queryAllUserActions } from './db.js';
 import { hasEventStarted } from "./utils.js";
-import { ACTIONS_PATH, CLOSEST_EVENT_PATH, MAX_QUERY_LIMIT, ORDER_API_URL, REFUND_OPTIONS_PATH } from "./const.js";
+import { ACTIONS_PATH, CLOSEST_EVENT_PATH, MAX_QUERY_LIMIT, ORDER_API_URL } from "./const.js";
 import axios from 'axios';
 
 const axiosInstance = axios.create({ withCredentials: true, baseURL: ORDER_API_URL });
@@ -54,7 +54,6 @@ export const refundTickets = async (req: Request, res: Response) => {
             return res.status(StatusCodes.NOT_FOUND).send({ message: "Error getting the action details" });
         }
         if (refund_details.refund_time !== undefined) {
-            // if (await isPurchaseRefunded(postData.purchase_id)) {
             console.error("Purchase doesn't exist or has already been refunded.")
             return res.status(StatusCodes.NOT_FOUND).send({ message: "Purchase doesn't exist or has already been refunded." });
         }
@@ -103,32 +102,6 @@ export const getClosestEvent = async (req: Request, res: Response) => {
 
         // console.log(" >> Closest event: ", closestEvent);
         res.status(StatusCodes.OK).send(closestEvent);
-    }
-    catch (error) {
-        res.status(StatusCodes.BAD_REQUEST).send({ message: "Bad Request." });
-    }
-}
-
-export const getNonRefundedPurchases = async (req: Request, res: Response) => {
-    console.log("GET " + REFUND_OPTIONS_PATH);
-    try {
-        const username = req.query.username as string;
-        if (!username) {
-            console.error("No username provided.")
-            throw Error("No username provided.");
-        }
-
-        const purchases = await queryNonRefundedPurchases(username);
-
-        if (purchases === StatusCodes.INTERNAL_SERVER_ERROR) {
-            return res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({ message: "Internal Server Error." });
-        }
-
-        if ((Array.isArray(purchases) && purchases.length === 0)) {
-            return res.status(StatusCodes.NOT_FOUND).send({ message: "No purchases found." });
-        }
-
-        res.status(StatusCodes.OK).send({ purchases });
     }
     catch (error) {
         res.status(StatusCodes.BAD_REQUEST).send({ message: "Bad Request." });

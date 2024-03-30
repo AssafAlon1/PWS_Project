@@ -19,12 +19,12 @@ const buyTicketSchema = Joi.object({
     purchase_id: Joi.string().required(),
     event_id: Joi.string().required(),
     ticket_amount: Joi.number().integer().required(),
-});
+}).unknown(true);
 
 const refundTicketSchema = Joi.object({
     event_id: Joi.string().required(),
     ticket_amount: Joi.number().integer().required(),
-});
+}).unknown(true);
 
 export const consumeMessages = async () => {
     try {
@@ -48,54 +48,50 @@ export const consumeMessages = async () => {
         await channel.bindQueue(REFUND_TICKETS_QUEUE, REFUND_TICKETS_EXCHANGE, '');
 
         await channel.consume(COMMENT_QUEUE, async (msg) => {
-            console.log("COMMENT_QUEUE");
             const eventId = msg.content.toString();
-            console.log(`Comsumer >>> received message: ${eventId} for comments`);
+            console.log(`[COMMENT] >>> received message: ${eventId} for comments`);
             await plusCommentCount(eventId);
             channel.ack(msg);
         });
 
         await channel.consume(TICKET_INFO_QUEUE, async (msg) => {
-            console.log("TICKET_INFO_QUEUE");
             const cheapest_ticket = JSON.parse(msg.content.toString());
             const { error } = cheapestTicketSchema.validate(cheapest_ticket);
             if (error) {
-                console.log(`Comsumer >>> received invalid message x_x`);
+                console.log(`[TICKET] >>> received invalid message x_x`);
                 console.log(error.message);
                 channel.ack(msg);
                 return;
             }
 
-            console.log(`Comsumer >>> received message: ${cheapest_ticket.eventId} for ticket info`);
+            console.log(`[TICKET] >>> received message: ${cheapest_ticket.eventId} for ticket info`);
             await updateCheapesstTicket(cheapest_ticket.eventId, cheapest_ticket.name, cheapest_ticket.price);
             channel.ack(msg);
         });
 
         await channel.consume(BUY_TICKETS_QUEUE, async (msg) => {
-            console.log("BUY_TICKETS_QUEUE");
             const order_data = JSON.parse(msg.content.toString());
             const { error } = buyTicketSchema.validate(order_data);
             if (error) {
-                console.log(`Comsumer >>> received invalid message x_x`);
+                console.log(`[BUY] >>> received invalid message x_x`);
                 channel.ack(msg);
                 return;
             }
-            console.log(`Comsumer >>> received buy message: ${order_data.purchase_id} for buying tickets`);
+            console.log(`[BUY] >>> received buy message: ${order_data.purchase_id} for buying tickets`);
 
             await updateAvailableTickets(order_data.event_id, -order_data.ticket_amount);
             channel.ack(msg);
         });
 
         await channel.consume(REFUND_TICKETS_QUEUE, async (msg) => {
-            console.log("REFUND_TICKETS_QUEUE");
             const refund_data = JSON.parse(msg.content.toString());
             const { error } = refundTicketSchema.validate(refund_data);
             if (error) {
-                console.log(`Comsumer >>> received invalid message x_x`);
+                console.log(`[REFUND] >>> received invalid message x_x`);
                 channel.ack(msg);
                 return;
             }
-            console.log(`Comsumer >>> received message for refunding tickets for event ${refund_data.event_id}`);
+            console.log(`[REFUND] >>> received message for refunding tickets for event ${refund_data.event_id}`);
             await updateAvailableTickets(refund_data.event_id, refund_data.ticket_amount);
             channel.ack(msg);
         });

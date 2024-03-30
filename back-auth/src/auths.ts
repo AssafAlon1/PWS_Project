@@ -1,15 +1,12 @@
 import jwt from "jsonwebtoken";
 import { NextFunction, Request, Response } from "express";
 import { StatusCodes } from "http-status-codes";
+import { UserRole } from "./const.js";
+import { hasPermission } from "./db.js";
 
 const secretKey = process.env.JWT_SECRET;
 
 export type TokenData = { username: string };
-
-
-const isHTTPError = (value: string | number | TokenData) => {
-  return [400, 401, 403, 404, 500].includes(value as number);
-}
 
 const verifyJWT = (token: string): TokenData | false => {
   try {
@@ -41,11 +38,102 @@ const getTokenFromCookie = (req: Request, res: Response) => {
   }
 };
 
-export const isAuthorized = (req: Request, res: Response, next: NextFunction): TokenData | number => {
+const getRequiredRole = (req: Request): UserRole => {
+  const url = new URL(req.originalUrl, `http://${req.headers.host}`).pathname;
+  // |================|
+  // | Paths for Auth |
+  // |================|
+  if (url.match(/^\/api\/userinfo$/) && req.method === "GET") { // get user info
+    return UserRole["Guest"];
+  }
+
+  // |==================|
+  // | Paths for Events |
+  // |==================|
+  if (url.match(/^\/api\/event$/)) {
+    if (req.method === "GET") { // get available events 
+      return UserRole["Guest"];
+    }
+    if (req.method === "POST") { // create event 
+      return UserRole["Manager"];
+    }
+  }
+
+  if (url.match(/^\/api\/event\/all$/) && req.method == "GET") { // get all events 
+    return UserRole["Worker"];
+  }
+
+  if (url.match(/^\/api\/event\/backoffice\/[^\/]+$/) && req.method == "GET") { // get event by id - back office 
+    return UserRole["Worker"];
+  }
+
+  if (url.match(/^\/api\/event\/[^\/]+$/)) { 
+    if(req.method === "GET") { // get event by id - regular user
+      return UserRole["Guest"];
+    }
+    // TODO - needs implementation!
+    if(req.method === "PUT") { // update event start time
+      return UserRole["Manager"];
+    }
+  }
+
+  // |===================|
+  // | Paths for Tickets |
+  // |===================|
+  if (url.match(/^\/api\/ticket\/all\/[^\/]+$/) && req.method == "GET") { // get all tickets for event 
+    return UserRole["Guest"];
+  }
+  if (url.match(/^\/api\/ticket$/) && req.method === "PUT") { // purchase ticket
+    return UserRole["Guest"];
+  }
+
+  // The events microservice handles it
+  // if (url.match(/^\/api\/tickets$/) && req.method === "POST") { // create all tickets as part of creating an event
+  //   return UserRole["manager"];
+  // }
+  
+  // |====================|
+  // | Paths for Comments |
+  // |====================|
+  if (url.match(/^\/api\/comment(\/[^\/]+)?$/) && ["GET", "POST"].includes(req.method)) { // get && post comments for event
+    return UserRole["Guest"];
+  }
+  
+  // |========================|
+  // | Paths for User Actions |
+  // |========================|
+
+// app.get(`${ACTIONS_PATH}/:purchase_id`, getUserActionByPurchaseId)
+// app.get(CLOSEST_EVENT_PATH, getClosestEvent);
+
+  if (url.match(/^\/api\/user_actions$/) && ["GET", "PUT"].includes(req.method)) { // get && put user actions
+    return UserRole["Guest"];
+  }
+  if (url.match(/^\/api\/user_actions\/[^\/]+$/) && req.method == "GET") { // get user action by purchase id
+    return UserRole["Guest"];
+  }
+  // if (url.match(/^\/api\/refund_options$/) && req.method == "GET") { // get non refunded purchases
+  //   return UserRole["Guest"];
+  // } 
+  if (url.match(/^\/api\/closest_event$/) && req.method == "GET") { // get closest event
+    return UserRole["Guest"];
+  }
+
+  // TODO - add this route!
+  if (url.match(/^\/api\/permission$/)) { // update user role
+    return UserRole["Admin"];
+  }
+  
+  // Shouldn't get here, require highest role.
+  console.log(" > Haven't entered a SINGLE if statement...");
+  return UserRole["Admin"];
+}
+
+export const isAuthorized = async (req: Request, res: Response, next: NextFunction): Promise<TokenData | number> => {
   // Token existence handled here
   const token = getTokenFromCookie(req, res);
 
-  if (isHTTPError(token)) {
+  if (!token) {
     // res was already handled in getTokenFromAuthHeader
     return StatusCodes.UNAUTHORIZED;
   }
@@ -59,11 +147,11 @@ export const isAuthorized = (req: Request, res: Response, next: NextFunction): T
   }
 
   // Check user role for permission
-  // const requiredRole = getRequiredRole(req);
-  // if (!(await hasPermission(user.id, requiredRole))) {
-  //   res.status(403).send({ message: "You have insufficient permission to perform this operation." });
-  //   return HTTPError["ERROR_403"];
-  // }
+  const requiredRole = getRequiredRole(req);
+  if (!(await hasPermission(user.username, requiredRole))) {
+    res.status(403).send({ message: "You have insufficient permission to perform this operation." });
+    return StatusCodes.FORBIDDEN;
+  }
   console.log(" > User is authorized!");
   next();
 };

@@ -2,6 +2,8 @@ export const MAX_EVENTS_IN_PAGE = 12;
 export const MAX_COMMENTS = 10;
 export const MAX_ACTIONS = 5;
 
+export enum UserRole { Admin, Manager, Worker, Guest, Unauthenticated }
+
 export const VALID_CATEGORIES = [
     "Charity Event",
     "Concert",

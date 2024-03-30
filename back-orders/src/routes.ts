@@ -5,7 +5,6 @@ import { BUY_PATH, PAYMENT_PROVIDER_URL, REFUND_PATH } from "./const.js";
 import { PaymentInformation, RefundInformation, paymentInformationSchema, refundInformationSchema } from './types.js';
 import axios from 'axios';
 import { PublisherChannel } from './publisher-channel.js';
-import Joi from 'joi';
 
 // const axiosInstance = axios.create({ withCredentials: true, baseURL: PAYMER_PROVIDER_URL });
 const axiosPayment = axios.create({ baseURL: PAYMENT_PROVIDER_URL });

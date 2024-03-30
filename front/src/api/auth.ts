@@ -14,6 +14,7 @@ export const AuthApi = {
         try {
             // Make a request to the server to login
             await axiosInst.post('/api/login', { username, password });
+            console.log("Logged in as: ", username);
             return APIStatus.Success;
         } catch (e) {
             return handleError(e);
@@ -38,14 +39,12 @@ export const AuthApi = {
             return handleError(e);
         }
     },
-    getUserName: async (): Promise<string | APIStatus> => {
+    getUserInfo: async (): Promise<{username: string, role: number} | null> => {
         try {
-            // Make a request to the server to get the username
-            const response = await axiosInst.get('/api/username');
-            // return the username
-            return response.data.username;
+            const response = await axiosInst.get('/api/userinfo');
+            return response.data;
         } catch (e) {
-            return handleError(e);
+            return null;
         }
     },
 };

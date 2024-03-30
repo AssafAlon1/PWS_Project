@@ -2,6 +2,7 @@ import { useContext, useState, useEffect } from 'react';
 import { Navigate, Outlet } from 'react-router';
 import { AuthContext } from '../AuthProvider/AuthProvider';
 import { ThreeSpanningSpinners } from '../SpinnerComponent/SpinnerComponent';
+import { LOGIN_PATH } from '../../paths';
 
 const PrivateRoute = () => {
     const auth = useContext(AuthContext);
@@ -24,8 +25,9 @@ const PrivateRoute = () => {
     }
 
     if (!auth.user) {
-        return <Navigate to="/login" />; // TODO - add some parameter saying "session expired"
+        return <Navigate to={LOGIN_PATH} />; // TODO - add some parameter saying "session expired"
     }
+
     console.log(" ### PrivateRoute approved :)");
     return <Outlet />;
 };

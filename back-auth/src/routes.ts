@@ -4,10 +4,14 @@ import jwt, { JwtPayload } from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 import User from './models/user.js';
 import { StatusCodes } from "http-status-codes";
+import { UserRole } from './const.js';
+import { queryUserRole } from './db.js';
+
 
 
 export async function loginRoute(req: Request, res: Response) {
   const credentials = req.body;
+  console.log(" >> User came with credentials: ", credentials);
   try {
     await User.validate(credentials);
   }
@@ -50,6 +54,7 @@ export async function logoutRoute(req: Request, res: Response) {
 
 export async function signupRoute(req: Request, res: Response) {
   const user = new User(req.body);
+  user.role = UserRole.Guest;
   try {
     const error = await user.validate();
   }
@@ -75,22 +80,24 @@ export async function signupRoute(req: Request, res: Response) {
   res.status(StatusCodes.CREATED).send('User created');
 }
 
-export async function usernameRoute(req: Request, res: Response) {
+export async function userInfoRoute(req: Request, res: Response) {
   const token = req.cookies.token;
   if (!token) {
     res.status(StatusCodes.UNAUTHORIZED).send('Not logged in');
     return;
   }
-
+  
   let username;
+  let role = UserRole.Guest;
   try {
     const payload = jwt.verify(token, process.env.JWT_SECRET);
     username = (payload as JwtPayload).username;
+    role = await queryUserRole(username);
   }
   catch (e) {
     res.status(StatusCodes.UNAUTHORIZED).send('Invalid token');
     return;
   }
 
-  res.status(StatusCodes.OK).send({ username });
+  res.status(StatusCodes.OK).send({ username, role });
 }

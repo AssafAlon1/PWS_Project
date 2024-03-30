@@ -12,7 +12,7 @@ const buyTicketSchema = Joi.object({
     purchase_id: Joi.string().required(),
     event_id: Joi.string().required(),
     ticket_amount: Joi.number().integer().required(),
-});
+}).unknown(true);
 
 export const consumeMessages = async () => {
     try {

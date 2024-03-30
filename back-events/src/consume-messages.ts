@@ -57,10 +57,7 @@ export const consumeMessages = async () => {
 
         await channel.consume(TICKET_INFO_QUEUE, async (msg) => {
             console.log("TICKET_INFO_QUEUE");
-            // TODO - handle null (meaning no ticket available for the event) // What did you mean by this Alina?
             const cheapest_ticket = JSON.parse(msg.content.toString());
-
-
             const { error } = cheapestTicketSchema.validate(cheapest_ticket);
             if (error) {
                 console.log(`Comsumer >>> received invalid message x_x`);

@@ -2,11 +2,13 @@
 import React, { useState } from 'react';
 import { Form, Button, FloatingLabel, Container } from 'react-bootstrap';
 import { Alert, Card, Col, Row } from 'react-bootstrap';
+import { useNavigate } from 'react-router-dom';
 import { VALID_CATEGORIES } from '../../const';
-import './NewEventPage.css';
 import EventApi from '../../api/event';
 import { CSEventCreationReqeust } from '../../types';
 import ButtonWithTooltip from '../../components/ButtonWithTooltip/ButtonWithTooltip';
+import './NewEventPage.css';
+import { SUCCESS_PATH } from '../../paths';
 
 interface NewTicket {
     name: string;
@@ -16,7 +18,7 @@ interface NewTicket {
 
 const NewEventPage: React.FC = () => {
     const [isFormValidated, setFormValidated] = useState<boolean>(false);
-    const [displayError, setDisplayError] = useState<boolean>(false);
+    const [displayError, setDisplayError] = useState<string>("");
     
     const [eventName, setEventName] = useState<string>("");
     const [catagory, setCatagory] = useState<string>("");
@@ -31,7 +33,9 @@ const NewEventPage: React.FC = () => {
     const [endTime, setEndTime] = useState<string>(new Date().toTimeString().split(' ')[0].substring(0, 5));
     const [tickets, setTickets] = useState<NewTicket[]>([]);
 
-    const handleEventNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const navigate = useNavigate();
+    
+   const handleEventNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setEventName(e.target.value);
     }
 
@@ -91,7 +95,7 @@ const NewEventPage: React.FC = () => {
             event.stopPropagation();
             setFormValidated(true);
             console.log("Form invalid");
-            setDisplayError(true);
+            setDisplayError("Invalid Form. Please check the form and try again.");
             return;
         }
         try {
@@ -111,11 +115,11 @@ const NewEventPage: React.FC = () => {
             }
             console.log(eventCreationRequest);
             const result = await EventApi.createEvent(eventCreationRequest);
-            alert("Event created successfully! ID: " + result); // TODO: Redirect to Catalog
+            navigate(SUCCESS_PATH, { state: { operationType: "create", createdEventId: result, message: "Event created successfully!" } });  
         }
         catch (error) {
             console.log(error);
-            setDisplayError(true);
+            setDisplayError("Failed to create event. Please try again.");
         }
     }
 
@@ -234,7 +238,6 @@ const NewEventPage: React.FC = () => {
     return (
         <>
             <h1>New Event</h1>
-            {/* <Form> */}
             <Form noValidate validated={isFormValidated} onSubmit={handleSubmit}>
                 <Row>
                     <Col>
@@ -403,17 +406,14 @@ const NewEventPage: React.FC = () => {
                             buttonType="submit"
                             placement="top"
                         />
-
-                        {/* <Button variant="primary" type="submit" disabled={tickets.length === 0}>
-                            Create Event
-                        </Button> */}
                     </Col>
                 </Row>
-            </Form > 
-            <Alert show={displayError} variant="danger" onClose={() => setDisplayError(false)} dismissible>
-                <Alert.Heading>Failed to create event</Alert.Heading>
+            </Form >             
+            
+            <Alert show={displayError !== ""} variant="danger" onClose={() => setDisplayError("")} dismissible>
+                <Alert.Heading>Something went wrong</Alert.Heading>
                 <p>
-                    Something went wrong while trying to create the event. Please try again.
+                    {displayError}
                 </p>
             </Alert>
         </>

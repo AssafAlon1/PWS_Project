@@ -168,8 +168,15 @@ export const purchaseTicket = async (req: Request, res: Response) => {
             throw Error("Failed buying ticket!");
         }
 
-        if (ticket.available === postData.ticket_amount) { // If we sold all tickets, send new cheapest ticket
-            const newCheapestTicket = await queryCheapestTicketsByEventID(postData.event_id); // could be null
+        // If we sold all tickets, send new cheapest ticket
+        if (ticket.available === postData.ticket_amount) {
+            let newCheapestTicket = await queryCheapestTicketsByEventID(postData.event_id);
+
+            // basically if we don't have a cheapest ticket - it means we don't have any tickets left at all.. theoretically, can just NOT sent the message
+            if (newCheapestTicket === null) {
+                // TODO - just return?;
+                newCheapestTicket = { eventId: postData.event_id, name: "No tickets available", price: 0, total: 0};
+            }
             await publisherChannel.sendEvent(JSON.stringify(newCheapestTicket));
         }
 

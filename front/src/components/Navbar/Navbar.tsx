@@ -73,7 +73,7 @@ const NavbarComponent: React.FC = () => {
                         {/* <Nav.Link as={Link} to={ERROR_PATH}>error</Nav.Link> */}
                         {context.isBackOffice ? <></> : <Nav.Link as={Link} to={USERSPACE_PATH}>User Space</Nav.Link>}
                         {context.isBackOffice ? <></> : <Nav.Link as={Link} to={REFUND_PATH}>Refunds</Nav.Link>}
-                        {context.role <= UserRole.Worker ? <Nav.Link as={Link} to={NEW_EVENT_PATH}>Create Event</Nav.Link> : <></>}
+                        {context.role <= UserRole.Manager ? <Nav.Link as={Link} to={NEW_EVENT_PATH}>Create Event</Nav.Link> : <></>}
                         
                     </Nav>
 

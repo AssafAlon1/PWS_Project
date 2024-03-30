@@ -2,9 +2,10 @@ import { useContext, useState, useEffect } from 'react';
 import { Navigate, Outlet } from 'react-router';
 import { AuthContext } from '../AuthProvider/AuthProvider';
 import { ThreeSpanningSpinners } from '../SpinnerComponent/SpinnerComponent';
-import { LOGIN_PATH } from '../../paths';
+import { ERROR_PATH, LOGIN_PATH } from '../../paths';
 
-const PrivateRoute = () => {
+
+const PrivateRoute: React.FC<{requiredRole?: number}> = ({requiredRole}) => {
     const auth = useContext(AuthContext);
     const [isLoading, setIsLoading] = useState<boolean>(true);
 
@@ -26,6 +27,10 @@ const PrivateRoute = () => {
 
     if (!auth.user) {
         return <Navigate to={LOGIN_PATH} />; // TODO - add some parameter saying "session expired"
+    }
+
+    if (requiredRole != undefined && auth.role > requiredRole) { // TODO - pass the required role as a parameter
+        return <Navigate to={ERROR_PATH} state={{ message: "You are not authorized to view this page. Bad boy ;)" }}/>;
     }
 
     console.log(" ### PrivateRoute approved :)");

@@ -62,7 +62,13 @@ const RealEventApi = {
             throw new Error("Failed to create event"); // TODO - Better handling?
         }
     },
-
+    postponeEvent: async (eventId: string, newStart: Date, newEnd: Date): Promise<void> => {
+        try {
+            await axiosInstance.put(`/api/event/${eventId}/postpone`, {start_date: newStart, end_date: newEnd});
+        } catch (error) {
+            throw new Error("Failed to postpone event"); // TODO - Better handling?
+        }
+    },
 };
 
 

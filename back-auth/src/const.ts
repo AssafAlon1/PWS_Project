@@ -17,3 +17,7 @@ export const USERNAME_PATH = "/api/username";
 export const USERINFO_PATH = "/api/userinfo";
 export const USER_ACTION_PATH = '/api/user_actions';
 export const CLOSEST_EVENT_PATH = '/api/closest_event';
+
+export const EVENT_PATH = '/api/event';
+export const COMMENT_PATH = '/api/comment';
+export const TICKET_PATH = '/api/ticket';

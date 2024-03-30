@@ -15,6 +15,8 @@ import { ThreeSpanningSpinners } from '../../components/SpinnerComponent/Spinner
 import CommentsComponent from '../../components/CommentsComponent/CommentsComponent';
 import { CATALOG_PATH, CHECKOUT_PATH, ERROR_PATH, NOTFOUND_PATH } from '../../paths';
 import { AuthContext } from '../../components/AuthProvider/AuthProvider';
+import PostponeEventForm from '../../components/PostponeEventForm/PostponeEventForm';
+import { UserRole } from '../../const';
 
 const EventDetails: React.FC = () => {
     const [event, setEvent] = useState<CSEvent | null>(null);
@@ -254,7 +256,7 @@ const EventDetails: React.FC = () => {
                         totalAmount={ticket.total || 0} />
                 });
             }
-            // Fron Desk
+            // Front Desk
             return tickets.map((ticket, index) => {
                 return <BuyTicketComponent
                     key={index}
@@ -277,6 +279,8 @@ const EventDetails: React.FC = () => {
         );
     }
 
+
+
     return <>
         <MainInformationComponent />
         <TicketsComponent />
@@ -284,6 +288,10 @@ const EventDetails: React.FC = () => {
             <CommentsComponent
                 eventId={eventId}
             />
+        }
+        {
+            ( authContext.isBackOffice && authContext.role <= UserRole.Manager) &&
+            <PostponeEventForm csEvent={event} refetchEvent={updateEvent} />
         }
     </>
 };

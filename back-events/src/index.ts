@@ -42,7 +42,7 @@ app.use(cookieParser());
 let origin = process.env.ORIGIN;
 app.use(cors({
   origin: origin,
-  methods: ['GET', 'POST'], // TODO - PUT, DELETE?
+  methods: ['GET', 'POST', 'PUT'], // TODO - PUT, DELETE?
   credentials: true,  // Frontend needs to send cookies with requests
 }));
 
@@ -61,7 +61,7 @@ app.get("/api/closest_event", getClosestEvent); // !! NOTE: this is NOT exposed 
 app.post(EVENT_PATH, createEvent);
 app.post(`${EVENT_PATH}/ticketless`, createTicketlessEvent); // TODO - legacy, may remove
 
-// TODO - Update event? Delete event (I think this is not required?)
+app.put(`${EVENT_PATH}/:eventId/postpone`, updateEvent);
 
 app.listen(port, () => {
   console.log(`Server running! port ${port}`);

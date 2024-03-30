@@ -3,10 +3,11 @@ import { Request, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
 
 import { deleteEventByID, insertEvent, queryClosestEvent, queryEventByID, queryUpcomingAvailableEvents, queryUpcomingEvents, updateEventByID } from "./db.js";
-import { ICSEvent, JoiEventCreationRequestSchema, eventSchema } from "./models/CSEvent.js";
+import { ICSEvent, JoiEventCreationRequestSchema, eventSchema, updateEventSchema } from "./models/CSEvent.js";
 import { MAX_QUERY_LIMIT, TICKET_API_URL } from "./const.js";
 import { CSEventWithTickets } from "./types.js";
 import axios from "axios";
+import Joi from 'joi';
 
 const axiosInstance = axios.create({ withCredentials: true, baseURL: TICKET_API_URL });
 
@@ -168,47 +169,39 @@ export const createTicketlessEvent = async (req: Request, res: Response) => {
 };
 
 export const updateEvent = async (req: Request, res: Response) => {
-  // TODO - UPDATE THIS FOR PROJECT REQUIREMENTS - only allow start date to be postponed
-
-  const eventID = new URL(req.url, `http://${req.headers.host}`).pathname.split("/").pop();
-  let event;
+  console.log("PUT /api/event/:eventId/postpone");
+  const eventId = req.params.eventId;
+  let event: ICSEvent | null;
   let putData;
 
-  // First, check the json is valid (throw 400 if it's not)
-  // Also make sure provided fields are valid before querying the DB to check for event existance
-  try {
-    putData = JSON.parse(req.body) as Partial<ICSEvent>;
-
-    if (putData._id) {
-      throw Error("Cannot update _id field.");
-    }
-
-    const { error } = eventSchema.validate(putData, { abortEarly: false, allowUnknown: true, presence: 'optional' });
-
-    if (error) {
-      throw Error("Invalid body ;)");
-    }
-  }
-  catch (error) {
-    res.status(StatusCodes.BAD_REQUEST).send({ message: "Bad Request." });
-    console.error(error);
+  putData = req.body as Partial<ICSEvent>;
+  const { error } = await updateEventSchema.validate(putData); // make sure only start and end times are updated
+  if(error){
+    console.log("You can't update this!", error);
+    console.log(req.body);
+    res.status(StatusCodes.BAD_REQUEST).send({ message: "Cannot update this!" });
     return;
   }
-
-  // Second, check the event exists
+  
+  // Check the event exists
   try {
-    event = await queryEventByID(eventID);
+    event = await queryEventByID(eventId);
     if (!event) {
       throw Error("Event not found.");
     }
   } catch (error) {
+    console.error("Event not found.");
     res.status(StatusCodes.NOT_FOUND).send({ message: "Event not found." });
     return;
   }
 
-  // Third, make sure the updated event is valid
-  try {
+  if( new Date(putData.start_date) < new Date(event.start_date) ){
+    res.status(StatusCodes.BAD_REQUEST).send({ message: "Cannot update event to start earlier!" });
+    return;
+  }
 
+  // Make sure the updated event is valid
+  try {
     // Patch event from putData
     const updatedEvent = await Object.assign(event, putData);
 
@@ -219,11 +212,12 @@ export const updateEvent = async (req: Request, res: Response) => {
       throw Error("Bad Request.");
     }
 
-    updateEventByID(eventID, value);
-    res.status(StatusCodes.OK).send({ _id: eventID });
+    updateEventByID(eventId, value);
+    res.status(StatusCodes.OK).send({ _id: eventId });
   }
 
   catch (error) {
+    console.error("Error updating event: ", error);
     res.status(StatusCodes.BAD_REQUEST).send({ message: "Bad Request." });
     return;
   }
@@ -256,22 +250,3 @@ export const getClosestEvent = async (req: Request, res: Response) => {
   res.status(StatusCodes.OK).send({ eventTitle: closestEvent.title, eventStartDate: closestEvent.start_date });
 }
 
-// export const deleteEvent = async (req: Request, res: Response) => {
-
-//   const eventID = new URL(req.url, `http://${req.headers.host}`).pathname.split("/").pop();
-
-//   // If the provided ID is not a valid mongoDB identifier, it cannot be in the DB (saves a query)
-//   if (!mongoose.Types.ObjectId.isValid(eventID)) {
-//     res.status(StatusCodes.OK).send();
-//     return;
-//   }
-
-//   try {
-//     // if an event does not exist - Mongo will treat the deletion as a success
-//     deleteEventByID(eventID);
-//     res.send();
-//   }
-//   catch {
-//     res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({ message: "Internal Server Error" });
-//   }
-// };

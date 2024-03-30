@@ -17,7 +17,8 @@ const shouldDisplayGoBackButton = (path: string) => {
         CHECKOUT_PATH,
         ERROR_PATH,
         USERSPACE_PATH,
-        REFUND_PATH
+        REFUND_PATH,
+        NEW_EVENT_PATH
     ].includes(path) || path.startsWith(EVENT_PATH);
 }
 
@@ -101,7 +102,7 @@ const NavbarComponent: React.FC = () => {
                         <GoBackButton />
                         <NextEvent />
                         <div className="vr" />
-                        <p className="nav-element"><b>{context.user} ({context.role})</b></p>
+                        <p className="nav-element"><b>{context.user}</b></p>
                         <div className="vr" />
                         <LogoutButton />
                     </> : <></>}

@@ -15,11 +15,14 @@ import {
 import {
     CLOSEST_EVENT_PATH,
     COMMENT_API_URL,
+    COMMENT_PATH,
     EVENT_API_URL,
+    EVENT_PATH,
     LOGIN_PATH,
     LOGOUT_PATH,
     SIGNUP_PATH,
     TICKET_API_URL,
+    TICKET_PATH,
     USERINFO_PATH,
     USER_ACTION_API_URL,
     USER_ACTION_PATH,
@@ -60,7 +63,7 @@ const eventProxy = createProxyMiddleware({
     onProxyReq: fixRequestBody,
     changeOrigin: true, // TODO - What is this?
 });
-app.use('/api/event', isAuthorized, eventProxy);
+app.use(EVENT_PATH, isAuthorized, eventProxy);
 
 // Comments Microservice
 const commentProxy = createProxyMiddleware({
@@ -68,7 +71,7 @@ const commentProxy = createProxyMiddleware({
     onProxyReq: fixRequestBody,
     changeOrigin: true, // TODO - What is this?
 });
-app.use('/api/comment', isAuthorized, commentProxy);
+app.use(COMMENT_PATH, isAuthorized, commentProxy);
 
 // Tickets Microservice
 const ticketProxy = createProxyMiddleware({
@@ -76,7 +79,7 @@ const ticketProxy = createProxyMiddleware({
     onProxyReq: fixRequestBody,
     changeOrigin: true, // TODO - What is this?
 });
-app.use('/api/ticket', isAuthorized, ticketProxy);
+app.use(TICKET_PATH, isAuthorized, ticketProxy);
 
 // User Actions Microservice
 const userActionProxy = createProxyMiddleware({
@@ -84,7 +87,6 @@ const userActionProxy = createProxyMiddleware({
     onProxyReq: fixRequestBody,
     changeOrigin: true,
 });
-
 app.use(USER_ACTION_PATH, isAuthorized, userActionProxy);
 app.use(CLOSEST_EVENT_PATH, isAuthorized, userActionProxy);
 

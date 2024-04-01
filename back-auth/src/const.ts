@@ -13,8 +13,9 @@ export const USER_ACTION_API_URL = process.env.USER_ACTION_API_URL;
 export const LOGIN_PATH = "/api/login";
 export const LOGOUT_PATH = "/api/logout";
 export const SIGNUP_PATH = "/api/signup";
-export const USERNAME_PATH = "/api/username";
 export const USERINFO_PATH = "/api/userinfo";
+export const PERMISSION_PATH = "/api/permission";
+
 export const USER_ACTION_PATH = '/api/user_actions';
 export const CLOSEST_EVENT_PATH = '/api/closest_event';
 

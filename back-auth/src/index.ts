@@ -9,6 +9,7 @@ import {
     loginRoute,
     logoutRoute,
     signupRoute,
+    updatePrivilegesRoute,
     userInfoRoute,
 } from './routes.js';
 
@@ -20,6 +21,7 @@ import {
     EVENT_PATH,
     LOGIN_PATH,
     LOGOUT_PATH,
+    PERMISSION_PATH,
     SIGNUP_PATH,
     TICKET_API_URL,
     TICKET_PATH,
@@ -94,6 +96,7 @@ app.use(CLOSEST_EVENT_PATH, isAuthorized, userActionProxy);
 app.post(LOGIN_PATH, loginRoute);
 app.post(LOGOUT_PATH, logoutRoute);
 app.post(SIGNUP_PATH, signupRoute);
+app.put(PERMISSION_PATH, isAuthorized, updatePrivilegesRoute);
 
 // utility route
 app.get(USERINFO_PATH, isAuthorized, userInfoRoute);

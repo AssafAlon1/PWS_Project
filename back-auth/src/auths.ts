@@ -47,6 +47,10 @@ const getRequiredRole = (req: Request): UserRole => {
     return UserRole["Guest"];
   }
 
+  if (url.match(/^\/api\/permission$/) && req.method === "PUT") { // update user role
+    return UserRole["Admin"];
+  }
+
   // |==================|
   // | Paths for Events |
   // |==================|
@@ -67,12 +71,12 @@ const getRequiredRole = (req: Request): UserRole => {
     return UserRole["Worker"];
   }
 
-  if (url.match(/^\/api\/event\/[^\/]+$/)) { 
-    if(req.method === "GET") { // get event by id - regular user
+  if (url.match(/^\/api\/event\/[^\/]+$/)) {
+    if (req.method === "GET") { // get event by id - regular user
       return UserRole["Guest"];
     }
     // TODO - needs implementation!
-    if(req.method === "PUT") { // update event start time
+    if (req.method === "PUT") { // update event start time
       return UserRole["Manager"];
     }
   }
@@ -94,20 +98,20 @@ const getRequiredRole = (req: Request): UserRole => {
   // if (url.match(/^\/api\/tickets$/) && req.method === "POST") { // create all tickets as part of creating an event
   //   return UserRole["manager"];
   // }
-  
+
   // |====================|
   // | Paths for Comments |
   // |====================|
   if (url.match(/^\/api\/comment(\/[^\/]+)?$/) && ["GET", "POST"].includes(req.method)) { // get && post comments for event
     return UserRole["Guest"];
   }
-  
+
   // |========================|
   // | Paths for User Actions |
   // |========================|
 
-// app.get(`${ACTIONS_PATH}/:purchase_id`, getUserActionByPurchaseId)
-// app.get(CLOSEST_EVENT_PATH, getClosestEvent);
+  // app.get(`${ACTIONS_PATH}/:purchase_id`, getUserActionByPurchaseId)
+  // app.get(CLOSEST_EVENT_PATH, getClosestEvent);
 
   if (url.match(/^\/api\/user_actions$/) && ["GET", "PUT"].includes(req.method)) { // get && put user actions
     return UserRole["Guest"];
@@ -126,7 +130,7 @@ const getRequiredRole = (req: Request): UserRole => {
   if (url.match(/^\/api\/permission$/)) { // update user role
     return UserRole["Admin"];
   }
-  
+
   // Shouldn't get here, require highest role.
   console.log(" > Haven't entered a SINGLE if statement...");
   return UserRole["Admin"];

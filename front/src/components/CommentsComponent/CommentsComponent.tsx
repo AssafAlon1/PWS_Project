@@ -19,7 +19,7 @@ const CommentsComponent: React.FC<CommentsComponentProps> = ({ eventId }) => {
     const [comments, setComments] = useState<Comment[] | null>(null);
     const [failedFetchingComments, setFailedFetchingComments] = useState<boolean>(false);
 
-    const [hasMore, setHasMore] = useState<boolean>(true);
+    const [hasMore, setHasMore] = useState<boolean>(false);
     const [displayError, setDisplayError] = useState<boolean>(false);
 
     const navigate = useNavigate();
@@ -45,8 +45,8 @@ const CommentsComponent: React.FC<CommentsComponentProps> = ({ eventId }) => {
             setFailedFetchingComments(true);
             fetchedComments = [];
         }
-        if (fetchedComments.length < MAX_COMMENTS) {
-            setHasMore(false);
+        if (fetchedComments.length == MAX_COMMENTS) {
+            setHasMore(true);
         }
         setComments(fetchedComments);
     }

@@ -75,7 +75,6 @@ const getRequiredRole = (req: Request): UserRole => {
     if (req.method === "GET") { // get event by id - regular user
       return UserRole["Guest"];
     }
-    // TODO - needs implementation!
     if (req.method === "PUT") { // update event start time
       return UserRole["Manager"];
     }
@@ -126,7 +125,6 @@ const getRequiredRole = (req: Request): UserRole => {
     return UserRole["Guest"];
   }
 
-  // TODO - add this route!
   if (url.match(/^\/api\/permission$/)) { // update user role
     return UserRole["Admin"];
   }

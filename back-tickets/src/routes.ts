@@ -1,8 +1,7 @@
-import mongoose from "mongoose";
 import { Request, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
 
-import { insertTicket, insertTickets, queryAllTicketsByEventID, queryAvailableTicketsByEventID, queryCheapestTicketsByEventID, queryTicketByName, updateTicketAmount } from "./db.js";
+import { insertTickets, queryAllTicketsByEventID, queryAvailableTicketsByEventID, queryCheapestTicketsByEventID, queryTicketByName, updateTicketAmount } from "./db.js";
 import { ICSTicket, ticketSchema } from "./models/CSTicket.js";
 import { MAX_TICKET_LIMIT, ORDER_API_URL } from "./const.js";
 import { PublisherChannel } from "./publisher-channel.js";
@@ -47,41 +46,6 @@ export const getAvailableTicketsByEventId = async (req: Request, res: Response) 
     res.status(StatusCodes.OK).send(data);
 }
 
-// TODO - Remove?
-// export const createTicket = async (req: Request, res: Response) => {
-//     console.log("POST /api/ticket");
-//     try {
-//         const postData = req.body as ICSTicket;
-//         postData.available = postData.total; // Added
-
-//         if (postData._id) {
-//             throw Error("_id is an automatically generated field.");
-//         }
-
-//         // Validate the ticket data
-//         const { value, error } = ticketSchema.validate(postData, { abortEarly: false, allowUnknown: true, presence: 'required' });
-
-//         if (error) {
-//             throw Error("Bad Request.");
-//         }
-
-//         const insertResult = await insertTicket(postData);
-
-//         if (insertResult == StatusCodes.BAD_REQUEST) {
-//             throw Error("Bad Request.")
-//         }
-
-//         if (insertResult == StatusCodes.INTERNAL_SERVER_ERROR) {
-//             res.status(StatusCodes.INTERNAL_SERVER_ERROR).send("Internal server error");
-//             return;
-//         }
-
-//         res.status(StatusCodes.CREATED).send({ ticket_id: insertResult });
-//     }
-//     catch (error) {
-//         res.status(StatusCodes.BAD_REQUEST).send({ message: "Bad Request." });
-//     }
-// }
 
 export const createTickets = async (req: Request, res: Response) => {
     console.log("POST /api/tickets");
@@ -176,7 +140,7 @@ export const purchaseTicket = async (req: Request, res: Response) => {
             // basically if we don't have a cheapest ticket - it means we don't have any tickets left at all.. theoretically, can just NOT sent the message
             if (newCheapestTicket === null) {
                 // TODO - just return?;
-                newCheapestTicket = { eventId: postData.event_id, name: "No tickets available", price: 0, total: 0};
+                newCheapestTicket = { eventId: postData.event_id, name: "No tickets available", price: 0, total: 0 };
             }
             await publisherChannel.sendEvent(JSON.stringify(newCheapestTicket));
         }

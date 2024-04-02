@@ -40,35 +40,6 @@ export const insertTickets = async (ticketData: ICSTicket[]): Promise<number> =>
   }
 }
 
-// TODO - legacy - maybe remove
-export const insertTicket = async (ticketData: ICSTicket): Promise<string | number> => {
-  const newTicket = new CSTicket(ticketData);
-  try {
-    await newTicket.validate();
-  }
-  catch (err) {
-    return StatusCodes.BAD_REQUEST;
-  }
-
-  try {
-    await newTicket.save();
-    return newTicket._id.toString();
-  }
-  catch (err) {
-    return StatusCodes.INTERNAL_SERVER_ERROR;
-  }
-}
-
-// TODO - legacy - maybe remove
-export const updateTicket = async (ticketData: ICSTicket): Promise<number> => {
-  try {
-    await CSTicket.updateOne({ _id: ticketData._id }, ticketData).exec();
-    return StatusCodes.OK;
-  }
-  catch (err) {
-    return StatusCodes.INTERNAL_SERVER_ERROR;
-  }
-}
 
 // Will be used for buying and refunding tickets
 export const updateTicketAmount = async (ticketId: string, increaseAmount: number): Promise<number> => {

@@ -16,3 +16,13 @@ export const hasPermission = async (username: string, requiredRole: UserRole): P
   console.log(" > User role: " + userRole);
   return userRole <= requiredRole;
 }
+
+export const updateRole = async (username: string, newRole: UserRole): Promise<boolean> => {
+  try {
+    await User.updateOne({ username }, { role: newRole });
+    return true;
+  } catch (error) {
+    console.error("Error updating role for " + username);
+    return false;
+  }
+}

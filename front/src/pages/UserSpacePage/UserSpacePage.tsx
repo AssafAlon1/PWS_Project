@@ -14,7 +14,7 @@ const UserSpacePage: React.FC = () => {
   const [userActions, setUserActions] = useState<UserAction[]>([]);
   const [userEvents, setUserEvents] = useState<(CSEvent | null)[]>([]);
   const [isLoading, setLoading] = useState<boolean>(false);
-  const [hasMore, setHasMore] = useState<boolean>(true);
+  const [hasMore, setHasMore] = useState<boolean>(false);
   const [displayErrorLoadMore, setDisplayErrorLoadMore] = useState<boolean>(false);
   const [errorText, setErrorText] = useState<string>("");
 
@@ -49,8 +49,7 @@ const UserSpacePage: React.FC = () => {
   const updateActions = async () => {
     setLoading(true);
     if (!username) {
-      // TODO - suggest refresh or something?
-      console.log("!!NO USER");
+      setErrorText("No user found");
       setLoading(false);
       return;
     }
@@ -60,8 +59,6 @@ const UserSpacePage: React.FC = () => {
     await new Promise(resolve => setTimeout(resolve, 500));
     try {
       fetchedActions = await UserActionApi.getUserActions(username, 0, MAX_ACTIONS) ?? [];
-      // TODO - seprate try?
-      fetchedEvents = await Promise.all(fetchedActions.map(action => EventApi.fetchEvent(action.event_id)));
     }
     catch (err) {
       console.error(`Failed to fetch actions for user ${username}`);
@@ -69,8 +66,18 @@ const UserSpacePage: React.FC = () => {
       fetchedActions = [];
       fetchedEvents = [];
     }
-    if (fetchedActions.length < MAX_ACTIONS) {
-      setHasMore(false);
+
+    try {
+      fetchedEvents = await Promise.all(fetchedActions.map(action => EventApi.fetchEvent(action.event_id)));
+    }
+    catch (err) {
+      console.error("Failed to fetch events for actions.");
+      setErrorText("Failed to fetch events for actions.")
+      fetchedEvents = fetchedActions.map(() => null);
+    }
+
+    if (fetchedActions.length == MAX_ACTIONS) {
+      setHasMore(true);
     }
     setUserActions(fetchedActions);
     setUserEvents(fetchedEvents);
@@ -78,7 +85,7 @@ const UserSpacePage: React.FC = () => {
   }
 
   const ErrorFetchingActions = () => {
-    if (errorText) {
+    if (errorText === "Failed to fetch actions.") {
       return (
         <Card>
           <Card.Body>
@@ -92,7 +99,7 @@ const UserSpacePage: React.FC = () => {
   }
 
   const UserActions = () => {
-    if (errorText) {
+    if (errorText === "Failed to fetch actions.") {
       return <Alert variant="danger">{errorText}</Alert>;
     }
 
@@ -105,9 +112,9 @@ const UserSpacePage: React.FC = () => {
         const csevent = userEvents[index];
         return (
           <ActionDetails
-          key={action.purchase_id}
-          action={action}
-          csevent={csevent}
+            key={action.purchase_id}
+            action={action}
+            csevent={csevent}
           />
         );
       });
@@ -132,6 +139,7 @@ const UserSpacePage: React.FC = () => {
       >
         {actionsArray}
       </InfiniteScroll>
+      <Alert show={errorText == "Failed to fetch events for actions."} variant="danger">{errorText}</Alert>
       <Alert show={displayErrorLoadMore} variant="danger" onClose={() => setDisplayErrorLoadMore(false)} dismissible>
         <Alert.Heading>Failed to user :(</Alert.Heading>
         <p>

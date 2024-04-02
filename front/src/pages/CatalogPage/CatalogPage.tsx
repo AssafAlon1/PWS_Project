@@ -16,7 +16,7 @@ const CatalogPage: React.FC = () => {
 
   const [events, setEvents] = useState<CSEvent[]>([]);
   const [isLoading, setLoading] = useState<boolean>(true);
-  const [hasMore, setHasMore] = useState<boolean>(true);
+  const [hasMore, setHasMore] = useState<boolean>(false);
   const [displayError, setDisplayError] = useState<boolean>(false);
 
   const navigate = useNavigate();
@@ -29,10 +29,10 @@ const CatalogPage: React.FC = () => {
     try {
       await new Promise(resolve => setTimeout(resolve, 1000)); // TODO - Remove
       let newEvents: CSEvent[] = [];
-      if(context.isBackOffice && context.role <= UserRole.Worker){
+      if (context.isBackOffice && context.role <= UserRole.Worker) {
         newEvents = await EventApi.fetchAllEvents(events.length, MAX_EVENTS_IN_PAGE);
       }
-      else{
+      else {
         newEvents = await EventApi.fetchEvents(events.length, MAX_EVENTS_IN_PAGE);
       }
       if (newEvents.length < MAX_EVENTS_IN_PAGE) {
@@ -85,19 +85,21 @@ const CatalogPage: React.FC = () => {
     );
   }
 
+  // On initial load, fetch the first events.
+  // Next events are fetched via`fetchMoreData` if hasMore is set to `true` (only if the number of fetched event is equal to the limit provided)
   useEffect(() => {
     const updateEvents = async () => {
       try {
         let fetchedEvents: CSEvent[] = [];
-        if(context.isBackOffice && context.role <= UserRole.Worker){
+        if (context.isBackOffice && context.role <= UserRole.Worker) {
           fetchedEvents = await EventApi.fetchAllEvents(0, MAX_EVENTS_IN_PAGE);
         }
-        else{
+        else {
           fetchedEvents = await EventApi.fetchEvents(0, MAX_EVENTS_IN_PAGE);
         }
         setEvents(fetchedEvents);
-        if (fetchedEvents.length < MAX_EVENTS_IN_PAGE) {
-          setHasMore(false);
+        if (fetchedEvents.length == MAX_EVENTS_IN_PAGE) {
+          setHasMore(true);
         }
         // TODO - Maybe 401 handling?
       }

@@ -73,8 +73,7 @@ const getRequiredRole = (req: Request): UserRole => {
     if (req.method === "GET") { // get event by id - regular user
       return UserRole["Guest"];
     }
-    // TODO - needs implementation!
-    if(req.method === "PUT") { // update event start time
+    if (req.method === "PUT") { // update event start time
       return UserRole["Manager"];
     }
   }
@@ -100,7 +99,7 @@ const getRequiredRole = (req: Request): UserRole => {
   // if (url.match(/^\/api\/tickets$/) && req.method === "POST") { // create all tickets as part of creating an event
   //   return UserRole["manager"];
   // }
-  
+
   // |====================|
   // | Paths for Comments |
   // |====================|
@@ -108,7 +107,7 @@ const getRequiredRole = (req: Request): UserRole => {
   if (url.match(/^\/api\/comment(\/[^\/]+)?$/) && ["GET", "POST"].includes(req.method)) { // get && post comments for event
     return UserRole["Guest"];
   }
-  
+
   // |========================|
   // | Paths for User Actions |
   // |========================|
@@ -125,7 +124,7 @@ const getRequiredRole = (req: Request): UserRole => {
   if (url.match(/^\/api\/permission$/)) { // update user role
     return UserRole["Admin"];
   }
-  
+
   // Shouldn't get here, require highest role.
   console.log(" > Haven't entered a SINGLE if statement...");
   return UserRole["Admin"];

@@ -12,10 +12,11 @@ interface PaymentFormProps {
 }
 
 const PaymentForm: React.FC<PaymentFormProps> = ({ purchaseTickets, isLoading, setPaymentDetails, price }) => {
-
+    const currentYear = new Date().getFullYear() % 100; // Mod to discard the first two digits
+    const currentMonth = new Date().getMonth() + 1;
     const [isFormValidated, setFormValidated] = useState<boolean>(false);
-    const [year, setYear] = useState<number>(0);
-    const [month, setMonth] = useState<number>(0);
+    const [year, setYear] = useState<number>(currentYear);
+    const [month, setMonth] = useState<number>(currentMonth);
     const [cardholderName, setCardholderName] = useState<string>('');
     const [cvv, setCvv] = useState<string>('');
     const [creditCardNumber, setCreditCardNumber] = useState<string>('');
@@ -48,18 +49,18 @@ const PaymentForm: React.FC<PaymentFormProps> = ({ purchaseTickets, isLoading, s
     }
 
     const YearOptions = () => {
-        const currentYear = new Date().getFullYear() % 100; // Mod to discard the first two digits
+        // Current year initialized in the parent component
         const years = Array.from(new Array(10), (_, index) => currentYear + index);
         return years.map((year, index) => <option key={index}>{year}</option>);
     }
 
     const MonthOptions = () => {
+        // Current month initialized in the parent component
         const months = Array.from(new Array(12), (_, index) => index + 1);
         return months.map((month, index) => <option key={index} value={month}>{month < 10 ? "0" : ""}{month}</option>);
     }
 
     const isFutureDate = (year: number, month: number) => {
-        const currentYear = new Date().getFullYear() % 100;
         const currentMonth = new Date().getMonth() + 1;
         return year > currentYear || month >= currentMonth; // No need to make sure year == currentYear since the year dropdown only shows future years
     }

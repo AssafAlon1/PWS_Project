@@ -69,8 +69,10 @@ const EventDetails: React.FC = () => {
         try {
             if (authContext.isBackOffice) {
                 fetchedTickets = await TicketApi.fetchBackOfficeTickets(eventId) ?? [];
+                console.log("Fetched backoffice tickets: ", fetchedTickets);
             } else {
                 fetchedTickets = await TicketApi.fetchTickets(eventId) ?? [];
+                console.log("Fetched regular tickets: ", fetchedTickets);
             }
             if (!fetchedTickets) {
                 throw new Error(`Failed to fetch tickets for event ${eventId}`);
@@ -181,7 +183,7 @@ const EventDetails: React.FC = () => {
         </Card>
     }
 
-    const BuyTicketComponent: React.FC<{ name: string, price: number, amountLeft: number }> = ({ name, price, amountLeft }) => {
+    const BuyTicketComponent: React.FC<{ name: string, price: number, amountLeft: number, locked: number }> = ({ name, price, amountLeft, locked }) => {
         const [ticketAmount, setTicketAmount] = useState<number>(0);
         const [errorMessage, setErrorMessage] = useState<string>("");
         // IMPORTANT TODO - The setErrorMessage isn't working, as observed by the debug `console.log`
@@ -223,6 +225,7 @@ const EventDetails: React.FC = () => {
                 <Card.Body>
                     <Card.Text>Price: <b>${price}</b></Card.Text>
                     <Card.Text><b>{amountLeft}</b> tickets left!</Card.Text>
+                    {locked ? <Card.Text>({locked} { locked === 1 ? "is" : "are"} saved for others)</Card.Text> : null}
                     <Card.Text>{amountLeft <= 0 ? "SOLD OUT!" : "Choose amount of tickets:"}</Card.Text>
                     <div className="direction-row">
                         <input disabled={amountLeft <= 0} className="tickets-amount" type="number" value={ticketAmount} onChange={(event) => setTicketAmount(Number(event.target.value))} />
@@ -284,7 +287,8 @@ const EventDetails: React.FC = () => {
                     key={index}
                     name={ticket.name}
                     price={ticket.price}
-                    amountLeft={ticket.available} />
+                    amountLeft={ticket.available} 
+                    locked={ticket.locked_amount ? ticket.locked_amount : 0}/>
             });
         }
 

@@ -61,7 +61,7 @@ export const getEventById = async (req: Request, res: Response) => {
     return;
   }
 
-  if (!req.keepSensitiveInfo) {
+  if (!req.keepSensitiveInfo && data.comment_count) {
     delete data.comment_count;
   }
 
@@ -126,9 +126,9 @@ export const createEvent = async (req: Request, res: Response) => {
   }
   catch (error) {
     console.error("Error inserting tickets for event: ", insertResult + ". Deleting event...");
-    console.error(error.response.data);
     deleteEventByID(insertResult); // Cleanup event if ticket insertion fails
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).send("Internal server error");
+    console.error(error);
     return;
   }
 };

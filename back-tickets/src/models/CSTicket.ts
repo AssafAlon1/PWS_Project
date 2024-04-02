@@ -36,7 +36,7 @@ export const ticketSchema = Joi.object({
     available: Joi.number().integer().min(0),
     total: Joi.number().integer().min(0).required(),
     price: Joi.number().min(0).required(),
-    locked: Joi.array().items(lockSchema).required().default([]),
+    locked: Joi.array().items(lockSchema).default([]),
 });
 
 export type ICSTicket = InferSchemaType<typeof mongooseTicketSchema>;

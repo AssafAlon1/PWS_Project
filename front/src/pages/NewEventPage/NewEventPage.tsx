@@ -17,20 +17,21 @@ interface NewTicket {
 }
 
 const NewEventPage: React.FC = () => {
+    const tomorrowDate = new Date(new Date().getTime() + 24 * 60 * 60 * 1000);
     const [isFormValidated, setFormValidated] = useState<boolean>(false);
     const [displayError, setDisplayError] = useState<string>("");
     
     const [eventName, setEventName] = useState<string>("");
-    const [catagory, setCatagory] = useState<string>("");
+    const [catagory, setCatagory] = useState<string>(VALID_CATEGORIES[0]);
     const [description, setDescription] = useState<string>("");
     const [location, setLocation] = useState<string>("");
     const [orginaizer, setOrginaizer] = useState<string>("");
     const [imageURL, setImageURL] = useState<string>("");
 
-    const [startDate, setStartDate] = useState<string>(new Date().toISOString().split('T')[0]);
-    const [endDate, setEndDate] = useState<string>(new Date().toISOString().split('T')[0]);
-    const [startTime, setStartTime] = useState<string>(new Date().toTimeString().split(' ')[0].substring(0, 5));
-    const [endTime, setEndTime] = useState<string>(new Date().toTimeString().split(' ')[0].substring(0, 5));
+    const [startDate, setStartDate] = useState<string>(tomorrowDate.toISOString().split('T')[0]);
+    const [endDate, setEndDate] = useState<string>(tomorrowDate.toISOString().split('T')[0]);
+    const [startTime, setStartTime] = useState<string>("09:00");
+    const [endTime, setEndTime] = useState<string>("17:00");
     const [tickets, setTickets] = useState<NewTicket[]>([]);
 
     const navigate = useNavigate();
@@ -247,7 +248,7 @@ const NewEventPage: React.FC = () => {
                                     required
                                     type="text"
                                     placeholder="Enter event name"
-                                    pattern="^[a-zA-Z\s\-0-9]+$"
+                                    pattern="^[a-zA-Z\s\-0-9']+$"
                                     value={eventName}
                                     onChange={handleEventNameChange}
                                 />
@@ -271,7 +272,7 @@ const NewEventPage: React.FC = () => {
                             <FloatingLabel label="Event Description">
                                 <Form.Control
                                     required
-                                    pattern='^[a-zA-Z\s\-0-9]+$'
+                                    pattern="^[a-zA-Z\s\-0-9']+$"
                                     as="textarea"
                                     rows={3}
                                     placeholder="Enter event description"
@@ -286,7 +287,7 @@ const NewEventPage: React.FC = () => {
                                 <Form.Control
                                     required
                                     type="text"
-                                    pattern='^[a-zA-Z\s\-0-9]+$'
+                                    pattern="^[a-zA-Z\s\-0-9']+$"
                                     placeholder="Enter event orginaizer"
                                     value={orginaizer}
                                     onChange={handleOrginaizerChange}
@@ -300,7 +301,7 @@ const NewEventPage: React.FC = () => {
                                 <Form.Control
                                     required
                                     type="text"
-                                    pattern='^[a-zA-Z\s\-0-9]+$'
+                                    pattern="^[a-zA-Z\s\-0-9']+$"
                                     placeholder="Enter event location"
                                     value={location}
                                     onChange={handleLocationChange}
@@ -410,7 +411,7 @@ const NewEventPage: React.FC = () => {
                 </Row>
             </Form >             
             
-            <Alert show={displayError !== ""} variant="danger" onClose={() => setDisplayError("")} dismissible>
+            <Alert show={displayError !== ""} variant="danger" onClose={() => setDisplayError("")} dismissible className="mt-2">
                 <Alert.Heading>Something went wrong</Alert.Heading>
                 <p>
                     {displayError}

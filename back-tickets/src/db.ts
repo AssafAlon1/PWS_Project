@@ -11,25 +11,8 @@ const clearExpiredLocks = async (ticketId: string) => {
     session = await startSession();
     session.startTransaction();
 
-    const ticket = await CSTicket.findById(ticketId).exec();
-    
-    // Re-add the locked tivkets to the available amount
-    let count = 0;
-    ticket.locked.forEach(lock => {
-      if(lock.expires < currentDate) {
-        count += lock.quantity;
-      }
-    });
-
-    await CSTicket.updateOne(
-      { _id: ticketId },
-      {
-        $inc: { available: count }
-      }
-    ).exec();
-
-    // Remove all the expired lokes
-    await CSTicket.updateOne(
+    // Remove all the expired locks
+    const oiginalTicket = await CSTicket.findOneAndUpdate(
       { _id: ticketId },
       {
         $pull: {
@@ -39,9 +22,26 @@ const clearExpiredLocks = async (ticketId: string) => {
         }
       }
     ).exec();
+    
+    // Re-add the locked tickets to the available amount
+    let count = 0;
+    oiginalTicket.locked.forEach(lock => {
+      if(lock.expires < currentDate) {
+        count += lock.quantity;
+      }
+    });
+
+    await CSTicket.findOneAndUpdate(
+      { _id: ticketId },
+      {
+        $inc: { available: count }
+      }
+    ).exec();
 
     await session.commitTransaction();
-    console.log(" > Cleared ", count, " ticket held by expired locks with id: ", ticketId);
+    if (count) {
+      console.log(" > Cleared ", count, " tickets held by expired locks with id: ", ticketId);
+    }
   }
   catch (err) {
     console.error("Failed to clear expired locks for ticket with id: ", ticketId);

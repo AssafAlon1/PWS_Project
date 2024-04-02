@@ -5,14 +5,14 @@ dotenv.config();
 export const MAX_QUERY_LIMIT = 50;
 
 export const VALID_CATEGORIES = [
-    "Charity%20Event",
+    "Charity Event",
     "Concert",
     "Conference",
     "Convention",
     "Exhibition",
     "Festival",
-    "Product%20Launch",
-    "Sports%20Event"
+    "Product Launch",
+    "Sports Event"
 ]
 
 export const EVENT_PATH = "/api/event";

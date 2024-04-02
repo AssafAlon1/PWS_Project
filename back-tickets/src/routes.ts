@@ -8,13 +8,16 @@ import { PublisherChannel } from "./publisher-channel.js";
 import { LockInformation, PaymentInformation, paymentInformationSchema } from "./types.js";
 import { purchaseTicketFromLock } from './utilities.js';
 
+interface ICSTicketFlexible extends ICSTicket {
+    locked_amount?: number;
+}
 
 export const getALLTicketsByEventId = async (req: Request, res: Response) => {
     console.log("GET /api/ticket/all");
     const eventId = req.params.eventId;
     const skip = parseInt(req.query.skip as string) || 0;
     const limit = parseInt(req.query.limit as string) || MAX_TICKET_LIMIT;
-    let data;
+    let data: ICSTicketFlexible[];
     try {
         console.log("Gonna fetch tickets for eventId: ", eventId);
         data = await queryAllTicketsByEventID(eventId, skip, limit);
@@ -23,6 +26,17 @@ export const getALLTicketsByEventId = async (req: Request, res: Response) => {
         res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({ message: "Internal Server Error" });
         return;
     }
+
+    if (!req.keepSensitiveInfo) {
+        data.forEach(ticket => {
+            delete ticket.total;
+            ticket.locked_amount = ticket.locked.reduce((acc, lock) => {
+                return acc + lock.quantity;
+            }, 0);
+        });
+    }
+    data.forEach(ticket => {delete ticket.locked});
+
     res.status(StatusCodes.OK).send(data);
 }
 
@@ -52,13 +66,16 @@ export const createTickets = async (req: Request, res: Response) => {
             console.error("No tickets provided.")
             throw Error("No tickets provided.");
         }
-
-        postData.map(ticket => ticket.available = ticket.total);
+        postData.map(ticket => {
+            ticket.available = ticket.total;
+            // ticket.locked = [];
+        });
         // Validate the ticket data
-        const validationResults = postData.map(ticket => ticketSchema.validate(ticket, { abortEarly: false, allowUnknown: true, presence: 'required' }));
+        const validationResults = postData.map(ticket => ticketSchema.validate(ticket, { abortEarly: false, allowUnknown: true }));
         const errors = validationResults.filter(result => result.error);
         if (errors.length > 0) {
             console.error("Ticket schema validation failed");
+            console.log(errors);
             throw Error("Bad Request.");
         }
         const insertResult = await insertTickets(postData);

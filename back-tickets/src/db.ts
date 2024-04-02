@@ -1,7 +1,52 @@
 import CSTicket, { ICSTicket } from "./models/CSTicket.js";
 import { StatusCodes } from 'http-status-codes';
 import { startSession } from 'mongoose';
-import { LOCK_TIME_SECONDS } from "./const.js";
+import { LOCK_TIME_SECONDS, LOCK_GRACE_PERIOD_SECONDS } from "./const.js";
+
+const clearExpiredLocks = async (ticketId: string) => {
+  const currentDate = new Date(new Date().getTime() - 2 * LOCK_GRACE_PERIOD_SECONDS * 1000);
+
+  let session;
+  try {
+    session = await startSession();
+    session.startTransaction();
+
+    const ticket = await CSTicket.findById(ticketId).exec();
+    
+    // Re-add the locked tivkets to the available amount
+    let count = 0;
+    ticket.locked.forEach(lock => {
+      if(lock.expires < currentDate) {
+        count += lock.quantity;
+      }
+    });
+
+    await CSTicket.updateOne(
+      { _id: ticketId },
+      {
+        $inc: { available: count }
+      }
+    ).exec();
+
+    // Remove all the expired lokes
+    await CSTicket.updateOne(
+      { _id: ticketId },
+      {
+        $pull: {
+          locked: {
+            expires: { $lte: currentDate }
+          }
+        }
+      }
+    ).exec();
+
+    await session.commitTransaction();
+    console.log(" > Cleared ", count, " ticket held by expired locks with id: ", ticketId);
+  }
+  catch (err) {
+    console.error("Failed to clear expired locks for ticket with id: ", ticketId);
+  }
+}
 
 // Adds all tickets in one transaction
 export const insertTickets = async (ticketData: ICSTicket[]): Promise<number> => {
@@ -39,7 +84,6 @@ export const insertTickets = async (ticketData: ICSTicket[]): Promise<number> =>
   }
 }
 
-
 // Will be used for buying and refunding tickets
 export const updateTicketAmount = async (ticketId: string, increaseAmount: number): Promise<number> => {
   try {
@@ -63,14 +107,17 @@ export const updateTicketAmount = async (ticketId: string, increaseAmount: numbe
 }
 
 export const queryAllTicketsByEventID = async (eventId: string, skip: number, limit: number): Promise<ICSTicket[]> => {
-  const tickets = await CSTicket.find({ eventId: eventId }).skip(skip).limit(limit).exec();
+  let tickets = await CSTicket.find({ eventId: eventId }).skip(skip).limit(limit).exec();
+  await Promise.all(tickets.map(async ticket => await clearExpiredLocks(ticket._id.toString())));
+  tickets = await CSTicket.find({ eventId: eventId }).skip(skip).limit(limit).exec(); // Painful, but needed to get the updated data
   return tickets.map(ticket => ticket.toJSON() as ICSTicket);
 }
 
-export const queryAvailableTicketsByEventID = async (eventId: string, skip: number, limit: number): Promise<ICSTicket[]> => {
-  const tickets = await CSTicket.find({ eventId: eventId, available: { $gt: 0 } }).skip(skip).limit(limit).exec();
-  return tickets.map(ticket => ticket.toJSON() as ICSTicket);
-}
+// TODO - legacy - maybe remove
+// // export const queryAvailableTicketsByEventID = async (eventId: string, skip: number, limit: number): Promise<ICSTicket[]> => {
+// //   const tickets = await CSTicket.find({ eventId: eventId, available: { $gt: 0 } }).skip(skip).limit(limit).exec();
+// //   return tickets.map(ticket => ticket.toJSON() as ICSTicket);
+// // }
 
 export const queryTicketByName = async (eventId: string, ticketName: string): Promise<ICSTicket | null> => {
   const ticket = await CSTicket.findOne({ eventId: eventId, name: ticketName }).exec();

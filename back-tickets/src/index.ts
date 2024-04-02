@@ -4,7 +4,7 @@ import dotenv from 'dotenv';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 
-import { createTickets, getALLTicketsByEventId, getAvailableTicketsByEventId, lockTicket, purchaseTicket } from './routes.js';
+import { createTickets, getALLTicketsByEventId, lockTicket, purchaseTicket } from './routes.js';
 import { ALL_TICKET_PATH, TICKET_PATH } from './const.js';
 import { Request, Response, NextFunction } from 'express';
 import { PublisherChannel } from './publisher-channel.js';

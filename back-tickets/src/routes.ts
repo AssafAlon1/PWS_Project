@@ -1,13 +1,12 @@
 import { Request, Response } from 'express';
-import { REQUESTED_RANGE_NOT_SATISFIABLE, StatusCodes } from 'http-status-codes';
+import { StatusCodes } from 'http-status-codes';
 
-import { insertTickets, lockTickets, queryAllTicketsByEventID, queryAvailableTicketsByEventID, queryCheapestTicketsByEventID, queryTicketByName, updateTicketAmount } from "./db.js";
-import { ICSTicket, lockRequestSchema, lockSchema, ticketSchema } from "./models/CSTicket.js";
-import { LOCK_GRACE_PERIOD_SECONDS, MAX_TICKET_LIMIT } from "./const.js";
+import { insertTickets, lockTickets, queryAllTicketsByEventID, queryTicketByName } from "./db.js";
+import { ICSTicket, lockRequestSchema, ticketSchema } from "./models/CSTicket.js";
+import { MAX_TICKET_LIMIT } from "./const.js";
 import { PublisherChannel } from "./publisher-channel.js";
 import { LockInformation, PaymentInformation, paymentInformationSchema } from "./types.js";
 import { purchaseTicketFromLock } from './utilities.js';
-
 
 
 export const getALLTicketsByEventId = async (req: Request, res: Response) => {
@@ -24,26 +23,26 @@ export const getALLTicketsByEventId = async (req: Request, res: Response) => {
         res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({ message: "Internal Server Error" });
         return;
     }
-
     res.status(StatusCodes.OK).send(data);
 }
 
-export const getAvailableTicketsByEventId = async (req: Request, res: Response) => {
-    console.log("GET /api/ticket");
-    const eventId = req.params.eventId;
-    const skip = parseInt(req.query.skip as string) || 0;
-    const limit = parseInt(req.query.limit as string) || MAX_TICKET_LIMIT;
-    let data;
-    try {
-        data = await queryAvailableTicketsByEventID(eventId, skip, limit);
-    }
-    catch (error) {
-        res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({ message: "Internal Server Error" });
-        return;
-    }
+// TODO - legacy - maybe remove
+// export const getAvailableTicketsByEventId = async (req: Request, res: Response) => {
+//     console.log("GET /api/ticket");
+//     const eventId = req.params.eventId;
+//     const skip = parseInt(req.query.skip as string) || 0;
+//     const limit = parseInt(req.query.limit as string) || MAX_TICKET_LIMIT;
+//     let data;
+//     try {
+//         data = await queryAvailableTicketsByEventID(eventId, skip, limit);
+//     }
+//     catch (error) {
+//         res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({ message: "Internal Server Error" });
+//         return;
+//     }
 
-    res.status(StatusCodes.OK).send(data);
-}
+//     res.status(StatusCodes.OK).send(data);
+// }
 
 export const createTickets = async (req: Request, res: Response) => {
     console.log("POST /api/tickets");

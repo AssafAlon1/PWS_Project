@@ -9,7 +9,6 @@ import axios from "axios";
 
 const axiosInstance = axios.create({ withCredentials: true, baseURL: ORDER_API_URL });
 
-// TODO - TYPE THIS!
 export const purchaseTicketFromLock = async (ticket: ICSTicket, paymentInformation: PaymentInformation, publisherChannel: PublisherChannel) => {
     let orderResult;
     if (!ticket._id) {

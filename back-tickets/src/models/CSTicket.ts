@@ -16,7 +16,6 @@ export const lockSchema = Joi.object({
 export const lockRequestSchema = Joi.object({
     username: Joi.string().required(),
     quantity: Joi.number().integer().min(0).required(),
-    expires: Joi.date().required(),
     eventId: Joi.string().required(),
     ticketName: Joi.string().required(),
 });
@@ -28,7 +27,7 @@ const mongooseTicketSchema = new mongoose.Schema({
     available: { type: Number, required: true },
     total: { type: Number, required: true },
     price: { type: Number, required: true },
-    locked: { type: [mongooseLockSchema], required: false, default: []}, // TODO - is dis oki?
+    locked: { type: [mongooseLockSchema], required: true, default: []}, // TODO - is dis oki?
 });
 
 export const ticketSchema = Joi.object({

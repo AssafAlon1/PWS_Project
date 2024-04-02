@@ -1,8 +1,7 @@
 import CSTicket, { ICSTicket } from "./models/CSTicket.js";
 import { StatusCodes } from 'http-status-codes';
 import { startSession } from 'mongoose';
-
-const LOCK_TIME_MINUTES = 2;
+import { LOCK_TIME_SECONDS } from "./const.js";
 
 // Adds all tickets in one transaction
 export const insertTickets = async (ticketData: ICSTicket[]): Promise<number> => {
@@ -58,7 +57,7 @@ export const updateTicketAmount = async (ticketId: string, increaseAmount: numbe
     return StatusCodes.OK;
   }
   catch (err) {
-    console.error("Failed to update ticket amount for ticket with id: ", ticketId + " and purchaseAmount: ", increaseAmount);
+    console.error("Failed to update ticket amount for ticket with id: ", ticketId + " and increaseAmount: ", increaseAmount);
     return StatusCodes.INTERNAL_SERVER_ERROR;
   }
 }
@@ -93,7 +92,7 @@ export const updateRefund = async (event_id: string, ticket_name: string, amount
   return await updateTicketAmount(ticket._id.toString(), amount);
 }
 
-export const lockTickets = async (event_id: string, ticketName: string, quantity: number, username: string): Promise<number> => {
+export const lockTickets = async (event_id: string, ticketName: string, quantity: number, username: string, expires?: Date): Promise<number> => {
   let session;
   try {
     session = await startSession();
@@ -117,14 +116,14 @@ export const lockTickets = async (event_id: string, ticketName: string, quantity
     ).exec();
 
     // Add the tickets to the locked array
-    const lockedExpires = new Date();
+    const lockedExpires = expires ? expires : new Date();
     await CSTicket.updateOne(
       { _id: ticket._id },
       {
         $push: {
           locked: {
             quantity: quantity,
-            expires: lockedExpires.setMinutes(lockedExpires.getMinutes() + LOCK_TIME_MINUTES),
+            expires: lockedExpires.setSeconds(lockedExpires.getSeconds() + LOCK_TIME_SECONDS),
             username: username
           }
         }
@@ -147,4 +146,53 @@ export const lockTickets = async (event_id: string, ticketName: string, quantity
       session.endSession();
     }
   }
+}
+
+export const removeTicketLock = async (ticketId: string, username: string, quantity: number, expires: Date): Promise<number> => {
+  try {
+    await CSTicket.updateOne(
+      { _id: ticketId },
+      {
+        $pull: {
+          locked: {
+            quantity: quantity,
+            expires: expires,
+            username: username
+          }
+        }
+      }
+    ).exec();
+  }
+  catch (err) {
+    console.error("Failed to remove ticket locks for ticket with id: ", ticketId);
+    return StatusCodes.INTERNAL_SERVER_ERROR;
+  }
+  return StatusCodes.OK;
+}
+
+export const addTicketLock = async (ticketId: string, username: string, quantity: number, expires: Date): Promise<number> => {
+  try {
+    await CSTicket.updateOne(
+      { _id: ticketId },
+      {
+        $push: {
+          locked: {
+            quantity: quantity,
+            expires: expires,
+            username: username
+          }
+        }
+      }
+    ).exec();
+  }
+  catch (err) {
+    console.error("Failed to add ticket locks for ticket with id: ", ticketId);
+    return StatusCodes.INTERNAL_SERVER_ERROR;
+  }
+  return StatusCodes.OK;
+}
+
+export const isSoldOut = async (ticketId: string): Promise<boolean> => {
+  const ticket = await CSTicket.findOne({ _id: ticketId, available: { $gt: 0 }}).exec();
+  return !ticket;
 }

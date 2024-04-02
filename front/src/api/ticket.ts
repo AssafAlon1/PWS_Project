@@ -55,7 +55,7 @@ const RealTicketApi = {
             }
             const result = await axiosInstance.put('/api/ticket', putData);
             console.log("Completed purchase");
-            return result.data.order_id
+            return result.data.order_id;
 
         } catch (error) {
             if (isAxiosError(error)) {
@@ -73,10 +73,9 @@ const RealTicketApi = {
                 quantity: ticketAmount,
                 username: username
             }
-            const result = await axiosInstance.put(`/api/ticket/${eventId}`, putData);
+            await axiosInstance.put(`/api/ticket/${eventId}`, putData);
             console.log("Completed lock");
-            return result.data.order_id
-
+            return true;
         } catch (error) {
             if (isAxiosError(error)) {
                 throw new Error("Failed to lock tickets: " + error.response?.data.message); // TODO - Better handling?

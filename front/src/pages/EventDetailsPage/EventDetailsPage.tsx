@@ -2,7 +2,7 @@ import './EventDetailsPage.css';
 
 import React, { useContext, useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Button, Card, Col, Placeholder, Row } from 'react-bootstrap';
+import { Alert, Button, Card, Col, Placeholder, Row } from 'react-bootstrap';
 
 import MissingImage from "../../assets/MissingImage.png"
 import { CSEvent, PurchaseDetails, Ticket } from '../../types';
@@ -183,7 +183,8 @@ const EventDetails: React.FC = () => {
 
     const BuyTicketComponent: React.FC<{ name: string, price: number, amountLeft: number }> = ({ name, price, amountLeft }) => {
         const [ticketAmount, setTicketAmount] = useState<number>(0);
-        const [error, setError] = useState<string>("");
+        const [errorMessage, setErrorMessage] = useState<string>("");
+        // IMPORTANT TODO - The setErrorMessage isn't working, as observed by the debug `console.log`
 
         const ticketPurchaseDetails: PurchaseDetails = {
             event_id: eventId ?? "0",
@@ -194,20 +195,24 @@ const EventDetails: React.FC = () => {
         }
 
         const onClickBuyNow = async () => {
-            setError("");
+            console.log("Buying tickets");
+            setErrorMessage("");
             if (!eventId || !authContext || !authContext.user) {
-                setError("Error: Missing event id or user information");
+                setErrorMessage("Error: Missing event id or user information");
                 return;
             }
-            setPurchaseDetails(ticketPurchaseDetails);
-            const lockRes = await TicketApi.lockTickets(eventId, ticketPurchaseDetails.ticket_name, ticketAmount, authContext.user);
-            if (!lockRes) {
-                //  TODO - handle error  
-                setError("Error: Failed locking ticket");
+            console.log("Set purchase details to: ", ticketPurchaseDetails);
+            console.log("Locking ticket");
+            try {
+                await TicketApi.lockTickets(eventId, ticketPurchaseDetails.ticket_name, ticketAmount, authContext.user);
+                setPurchaseDetails(ticketPurchaseDetails);
+                navigate(CHECKOUT_PATH);
+            }
+            catch (error) {
+                console.error("Failed to lock ticket: ", error);
+                setErrorMessage("Error: Failed to lock ticket");
                 return;
             }
-
-            navigate(CHECKOUT_PATH);
         }
 
         return (
@@ -222,13 +227,15 @@ const EventDetails: React.FC = () => {
                     <div className="direction-row">
                         <input disabled={amountLeft <= 0} className="tickets-amount" type="number" value={ticketAmount} onChange={(event) => setTicketAmount(Number(event.target.value))} />
                         <ButtonWithTooltip
-                            buttonContent={error ? "Error" : "Buy Now!"}
-                            tooltipContent={error ? error : (ticketAmount <= 0 ? "Cannot buy less than 1 ticket" : "Not enough tickets left")}
-                            variant={error ? "danger" : "primary"}
+                            buttonContent={errorMessage ? "Try Again" : "Buy Now!"}
+                            tooltipContent={ticketAmount <= 0 ? "Cannot buy less than 1 ticket" : "Not enough tickets left"}
                             isDisabled={ticketAmount <= 0 || ticketAmount > amountLeft}
                             buttonOnClick={onClickBuyNow}
                         />
                     </div>
+                    <Alert variant="danger" show={errorMessage !== ""} onClose={ () => setErrorMessage("")} dismissible>
+                        Oopsie woopsie!
+                    </Alert>
                 </Card.Body>
             </Card>
         );

@@ -45,7 +45,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({ purchaseTickets, isLoading, s
         catch {
             // TODO - HANDLE THIS RIGHT (show an error in the page probably. Maybe a toast?)
             setFormValidated(true);
-        }
+        } 
     }
 
     const YearOptions = () => {

@@ -3,7 +3,7 @@ import axios, { isAxiosError } from "axios";
 import { PaymentDetails, PurchaseDetails, Ticket } from "../types";
 import { API_GATEWAY_URL } from "../const";
 
-const axiosInstance = axios.create({ withCredentials: true, baseURL: API_GATEWAY_URL }); // TODO - withCredentials?
+const axiosInstance = axios.create({ withCredentials: true, baseURL: API_GATEWAY_URL }); 
 
 // TODO - rename to TicketApi
 const RealTicketApi = {

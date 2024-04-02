@@ -5,7 +5,7 @@ import bcrypt from 'bcrypt';
 import User from './models/user.js';
 import { StatusCodes } from "http-status-codes";
 import { UserRole } from './const.js';
-import { queryUserRole } from './db.js';
+import { queryUserRole, updateRole } from './db.js';
 
 
 
@@ -86,7 +86,7 @@ export async function userInfoRoute(req: Request, res: Response) {
     res.status(StatusCodes.UNAUTHORIZED).send('Not logged in');
     return;
   }
-  
+
   let username;
   let role = UserRole.Guest;
   try {
@@ -100,4 +100,46 @@ export async function userInfoRoute(req: Request, res: Response) {
   }
 
   res.status(StatusCodes.OK).send({ username, role });
+}
+
+
+export const updatePrivilegesRoute = async (req: Request, res: Response) => {
+  // Token validation and permission checking for the user initiating this request is done in isAuthorized middleware
+
+  const updatePermissionRequest = req.body as { username: string, permission: string };
+
+  // TODO - Consider JOI (not important...)
+  if (!updatePermissionRequest ||
+    !updatePermissionRequest.username ||
+    !updatePermissionRequest.permission ||
+    (updatePermissionRequest.permission !== "W" && updatePermissionRequest.permission !== "M")) {
+    res.status(StatusCodes.BAD_REQUEST).send('Bad request');
+    return;
+  }
+
+  const currentRole = await queryUserRole(updatePermissionRequest.username);
+  if (currentRole === UserRole.Admin) {
+    res.status(StatusCodes.BAD_REQUEST).send('Cannot change admin permission');
+    return;
+  }
+
+  if (currentRole === UserRole.Unauthenticated) {
+    res.status(StatusCodes.NOT_FOUND).send('User not found');
+    return;
+  }
+
+  try {
+    const role = updatePermissionRequest.permission === "M" ? UserRole.Manager : UserRole.Worker;
+    const updateResult = updateRole(updatePermissionRequest.username, role);
+    if (!updateResult) {
+      throw new Error("Failed to update permission.")
+    }
+
+    res.status(StatusCodes.OK).send('Updated permission');
+    return;
+  }
+  catch (error) {
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).send('Internal server error');
+    return;
+  }
 }

@@ -8,33 +8,6 @@ import axios from 'axios';
 
 const axiosInstance = axios.create({ withCredentials: true, baseURL: ORDER_API_URL });
 
-// TODO - convert to rabbit
-export const buyTickets = async (req: Request, res: Response) => {
-    console.log("POST " + ACTIONS_PATH);
-    try {
-        const postData = req.body as { username: string, event_id: string, purchase_time: Date, ticket_name: string, ticket_amount: number, purchase_id: string };
-        if (!postData.username || !postData.event_id || !postData.purchase_time || !postData.ticket_name || !postData.ticket_amount || !postData.purchase_id) {
-            console.error("Missing required fields.")
-            throw Error("Missing required fields.");
-        }
-
-        if (await hasEventStarted(postData.event_id)) {
-            console.error("Event has already started.");
-            return res.status(StatusCodes.BAD_REQUEST).send({ message: "Event has already started." });
-        }
-
-        // TODO - buy tickets with the order service
-
-        // irl, we would've checked for failure here.
-        // in practice, we don't have much to do if this fails =/
-        await addBuyTicketsAction(postData);
-
-        res.status(StatusCodes.CREATED).send({ message: "Tickets purchased." });
-    }
-    catch (error) {
-        res.status(StatusCodes.BAD_REQUEST).send({ message: "Bad Request." });
-    }
-}
 
 // TODO - verify (not necessarily here, but not in the front end)
 //        that the user that bought the tickets is the one asking to refund them

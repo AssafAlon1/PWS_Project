@@ -7,6 +7,9 @@ import TicketApi from '../../api/ticket';
 import { AuthContext } from '../../components/AuthProvider/AuthProvider';
 import { PaymentDetails } from '../../types';
 import { ERROR_PATH, SUCCESS_PATH } from '../../paths';
+import { CountdownCircleTimer } from 'react-countdown-circle-timer'
+import { LOCK_TIME_SECONDS } from '../../const';
+import "./CheckoutPage.css";
 
 const CheckoutPage: React.FC = () => {
     const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -54,8 +57,10 @@ const CheckoutPage: React.FC = () => {
                 throw new Error("No user found");
             }
             const result = await TicketApi.purchaseTickets(purchaseDetails, paymentDetails, username);
+            console.log("Result of purchaseTickets: ", result);
             if (result) {
                 setPurchaseId(result);
+                console.log("Purchase ID: ", result);
             }
         }
         catch (err) {
@@ -70,6 +75,7 @@ const CheckoutPage: React.FC = () => {
 
 
     const afterPurchaseRedirect = () => {
+        console.log(" >> After purchase redirect");
         if (context.updateNextEvent) {
             context.updateNextEvent();
         }
@@ -88,6 +94,42 @@ const CheckoutPage: React.FC = () => {
             }
         });
     }
+
+
+    const renderTime = ({ remainingTime }: { remainingTime: number }) => {
+        if (remainingTime === 0) {
+            return <div className="timer">Ticket no longer guaranteed :(</div>;
+        }
+
+        return (
+            <div className="timer">
+                <div className="text">Remaining</div>
+                <div className="value">{remainingTime}</div>
+                <div className="text">seconds</div>
+            </div>
+        );
+    };
+
+    const LockCountDownComponent = () => (
+        <Card className="mt-4">
+            <Card.Header>
+                <Card.Title>Ticket is saved for you for {LOCK_TIME_SECONDS/60} minutes</Card.Title>
+            </Card.Header>
+            <Card.Body className="timer-wrapper">
+                    <CountdownCircleTimer 
+                        isPlaying
+                        duration={LOCK_TIME_SECONDS}
+                        colors={['#004777', '#F7B801', '#A30000', '#A30000']}
+                        colorsTime={[LOCK_TIME_SECONDS, (LOCK_TIME_SECONDS / 3) * 2, (LOCK_TIME_SECONDS / 3), 0]}
+                        size={170}
+                        strokeWidth={12}
+                        trailColor="#d6d6d6"
+                    >
+                        {renderTime}
+                    </CountdownCircleTimer>
+            </Card.Body>
+        </Card>
+    )
 
     const price = (purchaseDetails?.price ?? 0) * (purchaseDetails?.ticket_amount ?? 0);
 
@@ -108,9 +150,12 @@ const CheckoutPage: React.FC = () => {
 
     useEffect(() => {
         if (purchaseId) {
+            console.log("Purchase ID: ", purchaseId);
+            console.log("IT'S REDIRECT TIME =D");
             afterPurchaseRedirect();
         }
-    }, [purchaseId, afterPurchaseRedirect]);
+        console.log("no purchase ID...");
+    }, [purchaseId]);
 
 
     return (
@@ -126,8 +171,10 @@ const CheckoutPage: React.FC = () => {
                 </Col>
                 <Col>
                     <OrderSummaryComponent />
+                    <LockCountDownComponent />
                 </Col>
             </Row>
+            {/* TODO - INDICATION IF TICKETS RAN OUT */}
             <Alert show={displayError} variant="danger" onClose={() => setDisplayError(false)} dismissible>
                 <Alert.Heading>Failed to purchase tickets</Alert.Heading>
                 <p>

@@ -4,7 +4,7 @@ import dotenv from 'dotenv';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 
-import { createTickets, getALLTicketsByEventId, getAvailableTicketsByEventId, purchaseTicket } from './routes.js';
+import { createTickets, getALLTicketsByEventId, lockTicket, purchaseTicket } from './routes.js';
 import { ALL_TICKET_PATH, TICKET_PATH } from './const.js';
 import { Request, Response, NextFunction } from 'express';
 import { PublisherChannel } from './publisher-channel.js';
@@ -54,8 +54,9 @@ function attachPublisherChannel(req: Request, res: Response, next: NextFunction)
   req.publisherChannel = publisherChannel;
   next();
 }
-
 app.put(TICKET_PATH, attachPublisherChannel, purchaseTicket);
+
+app.put(`${TICKET_PATH}/:eventId`, lockTicket);
 
 
 app.listen(port, () => {

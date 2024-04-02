@@ -3,7 +3,7 @@ import axios, { isAxiosError } from "axios";
 import { PaymentDetails, PurchaseDetails, Ticket } from "../types";
 import { API_GATEWAY_URL } from "../const";
 
-const axiosInstance = axios.create({ withCredentials: true, baseURL: API_GATEWAY_URL }); // TODO - withCredentials?
+const axiosInstance = axios.create({ withCredentials: true, baseURL: API_GATEWAY_URL }); 
 
 // TODO - rename to TicketApi
 const RealTicketApi = {
@@ -55,13 +55,32 @@ const RealTicketApi = {
             }
             const result = await axiosInstance.put('/api/ticket', putData);
             console.log("Completed purchase");
-            return result.data.order_id
+            return result.data.order_id;
 
         } catch (error) {
             if (isAxiosError(error)) {
                 throw new Error("Failed to purchase tickets: " + error.response?.data.message); // TODO - Better handling?
             }
             throw new Error("Failed to purchase tickets"); // TODO - Better handling?
+        }
+    },
+
+    lockTickets: async (eventId: string, ticketName: string, ticketAmount: number, username: string) => {
+        try {
+            const putData = {
+                eventId: eventId,
+                ticketName: ticketName,
+                quantity: ticketAmount,
+                username: username
+            }
+            await axiosInstance.put(`/api/ticket/${eventId}`, putData);
+            console.log("Completed lock");
+            return true;
+        } catch (error) {
+            if (isAxiosError(error)) {
+                throw new Error("Failed to lock tickets: " + error.response?.data.message); // TODO - Better handling?
+            }
+            throw new Error("Failed to lock tickets"); // TODO - Better handling?
         }
     },
 }

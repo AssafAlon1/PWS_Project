@@ -38,7 +38,7 @@ const CatalogPage: React.FC = () => {
       if (newEvents.length < MAX_EVENTS_IN_PAGE) {
         setHasMore(false);
       }
-      setEvents(prevEvents => [...prevEvents, ...newEvents]);
+      setEvents(prevEvents => [...prevEvents, ...newEvents]); // TODO - protect agains double insertion
     } catch {
       setDisplayError(true);
       setHasMore(false);

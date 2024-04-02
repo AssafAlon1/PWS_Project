@@ -43,10 +43,10 @@ const getRequiredRole = (req: Request): UserRole => {
   // |================|
   // | Paths for Auth |
   // |================|
+
   if (url.match(/^\/api\/userinfo$/) && req.method === "GET") { // get user info
     return UserRole["Guest"];
   }
-
   if (url.match(/^\/api\/permission$/) && req.method === "PUT") { // update user role
     return UserRole["Admin"];
   }
@@ -54,6 +54,7 @@ const getRequiredRole = (req: Request): UserRole => {
   // |==================|
   // | Paths for Events |
   // |==================|
+
   if (url.match(/^\/api\/event$/)) {
     if (req.method === "GET") { // get available events 
       return UserRole["Guest"];
@@ -62,15 +63,12 @@ const getRequiredRole = (req: Request): UserRole => {
       return UserRole["Manager"];
     }
   }
-
   if (url.match(/^\/api\/event\/all$/) && req.method == "GET") { // get all events 
     return UserRole["Worker"];
   }
-
   if (url.match(/^\/api\/event\/backoffice\/[^\/]+$/) && req.method == "GET") { // get event by id - back office 
     return UserRole["Worker"];
   }
-
   if (url.match(/^\/api\/event\/[^\/]+$/)) {
     if (req.method === "GET") { // get event by id - regular user
       return UserRole["Guest"];
@@ -83,6 +81,7 @@ const getRequiredRole = (req: Request): UserRole => {
   // |===================|
   // | Paths for Tickets |
   // |===================|
+  
   if (url.match(/^\/api\/ticket\/all\/[^\/]+$/) && req.method == "GET") { // get all tickets for event 
     return UserRole["Guest"];
   }
@@ -90,6 +89,9 @@ const getRequiredRole = (req: Request): UserRole => {
     return UserRole["Worker"];
   }
   if (url.match(/^\/api\/ticket$/) && req.method === "PUT") { // purchase ticket
+    return UserRole["Guest"];
+  }
+  if (url.match(/^\/api\/ticket\/[^\/]+$/) && req.method === "PUT") { // lock ticket
     return UserRole["Guest"];
   }
 
@@ -101,6 +103,7 @@ const getRequiredRole = (req: Request): UserRole => {
   // |====================|
   // | Paths for Comments |
   // |====================|
+
   if (url.match(/^\/api\/comment(\/[^\/]+)?$/) && ["GET", "POST"].includes(req.method)) { // get && post comments for event
     return UserRole["Guest"];
   }
@@ -109,22 +112,15 @@ const getRequiredRole = (req: Request): UserRole => {
   // | Paths for User Actions |
   // |========================|
 
-  // app.get(`${ACTIONS_PATH}/:purchase_id`, getUserActionByPurchaseId)
-  // app.get(CLOSEST_EVENT_PATH, getClosestEvent);
-
   if (url.match(/^\/api\/user_actions$/) && ["GET", "PUT"].includes(req.method)) { // get && put user actions
     return UserRole["Guest"];
   }
   if (url.match(/^\/api\/user_actions\/[^\/]+$/) && req.method == "GET") { // get user action by purchase id
     return UserRole["Guest"];
   }
-  // if (url.match(/^\/api\/refund_options$/) && req.method == "GET") { // get non refunded purchases
-  //   return UserRole["Guest"];
-  // } 
   if (url.match(/^\/api\/closest_event$/) && req.method == "GET") { // get closest event
     return UserRole["Guest"];
   }
-
   if (url.match(/^\/api\/permission$/)) { // update user role
     return UserRole["Admin"];
   }

@@ -61,7 +61,7 @@ export const getEventById = async (req: Request, res: Response) => {
     return;
   }
 
-  if (!req.keepSensitiveInfo) {
+  if (!req.keepSensitiveInfo && data.comment_count) {
     delete data.comment_count;
   }
 
@@ -126,47 +126,13 @@ export const createEvent = async (req: Request, res: Response) => {
   }
   catch (error) {
     console.error("Error inserting tickets for event: ", insertResult + ". Deleting event...");
-    console.error(error.response.data);
     deleteEventByID(insertResult); // Cleanup event if ticket insertion fails
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).send("Internal server error");
+    console.error(error);
     return;
   }
 };
 
-// TODO - Legacy, may remove
-export const createTicketlessEvent = async (req: Request, res: Response) => {
-  try {
-    const postData = req.body as ICSEvent;
-
-    if (postData._id) {
-      throw Error("_id is an automatically generated field.");
-    }
-
-    // Validate the event data
-    const { value, error } = eventSchema.validate(postData, { abortEarly: false, allowUnknown: true, presence: 'required' });
-
-    if (error) {
-      throw Error("Bad Request.");
-    }
-
-    const insertResult = await insertEvent(value);
-
-    if (insertResult == StatusCodes.BAD_REQUEST) {
-      throw Error("Bad Request.")
-    }
-
-    if (insertResult == StatusCodes.INTERNAL_SERVER_ERROR) {
-      res.status(StatusCodes.INTERNAL_SERVER_ERROR).send("Internal server error");
-      return;
-    }
-
-    res.status(StatusCodes.CREATED).send({ _id: insertResult });
-  }
-  catch (error) {
-    res.status(StatusCodes.BAD_REQUEST).send("Bad Request");
-    return;
-  }
-};
 
 export const updateEvent = async (req: Request, res: Response) => {
   console.log("PUT /api/event/:eventId/postpone");

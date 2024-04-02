@@ -1,0 +1,22 @@
+.timer-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+  
+.timer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+  
+.value {
+    font-size: 36px;
+    color: #333;
+}
+  
+.text {
+    color: #4d4d4d;
+    font-size: 18px;
+}
+    

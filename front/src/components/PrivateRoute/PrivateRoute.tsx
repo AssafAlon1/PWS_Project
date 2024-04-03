@@ -5,7 +5,7 @@ import { ThreeSpanningSpinners } from '../SpinnerComponent/SpinnerComponent';
 import { ERROR_PATH, LOGIN_PATH } from '../../paths';
 
 
-const PrivateRoute: React.FC<{requiredRole?: number}> = ({requiredRole}) => {
+const PrivateRoute: React.FC<{ requiredRole?: number }> = ({ requiredRole }) => {
     const auth = useContext(AuthContext);
     const [isLoading, setIsLoading] = useState<boolean>(true);
 
@@ -30,7 +30,15 @@ const PrivateRoute: React.FC<{requiredRole?: number}> = ({requiredRole}) => {
     }
 
     if (requiredRole != undefined && auth.role > requiredRole) { // TODO - pass the required role as a parameter
-        return <Navigate to={ERROR_PATH} state={{ message: "You are not authorized to view this page. Bad boy ;)" }}/>;
+        return <Navigate to={ERROR_PATH} state={{ message: "You are not authorized to view this page. Bad boy ;)" }} />;
+    }
+
+    if (requiredRole != undefined && !auth.isBackOffice) {
+        return <Navigate to={ERROR_PATH} state={
+            {
+                message: "You are authorized to view this page, but please, enter through the back office. We don't want people asking questions..."
+            }
+        } />;
     }
 
     console.log(" ### PrivateRoute approved :)");

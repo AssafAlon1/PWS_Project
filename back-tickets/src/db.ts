@@ -84,7 +84,7 @@ export const insertTickets = async (ticketData: ICSTicket[]): Promise<number> =>
   }
 }
 
-// Will be used for buying and refunding tickets
+// Will be used for refunding tickets
 export const updateTicketAmount = async (ticketId: string, increaseAmount: number): Promise<number> => {
   try {
     // This is done atomically (check amount and update if enough tickets are available)
@@ -106,18 +106,14 @@ export const updateTicketAmount = async (ticketId: string, increaseAmount: numbe
   }
 }
 
+// TODO - no need to call for unlock
+// Will be done on timeout instead
 export const queryAllTicketsByEventID = async (eventId: string, skip: number, limit: number): Promise<ICSTicket[]> => {
   let tickets = await CSTicket.find({ eventId: eventId }).skip(skip).limit(limit).exec();
   await Promise.all(tickets.map(async ticket => await clearExpiredLocks(ticket._id.toString())));
   tickets = await CSTicket.find({ eventId: eventId }).skip(skip).limit(limit).exec(); // Painful, but needed to get the updated data
   return tickets.map(ticket => ticket.toJSON() as ICSTicket);
 }
-
-// TODO - legacy - maybe remove
-// // export const queryAvailableTicketsByEventID = async (eventId: string, skip: number, limit: number): Promise<ICSTicket[]> => {
-// //   const tickets = await CSTicket.find({ eventId: eventId, available: { $gt: 0 } }).skip(skip).limit(limit).exec();
-// //   return tickets.map(ticket => ticket.toJSON() as ICSTicket);
-// // }
 
 export const queryTicketByName = async (eventId: string, ticketName: string): Promise<ICSTicket | null> => {
   const ticket = await CSTicket.findOne({ eventId: eventId, name: ticketName }).exec();

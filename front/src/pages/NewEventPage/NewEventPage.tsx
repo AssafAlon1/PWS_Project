@@ -20,7 +20,7 @@ const NewEventPage: React.FC = () => {
     const tomorrowDate = new Date(new Date().getTime() + 24 * 60 * 60 * 1000);
     const [isFormValidated, setFormValidated] = useState<boolean>(false);
     const [displayError, setDisplayError] = useState<string>("");
-    
+
     const [eventName, setEventName] = useState<string>("");
     const [catagory, setCatagory] = useState<string>(VALID_CATEGORIES[0]);
     const [description, setDescription] = useState<string>("");
@@ -35,8 +35,8 @@ const NewEventPage: React.FC = () => {
     const [tickets, setTickets] = useState<NewTicket[]>([]);
 
     const navigate = useNavigate();
-    
-   const handleEventNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+
+    const handleEventNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setEventName(e.target.value);
     }
 
@@ -116,7 +116,7 @@ const NewEventPage: React.FC = () => {
             }
             console.log(eventCreationRequest);
             const result = await EventApi.createEvent(eventCreationRequest);
-            navigate(SUCCESS_PATH, { state: { operationType: "create", createdEventId: result, message: "Event created successfully!" } });  
+            navigate(SUCCESS_PATH, { state: { operationType: "create", createdEventId: result, message: "Event created successfully!" } });
         }
         catch (error) {
             console.log(error);
@@ -143,7 +143,7 @@ const NewEventPage: React.FC = () => {
 
         const isDisabled = ticketName === "" || ticketPrice < 0 || ticketQuantity <= 0;
 
-        
+
 
         const onClickTicket = () => {
             const result = addTicket({
@@ -409,9 +409,14 @@ const NewEventPage: React.FC = () => {
                         />
                     </Col>
                 </Row>
-            </Form >             
-            
-            <Alert show={displayError !== ""} variant="danger" onClose={() => setDisplayError("")} dismissible className="mt-2">
+            </Form >
+
+            <Alert
+                show={displayError !== ""}
+                variant="danger"
+                onClose={() => setDisplayError("")}
+                dismissible
+                className="mt-2">
                 <Alert.Heading>Something went wrong</Alert.Heading>
                 <p>
                     {displayError}

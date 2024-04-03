@@ -42,7 +42,7 @@ let origin = process.env.ORIGIN;
 app.use(cors({
   origin: origin,
   methods: ['GET', 'POST', 'PUT'], // TODO - PUT, DELETE?
-  credentials: true,  // Frontend needs to send cookies with requests
+  // credentials: true,  // TODO - remove? Frontend needs to send cookies with requests
 }));
 
 

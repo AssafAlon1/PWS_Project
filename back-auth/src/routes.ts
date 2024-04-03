@@ -8,7 +8,6 @@ import { UserRole } from './const.js';
 import { queryUserRole, updateRole } from './db.js';
 
 
-
 export async function loginRoute(req: Request, res: Response) {
   const credentials = req.body;
   console.log(" >> User came with credentials: ", credentials);
@@ -102,8 +101,7 @@ export async function userInfoRoute(req: Request, res: Response) {
   res.status(StatusCodes.OK).send({ username, role });
 }
 
-
-export const updatePrivilegesRoute = async (req: Request, res: Response) => {
+export async function updatePrivilegesRoute(req: Request, res: Response) {
   // Token validation and permission checking for the user initiating this request is done in isAuthorized middleware
 
   const updatePermissionRequest = req.body as { username: string, permission: string };

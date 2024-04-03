@@ -13,6 +13,8 @@ import { CATALOG_PATH, CHECKOUT_PATH, ERROR_PATH, EVENT_PATH, LOGIN_PATH, NEW_EV
 import { UserRole } from "../../const";
 
 const shouldDisplayGoBackButton = (path: string) => {
+    console.log("Checking if should display go back button for path: ", path);
+    console.log("Allowed paths: ", [CHECKOUT_PATH, ERROR_PATH, USERSPACE_PATH, REFUND_PATH, NEW_EVENT_PATH, EVENT_PATH]);
     return [
         CHECKOUT_PATH,
         ERROR_PATH,
@@ -51,6 +53,7 @@ const NavbarComponent: React.FC = () => {
         context.setUser("");
         context.updateNextEvent();
         context.setBackOffice(false);
+        console.log("Updated what was was");
         navigate(LOGIN_PATH);
     }
 
@@ -89,7 +92,7 @@ const NavbarComponent: React.FC = () => {
                 <Container>
                     <Navbar.Brand as={Link} to={CATALOG_PATH}>CS Events</Navbar.Brand>
                     <Nav className="me-auto">
-                        <ToggleBackOfficeButton/>
+                        <ToggleBackOfficeButton />
                         {/* <Nav.Link as={Link} to={ERROR_PATH}>error</Nav.Link> */}
                         {(context.user && !context.isBackOffice) && <Nav.Link as={Link} to={USERSPACE_PATH}>User Space</Nav.Link>}
                         {(context.user && !context.isBackOffice) && <Nav.Link as={Link} to={REFUND_PATH}>Refunds</Nav.Link>}

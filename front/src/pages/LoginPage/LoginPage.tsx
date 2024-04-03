@@ -63,6 +63,7 @@ export const LoginPage: React.FC = () => {
   };
 
   useEffect(() => {
+    console.log("Context: " + auth);
     if (auth.user) {
       navigate(CATALOG_PATH);
     }

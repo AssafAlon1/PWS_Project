@@ -33,7 +33,7 @@ function CSRouter() {
                     <Route element={<PrivateRoute requiredRole={UserRole.Worker} />}>
                         <Route path={EVENT_PATH + "backoffice/:eventId"} element={<EventDetails />} />
                     </Route>
-                    <Route element={<PrivateRoute />}>
+                    <Route element={<PrivateRoute requiredRole={UserRole.Guest} />}>
                         <Route path={CHECKOUT_PATH} element={<CheckoutPage />} />
                     </Route>
                     <Route element={<PrivateRoute />}>

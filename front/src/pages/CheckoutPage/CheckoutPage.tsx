@@ -110,6 +110,12 @@ const CheckoutPage: React.FC = () => {
         );
     };
 
+    const TimerRanOut = () => {
+        console.log("Timer ran out");
+        // setDisplayError(true);
+        navigate(ERROR_PATH, { state: { message: "Purchase request timed-out, tickect no longer guaranteed...\n You gotta be quicker next time" } });
+    }
+
     const LockCountDownComponent = () => (
         <Card className="mt-4">
             <Card.Header>
@@ -124,6 +130,7 @@ const CheckoutPage: React.FC = () => {
                         size={170}
                         strokeWidth={12}
                         trailColor="#d6d6d6"
+                        onComplete={() => TimerRanOut()}
                     >
                         {renderTime}
                     </CountdownCircleTimer>
@@ -151,7 +158,6 @@ const CheckoutPage: React.FC = () => {
     useEffect(() => {
         if (purchaseId) {
             console.log("Purchase ID: ", purchaseId);
-            console.log("IT'S REDIRECT TIME =D");
             afterPurchaseRedirect();
         }
         console.log("no purchase ID...");

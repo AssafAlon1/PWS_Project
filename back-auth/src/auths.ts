@@ -1,5 +1,6 @@
 import jwt from "jsonwebtoken";
 import { NextFunction, Request, Response } from "express";
+import { body, validationResult } from 'express-validator';
 import { StatusCodes } from "http-status-codes";
 import { UserRole } from "./const.js";
 import { hasPermission } from "./db.js";
@@ -156,3 +157,12 @@ export const isAuthorized = async (req: Request, res: Response, next: NextFuncti
   console.log(" > User is authorized!");
   next();
 };
+
+// Middleware to sanitize all fields against XSS
+// export const sanitizeInput = (req: Request, res: Response, next: NextFunction): void => {
+//   Object.keys(req.body).forEach((key: string) => {
+//     // Escaping potentially dangerous characters
+//     body(key).escape().run(req);
+//   });
+//   next();
+// };

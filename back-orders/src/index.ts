@@ -22,7 +22,7 @@ let origin = process.env.ORIGIN;
 app.use(cors({
     origin: origin,
     methods: ['POST'],
-    credentials: true,  // Frontend needs to send cookies with requests
+    // credentials: true,  // TODO - remove? Frontend needs to send cookies with requests
 }));
 
 function attachPublisherChannel(req: Request, res: Response, next: NextFunction) {

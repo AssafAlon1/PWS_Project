@@ -410,9 +410,13 @@ const NewEventPage: React.FC = () => {
                     </Col>
                 </Row>
             </Form >
-        
-            <Alert show={displayError !== ""} variant="danger" onClose={() => setDisplayError("")} dismissible>
 
+            <Alert
+                show={displayError !== ""}
+                variant="danger"
+                onClose={() => setDisplayError("")}
+                dismissible
+                className="mt-2">
                 <Alert.Heading>Something went wrong</Alert.Heading>
                 <p>
                     {displayError}

@@ -9,17 +9,12 @@ import React, { useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { AuthContext } from "../AuthProvider/AuthProvider";
 import { AuthApi } from "../../api/auth";
-import { CATALOG_PATH, CHECKOUT_PATH, ERROR_PATH, EVENT_PATH, LOGIN_PATH, NEW_EVENT_PATH, PROJECT_BASE, REFUND_PATH, USERSPACE_PATH } from "../../paths";
+import { CATALOG_PATH, LOGIN_PATH, NEW_EVENT_PATH, REFUND_PATH, SIGNUP_PATH, SUCCESS_PATH, USERSPACE_PATH } from "../../paths";
 import { UserRole } from "../../const";
 
 const shouldDisplayGoBackButton = (path: string) => {
-    return [
-        PROJECT_BASE + CHECKOUT_PATH,
-        PROJECT_BASE + ERROR_PATH,
-        PROJECT_BASE + USERSPACE_PATH,
-        PROJECT_BASE + REFUND_PATH,
-        PROJECT_BASE + NEW_EVENT_PATH
-    ].includes(path) || path.startsWith(EVENT_PATH);
+    console.log("Checking if should display go back button on path " + path);
+    return !(path.includes(SUCCESS_PATH) || path.includes(LOGIN_PATH) || path.includes(SIGNUP_PATH));
 }
 
 const NavbarComponent: React.FC = () => {

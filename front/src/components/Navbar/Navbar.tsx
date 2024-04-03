@@ -14,7 +14,7 @@ import { UserRole } from "../../const";
 
 const shouldDisplayGoBackButton = (path: string) => {
     console.log("Checking if should display go back button on path " + path);
-    return !(path.includes(SUCCESS_PATH) || path.includes(LOGIN_PATH) || path.includes(SIGNUP_PATH) || path.includes(CATALOG_PATH));
+    return !(path.includes(SUCCESS_PATH) || path.includes(LOGIN_PATH) || path.includes(SIGNUP_PATH) || path == CATALOG_PATH);
 }
 
 const NavbarComponent: React.FC = () => {

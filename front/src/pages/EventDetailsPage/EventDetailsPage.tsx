@@ -2,7 +2,7 @@ import './EventDetailsPage.css';
 
 import React, { useContext, useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Button, Card, Col, Placeholder, Row } from 'react-bootstrap';
+import { Alert, Button, Card, Col, Placeholder, Row } from 'react-bootstrap';
 
 import MissingImage from "../../assets/MissingImage.png"
 import { CSEvent, PurchaseDetails, Ticket } from '../../types';
@@ -14,6 +14,7 @@ import TicketApi from '../../api/ticket';
 import { ThreeSpanningSpinners } from '../../components/SpinnerComponent/SpinnerComponent';
 import CommentsComponent from '../../components/CommentsComponent/CommentsComponent';
 import { CATALOG_PATH, CHECKOUT_PATH, ERROR_PATH, NOTFOUND_PATH } from '../../paths';
+
 import { AuthContext } from '../../components/AuthProvider/AuthProvider';
 import PostponeEventForm from '../../components/PostponeEventForm/PostponeEventForm';
 import { UserRole } from '../../const';
@@ -68,8 +69,10 @@ const EventDetails: React.FC = () => {
         try {
             if (authContext.isBackOffice) {
                 fetchedTickets = await TicketApi.fetchBackOfficeTickets(eventId) ?? [];
+                console.log("Fetched backoffice tickets: ", fetchedTickets);
             } else {
                 fetchedTickets = await TicketApi.fetchTickets(eventId) ?? [];
+                console.log("Fetched regular tickets: ", fetchedTickets);
             }
             if (!fetchedTickets) {
                 throw new Error(`Failed to fetch tickets for event ${eventId}`);
@@ -108,7 +111,7 @@ const EventDetails: React.FC = () => {
                 <Card className="event-block">
                     <Card.Body>
                         <Card.Text>{event?.category}</Card.Text>
-                        <Card.Text>From ${event.cheapest_ticket_price}</Card.Text>
+                        { !authContext.isBackOffice && <Card.Text>From ${event.cheapest_ticket_price}</Card.Text>}
                         <Card.Text>{event.total_available_tickets} tickets available</Card.Text>
                     </Card.Body>
                 </Card>
@@ -180,8 +183,10 @@ const EventDetails: React.FC = () => {
         </Card>
     }
 
-    const BuyTicketComponent: React.FC<{ name: string, price: number, amountLeft: number }> = ({ name, price, amountLeft }) => {
+    const BuyTicketComponent: React.FC<{ name: string, price: number, amountLeft: number, locked: number }> = ({ name, price, amountLeft, locked }) => {
         const [ticketAmount, setTicketAmount] = useState<number>(0);
+        const [errorMessage, setErrorMessage] = useState<string>("");
+        // IMPORTANT TODO - The setErrorMessage isn't working, as observed by the debug `console.log`
 
         const ticketPurchaseDetails: PurchaseDetails = {
             event_id: eventId ?? "0",
@@ -191,9 +196,25 @@ const EventDetails: React.FC = () => {
             price: price
         }
 
-        const onClickBuyNow = () => {
-            setPurchaseDetails(ticketPurchaseDetails);
-            navigate(CHECKOUT_PATH);
+        const onClickBuyNow = async () => {
+            console.log("Buying tickets");
+            setErrorMessage("");
+            if (!eventId || !authContext || !authContext.user) {
+                setErrorMessage("Error: Missing event id or user information");
+                return;
+            }
+            console.log("Set purchase details to: ", ticketPurchaseDetails);
+            console.log("Locking ticket");
+            try {
+                await TicketApi.lockTickets(eventId, ticketPurchaseDetails.ticket_name, ticketAmount, authContext.user);
+                setPurchaseDetails(ticketPurchaseDetails);
+                navigate(CHECKOUT_PATH);
+            }
+            catch (error) {
+                console.error("Failed to lock ticket: ", error);
+                setErrorMessage("Error: Failed to lock ticket");
+                return;
+            }
         }
 
         return (
@@ -204,16 +225,20 @@ const EventDetails: React.FC = () => {
                 <Card.Body>
                     <Card.Text>Price: <b>${price}</b></Card.Text>
                     <Card.Text><b>{amountLeft}</b> tickets left!</Card.Text>
+                    {locked ? <Card.Text>({locked} { locked === 1 ? "is" : "are"} saved for others)</Card.Text> : null}
                     <Card.Text>{amountLeft <= 0 ? "SOLD OUT!" : "Choose amount of tickets:"}</Card.Text>
                     <div className="direction-row">
                         <input disabled={amountLeft <= 0} className="tickets-amount" type="number" value={ticketAmount} onChange={(event) => setTicketAmount(Number(event.target.value))} />
                         <ButtonWithTooltip
-                            buttonContent="Buy Now!"
+                            buttonContent={errorMessage ? "Try Again" : "Buy Now!"}
                             tooltipContent={ticketAmount <= 0 ? "Cannot buy less than 1 ticket" : "Not enough tickets left"}
                             isDisabled={ticketAmount <= 0 || ticketAmount > amountLeft}
                             buttonOnClick={onClickBuyNow}
                         />
                     </div>
+                    <Alert variant="danger" show={errorMessage !== ""} onClose={ () => setErrorMessage("")} dismissible>
+                        Oopsie woopsie!
+                    </Alert>
                 </Card.Body>
             </Card>
         );
@@ -262,7 +287,8 @@ const EventDetails: React.FC = () => {
                     key={index}
                     name={ticket.name}
                     price={ticket.price}
-                    amountLeft={ticket.available} />
+                    amountLeft={ticket.available} 
+                    locked={ticket.locked_amount ? ticket.locked_amount : 0}/>
             });
         }
 

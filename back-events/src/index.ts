@@ -8,7 +8,6 @@ import { Request, Response, NextFunction } from 'express';
 import {
   getEventById,
   createEvent,
-  createTicketlessEvent,
   updateEvent,
   getUpcomingEvents,
   getUpcomingAvailableEvents,
@@ -43,7 +42,7 @@ let origin = process.env.ORIGIN;
 app.use(cors({
   origin: origin,
   methods: ['GET', 'POST', 'PUT'], // TODO - PUT, DELETE?
-  credentials: true,  // Frontend needs to send cookies with requests
+  // credentials: true,  // TODO - remove? Frontend needs to send cookies with requests
 }));
 
 
@@ -59,7 +58,6 @@ app.get(`${EVENT_PATH}/backoffice/:eventId`, keepSensitiveInfo, getEventById);
 app.get("/api/closest_event", getClosestEvent); // !! NOTE: this is NOT exposed to the API Gateway (therefore it's OK that it shares the same path as the user-actions service)
 
 app.post(EVENT_PATH, createEvent);
-app.post(`${EVENT_PATH}/ticketless`, createTicketlessEvent); // TODO - legacy, may remove
 
 app.put(`${EVENT_PATH}/:eventId/postpone`, updateEvent);
 

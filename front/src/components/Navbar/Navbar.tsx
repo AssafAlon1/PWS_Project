@@ -65,10 +65,10 @@ const NavbarComponent: React.FC = () => {
     }
 
     const ToggleBackOfficeButton = () => {
-        if (context.role > UserRole.Worker) {
+        if (!context.user || context.role > UserRole.Worker) {
             return <></>
         }
-        
+
         const onClick = () => {
             context.setBackOffice(!context.isBackOffice);
             navigate(CATALOG_PATH);
@@ -91,10 +91,10 @@ const NavbarComponent: React.FC = () => {
                     <Nav className="me-auto">
                         <ToggleBackOfficeButton/>
                         {/* <Nav.Link as={Link} to={ERROR_PATH}>error</Nav.Link> */}
-                        {!context.isBackOffice && <Nav.Link as={Link} to={USERSPACE_PATH}>User Space</Nav.Link>}
-                        {!context.isBackOffice && <Nav.Link as={Link} to={REFUND_PATH}>Refunds</Nav.Link>}
+                        {(context.user && !context.isBackOffice) && <Nav.Link as={Link} to={USERSPACE_PATH}>User Space</Nav.Link>}
+                        {(context.user && !context.isBackOffice) && <Nav.Link as={Link} to={REFUND_PATH}>Refunds</Nav.Link>}
 
-                        {(context.isBackOffice && context.role <= UserRole.Manager) && <Nav.Link as={Link} to={NEW_EVENT_PATH}>Create Event</Nav.Link>}
+                        {(context.user && context.isBackOffice && context.role <= UserRole.Manager) && <Nav.Link as={Link} to={NEW_EVENT_PATH}>Create Event</Nav.Link>}
 
                     </Nav>
 

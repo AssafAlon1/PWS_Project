@@ -22,7 +22,7 @@ const SuccessPage: React.FC = () => {
             authContext.updateNextEvent();
         };
 
-        if (operationType == "purchase" && eventName && ticketQuantity && ticketName && ticketPrice && orderId) {
+        if (operationType == "purchase" && eventName && ticketQuantity && ticketName && ticketPrice != undefined && orderId) {
             return <Card.Body>
                 <Card.Text>Order ID: {orderId}</Card.Text>
                 <Card.Text>Tickets: {ticketQuantity} x {ticketName}</Card.Text>
@@ -47,6 +47,7 @@ const SuccessPage: React.FC = () => {
         }
         else { // Souldn't get here
             console.log("Uhmmm... Why are you HERE?");
+            console.log(location.state);
             return <Card.Body>
                 <Card.Text>{message}</Card.Text>
                 <Link to={CATALOG_PATH}><Button variant="primary" onClick={handleReturnToCatalog}>Return to Catalog</Button></Link>

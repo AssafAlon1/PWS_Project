@@ -1,22 +1,23 @@
 import { Request, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
 
-import { insertTickets, queryAllTicketsByEventID, queryAvailableTicketsByEventID, queryCheapestTicketsByEventID, queryTicketByName, updateTicketAmount } from "./db.js";
-import { ICSTicket, ticketSchema } from "./models/CSTicket.js";
-import { MAX_TICKET_LIMIT, ORDER_API_URL } from "./const.js";
+import { insertTickets, lockTickets, queryAllTicketsByEventID, queryTicketByName } from "./db.js";
+import { ICSTicket, lockRequestSchema, ticketSchema } from "./models/CSTicket.js";
+import { MAX_TICKET_LIMIT } from "./const.js";
 import { PublisherChannel } from "./publisher-channel.js";
-import axios from 'axios';
-import { PaymentInformation, paymentInformationSchema } from "./types.js";
+import { LockInformation, PaymentInformation, paymentInformationSchema } from "./types.js";
+import { purchaseTicketFromLock } from './utilities.js';
 
-const axiosInstance = axios.create({ withCredentials: true, baseURL: ORDER_API_URL });
-
+interface ICSTicketFlexible extends ICSTicket {
+    locked_amount?: number;
+}
 
 export const getALLTicketsByEventId = async (req: Request, res: Response) => {
     console.log("GET /api/ticket/all");
     const eventId = req.params.eventId;
     const skip = parseInt(req.query.skip as string) || 0;
     const limit = parseInt(req.query.limit as string) || MAX_TICKET_LIMIT;
-    let data;
+    let data: ICSTicketFlexible[];
     try {
         console.log("Gonna fetch tickets for eventId: ", eventId);
         data = await queryAllTicketsByEventID(eventId, skip, limit);
@@ -26,26 +27,36 @@ export const getALLTicketsByEventId = async (req: Request, res: Response) => {
         return;
     }
 
-    res.status(StatusCodes.OK).send(data);
-}
-
-export const getAvailableTicketsByEventId = async (req: Request, res: Response) => {
-    console.log("GET /api/ticket");
-    const eventId = req.params.eventId;
-    const skip = parseInt(req.query.skip as string) || 0;
-    const limit = parseInt(req.query.limit as string) || MAX_TICKET_LIMIT;
-    let data;
-    try {
-        data = await queryAvailableTicketsByEventID(eventId, skip, limit);
+    if (!req.keepSensitiveInfo) {
+        data.forEach(ticket => {
+            delete ticket.total;
+            ticket.locked_amount = ticket.locked.reduce((acc, lock) => {
+                return acc + lock.quantity;
+            }, 0);
+        });
     }
-    catch (error) {
-        res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({ message: "Internal Server Error" });
-        return;
-    }
+    data.forEach(ticket => {delete ticket.locked});
 
     res.status(StatusCodes.OK).send(data);
 }
 
+// TODO - legacy - maybe remove
+// export const getAvailableTicketsByEventId = async (req: Request, res: Response) => {
+//     console.log("GET /api/ticket");
+//     const eventId = req.params.eventId;
+//     const skip = parseInt(req.query.skip as string) || 0;
+//     const limit = parseInt(req.query.limit as string) || MAX_TICKET_LIMIT;
+//     let data;
+//     try {
+//         data = await queryAvailableTicketsByEventID(eventId, skip, limit);
+//     }
+//     catch (error) {
+//         res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({ message: "Internal Server Error" });
+//         return;
+//     }
+
+//     res.status(StatusCodes.OK).send(data);
+// }
 
 export const createTickets = async (req: Request, res: Response) => {
     console.log("POST /api/tickets");
@@ -55,13 +66,16 @@ export const createTickets = async (req: Request, res: Response) => {
             console.error("No tickets provided.")
             throw Error("No tickets provided.");
         }
-
-        postData.map(ticket => ticket.available = ticket.total); // Added
+        postData.map(ticket => {
+            ticket.available = ticket.total;
+            // ticket.locked = [];
+        });
         // Validate the ticket data
-        const validationResults = postData.map(ticket => ticketSchema.validate(ticket, { abortEarly: false, allowUnknown: true, presence: 'required' }));
+        const validationResults = postData.map(ticket => ticketSchema.validate(ticket, { abortEarly: false, allowUnknown: true }));
         const errors = validationResults.filter(result => result.error);
         if (errors.length > 0) {
             console.error("Ticket schema validation failed");
+            console.log(errors);
             throw Error("Bad Request.");
         }
         const insertResult = await insertTickets(postData);
@@ -83,35 +97,82 @@ export const createTickets = async (req: Request, res: Response) => {
     }
 }
 
-// TODO - check updateEvent in back-events/src/routes.ts and replicate logic!
 export const purchaseTicket = async (req: Request, res: Response) => {
     console.log("PUT /api/ticket");
     let postData;
-    let ticket;
+    let ticket: ICSTicket;
     const publisherChannel: PublisherChannel = req.publisherChannel;
+
+    postData = req.body as PaymentInformation;
+    const { error } = paymentInformationSchema.validate(postData);
+    if (error) {
+        console.log("Payment Information invalid", error);
+        res.status(StatusCodes.BAD_REQUEST).send({ message: "Payment Information invalid." });
+        return;
+    }
+    // Get the wanted ticket
+    ticket = await queryTicketByName(postData.event_id, postData.ticket_name);
+    if (!ticket) {
+        console.error("Ticket not found");
+        res.status(StatusCodes.BAD_REQUEST).send({ message: "Ticket not found." });
+        return;
+    }
+
+    // Check if the user has a lock on the tickets
+    const doesUserHaveLock: boolean = ticket.locked.find(lock =>
+        lock.username === postData.username &&
+        lock.quantity === postData.ticket_amount &&
+        lock.expires  > new Date()
+    ) !== null;
+    console.log("[DEBUG] doesUserHaveLock: ", doesUserHaveLock);
+
+    // purchase the tickets from the available tickets:
+    // if there are enough tickets available, lock them and purchase from the lock.
+    if(!doesUserHaveLock) {
+        console.log("User doesn't have a lock on the tickets - attempting lock");
+        if (ticket.available < postData.ticket_amount) {
+            console.error("Not enough tickets available.");
+            res.status(StatusCodes.BAD_REQUEST).send({ message: "Not enough tickets available." });
+            return;
+        }
+
+        // Lock the tickets
+        const lockResult = await lockTickets(postData.event_id, postData.ticket_name, postData.ticket_amount, postData.username);
+        if (lockResult != StatusCodes.OK) {
+            console.error("Failed to lock tickets to purchase :(");
+            res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({ message: "Failed to lock tickets to purchase" });
+            return;
+        }
+    }
+  
+    // Assuming the user has a lock on the tickets, purchase the tickets from the lock
     try {
-        postData = req.body as PaymentInformation;
-        const { error } = paymentInformationSchema.validate(postData);
+        console.log("gonna buy ticket from lock");
+        const purchaseInfo = await purchaseTicketFromLock(ticket, postData, publisherChannel);
+        res.status(StatusCodes.OK).send({ order_id: purchaseInfo });
+        return;
+    }
+    catch(error) {
+        console.error("Failed purchasing ticket from lock: ", error);
+        res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({ message: "Failed purchasing ticket" });
+        return;
+    }      
+}
+
+export const lockTicket = async (req: Request, res: Response) => {
+    console.log("PUT /api/ticket/lock");
+    let postData: LockInformation;
+    try {
+        postData = req.body;
+        const { error } = lockRequestSchema.validate(postData);
         if (error) {
-            console.log(error);
+            console.log("Bad request", error);
             res.status(StatusCodes.BAD_REQUEST).send({ message: "Bad Request." });
             return;
         }
-        // Get the wanted ticket
-        ticket = await queryTicketByName(postData.event_id, postData.ticket_name);
-        if (!ticket) {
-            console.error("Ticket not found");
-            console.error(ticket);
-            throw Error("Ticket not found.");
-        }
-        // TODO - Make sure we have enough tickets to sell or that they are reseved in the locked array for the user!
-        if (ticket.available < postData.ticket_amount) {
-            console.error("Not enough tickets available.");
-            throw Error("Not enough tickets available.");
-        }
 
-        console.log(`>> Buying ${postData.ticket_amount} tickets for of id ${ticket._id}`);
-        const result = await updateTicketAmount(ticket._id.toString(), -postData.ticket_amount);
+        console.log(`>> Locking ${postData.quantity} tickets of type ${postData.ticketName} for event id ${postData.eventId}`);
+        const result = await lockTickets(postData.eventId, postData.ticketName, postData.quantity, postData.username);
 
         if (result != StatusCodes.OK) {
             console.error("Failed updating ticket in DB");
@@ -120,42 +181,10 @@ export const purchaseTicket = async (req: Request, res: Response) => {
         }
     }
     catch (error) {
-        console.error("Encountered error while purchasing ticket: ", error);
+        console.error("Encountered error while locking ticket: ", error);
         res.status(StatusCodes.BAD_REQUEST).send({ message: "Bad Request." });
         return;
     }
 
-    try {
-        // CREATE THE ORDER, AND UNDO CHANGES IF FAILED
-        const orderResult = await axiosInstance.post("/api/buy", postData);
-        if (orderResult.status != StatusCodes.OK) {
-            console.error("I believe this code is unreachable. Can you see me?");
-            throw Error("Failed buying ticket!");
-        }
-
-        // If we sold all tickets, send new cheapest ticket
-        if (ticket.available === postData.ticket_amount) {
-            let newCheapestTicket = await queryCheapestTicketsByEventID(postData.event_id);
-
-            // basically if we don't have a cheapest ticket - it means we don't have any tickets left at all.. theoretically, can just NOT sent the message
-            if (newCheapestTicket === null) {
-                // TODO - just return?;
-                newCheapestTicket = { eventId: postData.event_id, name: "No tickets available", price: 0, total: 0 };
-            }
-            await publisherChannel.sendEvent(JSON.stringify(newCheapestTicket));
-        }
-
-        res.status(StatusCodes.OK).send({ order_id: orderResult.data.order_id });
-    }
-    catch (error) {
-        // UNDO CHANGES
-        // console.error(error);
-        // TODO - when hammerhead returns 500 we don't handel it properly - can't try to purchase again...
-        console.error("Failed buying ticket - Order API failed");
-        await updateTicketAmount(ticket._id.toString(), postData.ticket_amount);
-        console.error("Ticket purchase failed. Rolling back changes.");
-        res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({ message: "Internal Server Error" });
-        return;
-    }
-
+    res.status(StatusCodes.OK).send({ message: "Ticket locked." });
 }

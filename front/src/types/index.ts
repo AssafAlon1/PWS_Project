@@ -38,6 +38,7 @@ export interface Ticket {
     available: number;
     total?: number; // Only for back office
     price: number;
+    locked_amount?: number; // Only for back office
 }
 
 export interface PurchaseDetails {

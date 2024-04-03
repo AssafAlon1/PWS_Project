@@ -1,5 +1,5 @@
 
-import express from 'express';
+import express, { NextFunction } from 'express';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import cookieParser from 'cookie-parser';
@@ -73,7 +73,9 @@ const commentProxy = createProxyMiddleware({
     onProxyReq: fixRequestBody,
     changeOrigin: true, // TODO - What is this?
 });
-app.use(COMMENT_PATH, isAuthorized, commentProxy);
+// Note on sanitizeInput - this was originally used to sanitize user input in request body to protect fron XSS attacks
+// However, React sanitaizes all data by default so no need to sanitize again.
+app.use(COMMENT_PATH, isAuthorized, /*sanitizeInput,*/ commentProxy); 
 
 // Tickets Microservice
 const ticketProxy = createProxyMiddleware({
@@ -106,3 +108,68 @@ app.listen(port, () => {
     console.log(`Server running! port ${port}`);
     console.log("ORIGIN: " + origin);
 });
+
+
+/*
+import express, { Request, Response, NextFunction } from 'express';
+
+
+const app: express.Application = express();
+
+app.use(express.json()); // Middleware to parse JSON bodies
+
+
+
+// Apply sanitization middleware to all incoming requests
+app.post('/data', sanitizeInput, (req: Request, res: Response): void => {
+  // Validate request after sanitization
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+
+  // Your logic after input has been sanitized
+  res.status(200).json({ message: 'Data processed safely', data: req.body });
+});
+
+*/
+
+
+
+
+/*
+import * as express from 'express';
+// const express = require('express');
+const { body, validationResult } = require('express-validator');
+const app = express();
+
+app.use(express.json()); // Middleware to parse JSON bodies
+
+// Middleware to sanitize all fields against XSS
+const sanitizeInput = (req, res, next) => {
+  Object.keys(req.body).forEach(key => {
+    // Escaping potentially dangerous characters
+    body(key).escape().run(req);
+  });
+  next();
+};
+
+// Apply sanitization middleware to all incoming requests
+app.post('/data', sanitizeInput, (req, res) => {
+  // Validate request after sanitization
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+
+  // Your logic after input has been sanitized
+  res.status(200).json({ message: 'Data processed safely', data: req.body });
+});
+
+// Start your Express server
+app.listen(3000, () => {
+  console.log('Server listening on port 3000');
+});
+
+
+*/

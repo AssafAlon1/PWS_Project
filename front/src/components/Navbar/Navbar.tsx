@@ -9,18 +9,18 @@ import React, { useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { AuthContext } from "../AuthProvider/AuthProvider";
 import { AuthApi } from "../../api/auth";
-import { CATALOG_PATH, CHECKOUT_PATH, ERROR_PATH, EVENT_PATH, LOGIN_PATH, NEW_EVENT_PATH, REFUND_PATH, USERSPACE_PATH } from "../../paths";
+import { CATALOG_PATH, CHECKOUT_PATH, ERROR_PATH, EVENT_PATH, LOGIN_PATH, NEW_EVENT_PATH, PROJECT_BASE, REFUND_PATH, USERSPACE_PATH } from "../../paths";
 import { UserRole } from "../../const";
 
 const shouldDisplayGoBackButton = (path: string) => {
     console.log("Checking if should display go back button for path: ", path);
     console.log("Allowed paths: ", [CHECKOUT_PATH, ERROR_PATH, USERSPACE_PATH, REFUND_PATH, NEW_EVENT_PATH, EVENT_PATH]);
     return [
-        CHECKOUT_PATH,
-        ERROR_PATH,
-        USERSPACE_PATH,
-        REFUND_PATH,
-        NEW_EVENT_PATH
+        PROJECT_BASE + CHECKOUT_PATH,
+        PROJECT_BASE + ERROR_PATH,
+        PROJECT_BASE + USERSPACE_PATH,
+        PROJECT_BASE + REFUND_PATH,
+        PROJECT_BASE + NEW_EVENT_PATH
     ].includes(path) || path.startsWith(EVENT_PATH);
 }
 

@@ -3,6 +3,7 @@ import { Navigate, Outlet } from 'react-router';
 import { AuthContext } from '../AuthProvider/AuthProvider';
 import { ThreeSpanningSpinners } from '../SpinnerComponent/SpinnerComponent';
 import { ERROR_PATH, LOGIN_PATH } from '../../paths';
+import { UserRole } from '../../const';
 
 
 const PrivateRoute: React.FC<{ requiredRole?: number }> = ({ requiredRole }) => {
@@ -33,7 +34,7 @@ const PrivateRoute: React.FC<{ requiredRole?: number }> = ({ requiredRole }) => 
         return <Navigate to={ERROR_PATH} state={{ message: "You are not authorized to view this page. Bad boy ;)" }} />;
     }
 
-    if (requiredRole != undefined && !auth.isBackOffice) {
+    if (requiredRole != undefined && requiredRole < UserRole.Guest && !auth.isBackOffice) {
         return <Navigate to={ERROR_PATH} state={
             {
                 message: "You are authorized to view this page, but please, enter through the back office. We don't want people asking questions..."

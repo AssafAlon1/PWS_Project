@@ -14,9 +14,15 @@ import { UserRole } from "../../const";
 
 const shouldDisplayGoBackButton = (path: string) => {
     console.log("Checking if should display go back button on path " + path);
-    console.log("Allowed paths: ", [CHECKOUT_PATH, ERROR_PATH, USERSPACE_PATH, REFUND_PATH, NEW_EVENT_PATH, EVENT_PATH]);
+    console.log("Allowed paths: ", [
+        PROJECT_BASE + CHECKOUT_PATH,
+        PROJECT_BASE + ERROR_PATH,
+        PROJECT_BASE + USERSPACE_PATH,
+        PROJECT_BASE + REFUND_PATH,
+        PROJECT_BASE + NEW_EVENT_PATH
+    ]);
     return [
-        PROJECT_BASE,
+        PROJECT_BASE + CHECKOUT_PATH,
         PROJECT_BASE + ERROR_PATH,
         PROJECT_BASE + USERSPACE_PATH,
         PROJECT_BASE + REFUND_PATH,

@@ -41,6 +41,10 @@ const PrivateRoute: React.FC<{ requiredRole?: number }> = ({ requiredRole }) => 
         } />;
     }
 
+    if (requiredRole == undefined && auth.isBackOffice) {
+        return <Navigate to={ERROR_PATH} state={{ message: "To use the system like a user, please go to the front desk." }} />;
+    }
+
     console.log(" ### PrivateRoute approved :)");
     return <Outlet />;
 };

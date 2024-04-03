@@ -1,4 +1,4 @@
-import { BrowserRouter, Route, Routes } from 'react-router-dom'
+import { HashRouter, Route, Routes } from 'react-router-dom'
 
 import CatalogPage from '../../pages/CatalogPage/CatalogPage'
 import EventDetails from '../../pages/EventDetailsPage/EventDetailsPage'
@@ -20,7 +20,7 @@ import { UserRole } from '../../const'
 function CSRouter() {
 
     return (
-        <BrowserRouter basename={PROJECT_BASE}>
+        <HashRouter basename={PROJECT_BASE}>
             <AuthProvider>
                 <NavbarComponent />
                 <Routes>
@@ -54,7 +54,7 @@ function CSRouter() {
                     <Route path="*" element={<NotFound />} />
                 </Routes>
             </AuthProvider>
-        </BrowserRouter>
+        </HashRouter>
     )
 }
 export default CSRouter

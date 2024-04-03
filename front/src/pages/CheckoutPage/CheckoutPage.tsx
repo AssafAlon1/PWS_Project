@@ -112,7 +112,7 @@ const CheckoutPage: React.FC = () => {
 
     const TimerRanOut = () => {
         console.log("Timer ran out");
-        // setDisplayError(true);
+        // setLockValid(false);
         navigate(ERROR_PATH, { state: { message: "Purchase request timed-out, tickect no longer guaranteed...\n You gotta be quicker next time" } });
     }
 
@@ -192,3 +192,49 @@ const CheckoutPage: React.FC = () => {
 };
 
 export default CheckoutPage;
+
+
+/*
+Failed attempt to prevent re-render of the timer component using memo
+
+const LockCountDownComponent: React.FC<LockCountDownComponentProps> = memo(({ lockTimeSeconds, renderTime }) => (
+  <Card className="mt-4">
+    <Card.Header>
+      <Card.Title>Ticket is saved for you for {lockTimeSeconds / 60} minutes</Card.Title>
+    </Card.Header>
+    <Card.Body className="timer-wrapper">
+      <CountdownCircleTimer
+        isPlaying
+        duration={lockTimeSeconds}
+        colors={['#004777', '#F7B801', '#A30000', '#A30000']}
+        colorsTime={[lockTimeSeconds, (lockTimeSeconds / 3) * 2, (lockTimeSeconds / 3), 0]}
+        size={170}
+        strokeWidth={12}
+        trailColor="#d6d6d6"
+      >
+        {renderTime}
+      </CountdownCircleTimer>
+    </Card.Body>
+  </Card>
+));
+
+const ParentComponent = () => {
+    const renderTime = useCallback(({ remainingTime }) => {
+        // Your render time logic
+    }, []); // Dependency array is empty if renderTime doesn't depend on props or state
+
+    return (
+        <LockCountDownComponent 
+            lockTimeSeconds={LOCK_TIME_SECONDS} 
+            renderTime={renderTime} 
+        />
+    );
+};
+
+Note on TimerRanOut function:
+the idea was to set a state and pass it to the form
+and show an alert or message indicating lock expired and give user option to go back to the event page
+the form will take it into consideration on availability of the Buy now button and maybe add a tooltip
+
+in practice - setting the state in the TimerRanOut function caused a re-render of the component and the timer started running again :(
+*/

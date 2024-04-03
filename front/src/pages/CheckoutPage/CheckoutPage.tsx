@@ -17,6 +17,7 @@ const CheckoutPage: React.FC = () => {
     const [purchaseId, setPurchaseId] = useState<string>("");
     const { purchaseDetails, setPurchaseDetails } = usePurchaseDetails();
     const [paymentDetails, setPaymentDetails] = useState<PaymentDetails | null>(null);
+    const [dueDate, setDueDate] = useState<Date>(new Date(new Date().getTime() + LOCK_TIME_SECONDS * 1000));
     const navigate = useNavigate();
     const context = useContext(AuthContext);
 
@@ -116,27 +117,30 @@ const CheckoutPage: React.FC = () => {
         navigate(ERROR_PATH, { state: { message: "Purchase request timed-out, tickect no longer guaranteed...\n You gotta be quicker next time" } });
     }
 
-    const LockCountDownComponent = () => (
-        <Card className="mt-4">
+    const LockCountDownComponent = () => {
+        const timeLeft = Math.floor((dueDate.getTime() - new Date().getTime()) / 1000);
+        return <Card className="mt-4">
             <Card.Header>
-                <Card.Title>Ticket is saved for you for {LOCK_TIME_SECONDS/60} minutes</Card.Title>
+                <Card.Title>Ticket is saved for you for {LOCK_TIME_SECONDS / 60} minutes</Card.Title>
             </Card.Header>
             <Card.Body className="timer-wrapper">
-                    <CountdownCircleTimer 
-                        isPlaying
-                        duration={LOCK_TIME_SECONDS}
-                        colors={['#004777', '#F7B801', '#A30000', '#A30000']}
-                        colorsTime={[LOCK_TIME_SECONDS, (LOCK_TIME_SECONDS / 3) * 2, (LOCK_TIME_SECONDS / 3), 0]}
-                        size={170}
-                        strokeWidth={12}
-                        trailColor="#d6d6d6"
-                        onComplete={() => TimerRanOut()}
-                    >
-                        {renderTime}
-                    </CountdownCircleTimer>
+                <CountdownCircleTimer
+                    isPlaying
+                    initialRemainingTime={timeLeft}
+                    duration={LOCK_TIME_SECONDS}
+                    colors={['#004777', '#F7B801', '#A30000', '#A30000']}
+                    colorsTime={[LOCK_TIME_SECONDS, (LOCK_TIME_SECONDS / 3) * 2, (LOCK_TIME_SECONDS / 3), 0]}
+                    size={170}
+                    strokeWidth={12}
+                    updateInterval={1}
+                    trailColor="#d6d6d6"
+                    onComplete={() => TimerRanOut()}
+                >
+                    {renderTime}
+                </CountdownCircleTimer>
             </Card.Body>
         </Card>
-    )
+    }
 
     const price = (purchaseDetails?.price ?? 0) * (purchaseDetails?.ticket_amount ?? 0);
 

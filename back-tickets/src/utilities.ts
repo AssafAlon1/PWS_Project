@@ -60,7 +60,8 @@ export const purchaseTicketFromLock = async (ticket: ICSTicket, paymentInformati
 
     // If we sold all tickets, send new cheapest ticket
     try {
-        if (isSoldOut(ticket._id.toString())) {
+        if (await isSoldOut(ticket._id.toString())) {
+            console.log("All tickets sold out - sending new cheapest ticket");
             const newCheapestTicket = await queryCheapestTicketsByEventID(paymentInformation.event_id);
             const newCheapestMessage = {
                 eventId: paymentInformation.event_id,
@@ -78,59 +79,7 @@ export const purchaseTicketFromLock = async (ticket: ICSTicket, paymentInformati
     return orderResult.data.order_id;
 }
 
-// TODO - In frontend, show amount of locked tickets ("xx tickets are about to be purchased...)
+
 // TODO - In frontend checkout page, indicate user if there's no available tickets to buy (maybe by kicking them out to the catalog or something)
 
-// TODO - change lock+unlock mechanism with timeout!
-/*
-async function lockTickets(ticketId, quantity) {
-    const lockDuration = 2 * 60 * 1000; // 2 minutes in milliseconds
-    const expiration = new Date(Date.now() + lockDuration);
 
-    const ticket = await Ticket.findById(ticketId);
-
-    if (!ticket || (ticket.available - totalLockedTickets(ticket)) < quantity) {
-        throw new Error('Not enough available tickets to lock.');
-    }
-
-    // Add a new lock
-    ticket.locks.push({ quantity, expiration });
-    await ticket.save();
-
-    // Set a timeout to automatically unlock these tickets
-    setTimeout(() => {
-        unlockTickets(ticketId, quantity, expiration).catch(console.error);
-    }, lockDuration);
-
-    return ticket;
-}
-
-// Helper function to calculate the total number of locked tickets
-function totalLockedTickets(ticket) {
-    return ticket.locks.reduce((sum, lock) => sum + lock.quantity, 0);
-}
-*/
-
-/*
-async function unlockTickets(ticketId, quantity, expiration) {
-    const ticket = await Ticket.findById(ticketId);
-
-    if (!ticket) {
-        throw new Error('Ticket not found.');
-    }
-
-    // Find the specific lock by its expiration and quantity and remove it
-    const lockIndex = ticket.locks.findIndex(lock => 
-        lock.quantity === quantity && lock.expiration.getTime() === expiration.getTime());
-
-    if (lockIndex > -1) {
-        ticket.locks.splice(lockIndex, 1);
-    } else {
-        throw new Error('Lock not found.');
-    }
-
-    await ticket.save();
-
-    return ticket;
-}
-*/

@@ -40,24 +40,6 @@ export const getALLTicketsByEventId = async (req: Request, res: Response) => {
     res.status(StatusCodes.OK).send(data);
 }
 
-// TODO - legacy - maybe remove
-// export const getAvailableTicketsByEventId = async (req: Request, res: Response) => {
-//     console.log("GET /api/ticket");
-//     const eventId = req.params.eventId;
-//     const skip = parseInt(req.query.skip as string) || 0;
-//     const limit = parseInt(req.query.limit as string) || MAX_TICKET_LIMIT;
-//     let data;
-//     try {
-//         data = await queryAvailableTicketsByEventID(eventId, skip, limit);
-//     }
-//     catch (error) {
-//         res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({ message: "Internal Server Error" });
-//         return;
-//     }
-
-//     res.status(StatusCodes.OK).send(data);
-// }
-
 export const createTickets = async (req: Request, res: Response) => {
     console.log("POST /api/tickets");
     try {

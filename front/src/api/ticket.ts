@@ -3,9 +3,8 @@ import axios, { isAxiosError } from "axios";
 import { PaymentDetails, PurchaseDetails, Ticket } from "../types";
 import { API_GATEWAY_URL } from "../const";
 
-const axiosInstance = axios.create({ withCredentials: true, baseURL: API_GATEWAY_URL }); 
+const axiosInstance = axios.create({ withCredentials: true, baseURL: API_GATEWAY_URL });
 
-// TODO - rename to TicketApi
 const RealTicketApi = {
 
     fetchTickets: async (eventId: string, skip?: number, limit?: number): Promise<Ticket[] | null> => {
@@ -45,7 +44,6 @@ const RealTicketApi = {
     },
 
     purchaseTickets: async (purchaseDetails: PurchaseDetails, paymentDetails: PaymentDetails, username: string) => {
-        // TODO - implement lock!
         try {
             const putData = {
                 event_id: purchaseDetails.event_id,

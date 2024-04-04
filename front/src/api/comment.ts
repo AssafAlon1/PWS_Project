@@ -3,7 +3,7 @@ import { APIStatus } from "../types";
 import { API_GATEWAY_URL } from "../const";
 import { Comment } from "../types";
 
-const axiosInstance = axios.create({ withCredentials: true, baseURL: API_GATEWAY_URL }); // TODO - withCredentials?
+const axiosInstance = axios.create({ withCredentials: true, baseURL: API_GATEWAY_URL });
 
 const RealCommentApi = {
     postComment: async (username: string, eventId: string, comment: string) => {

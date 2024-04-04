@@ -6,7 +6,6 @@ import { API_GATEWAY_URL } from "../const";
 const axiosInstance = axios.create({ withCredentials: true, baseURL: API_GATEWAY_URL }); // TODO - withCredentials?
 
 // TODO - Paths (/api/event) to consts?
-//TODO - rename to EventApi
 const RealEventApi = {
     fetchEvents: async (skip?: number, limit?: number): Promise<CSEvent[]> => {
         try {
@@ -47,7 +46,7 @@ const RealEventApi = {
                     skip,
                     limit
                 }
-            
+
             });
             return response.data;
         } catch (error) {

@@ -1,12 +1,12 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Alert, Card, Col, Row } from 'react-bootstrap';
+import { Alert, Button, Card, Col, Row } from 'react-bootstrap';
 import PaymentForm from '../../components/PaymentForm/PaymentForm';
 import { usePurchaseDetails } from '../../components/PurchaseDetailsContext/PurchaseDetailsContext';
 import TicketApi from '../../api/ticket';
 import { AuthContext } from '../../components/AuthProvider/AuthProvider';
 import { PaymentDetails } from '../../types';
-import { ERROR_PATH, SUCCESS_PATH } from '../../paths';
+import { CATALOG_PATH, ERROR_PATH, SUCCESS_PATH } from '../../paths';
 import { CountdownCircleTimer } from 'react-countdown-circle-timer'
 import { LOCK_TIME_SECONDS } from '../../const';
 import "./CheckoutPage.css";
@@ -14,10 +14,11 @@ import "./CheckoutPage.css";
 const CheckoutPage: React.FC = () => {
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [displayError, setDisplayError] = useState<boolean>(false);
+    const [lockValid, setLockValid] = useState<boolean>(true);
     const [purchaseId, setPurchaseId] = useState<string>("");
-    const { purchaseDetails, setPurchaseDetails } = usePurchaseDetails();
     const [paymentDetails, setPaymentDetails] = useState<PaymentDetails | null>(null);
-    const [dueDate, setDueDate] = useState<Date>(new Date(new Date().getTime() + LOCK_TIME_SECONDS * 1000));
+    const [dueDate] = useState<Date>(new Date(new Date().getTime() + LOCK_TIME_SECONDS * 1000));
+    const { purchaseDetails, setPurchaseDetails } = usePurchaseDetails();
     const navigate = useNavigate();
     const context = useContext(AuthContext);
 
@@ -113,8 +114,7 @@ const CheckoutPage: React.FC = () => {
 
     const TimerRanOut = () => {
         console.log("Timer ran out");
-        // setLockValid(false);
-        navigate(ERROR_PATH, { state: { message: "Purchase request timed-out, tickect no longer guaranteed...\n You gotta be quicker next time" } });
+        setLockValid(false);
     }
 
     const LockCountDownComponent = () => {
@@ -177,68 +177,33 @@ const CheckoutPage: React.FC = () => {
                         purchaseTickets={performPurchase}
                         isLoading={isLoading}
                         setPaymentDetails={setPaymentDetails}
-                        price={price} />
+                        price={price} 
+                        lockValid={lockValid}/>
                 </Col>
                 <Col>
                     <OrderSummaryComponent />
                     <LockCountDownComponent />
                 </Col>
             </Row>
-            {/* TODO - INDICATION IF TICKETS RAN OUT */}
-            <Alert show={displayError} variant="danger" onClose={() => setDisplayError(false)} dismissible>
+            
+            {/* Alert of failed purchase */}
+            <Alert show={displayError && lockValid} variant="danger" onClose={() => setDisplayError(false)} dismissible className="mt-4 mb-4">
                 <Alert.Heading>Failed to purchase tickets</Alert.Heading>
                 <p>
                     Something went wrong while trying to purchase your tickets. Please try again.
                 </p>
             </Alert>
+
+            {/* Alert of expired lock */}
+            <Alert show={!lockValid} variant="danger" className="mt-4 mb-4">
+                <Alert.Heading>Time's up!</Alert.Heading>
+                <p>
+                    Purchase request timed-out, Your ticket is no longer guaranteed. Please try again.
+                </p>
+            </Alert>
+                {!lockValid && <Button onClick={() => navigate(CATALOG_PATH)}>Back to Catalog</Button>}
         </>
     );
 };
 
 export default CheckoutPage;
-
-
-/*
-Failed attempt to prevent re-render of the timer component using memo
-
-const LockCountDownComponent: React.FC<LockCountDownComponentProps> = memo(({ lockTimeSeconds, renderTime }) => (
-  <Card className="mt-4">
-    <Card.Header>
-      <Card.Title>Ticket is saved for you for {lockTimeSeconds / 60} minutes</Card.Title>
-    </Card.Header>
-    <Card.Body className="timer-wrapper">
-      <CountdownCircleTimer
-        isPlaying
-        duration={lockTimeSeconds}
-        colors={['#004777', '#F7B801', '#A30000', '#A30000']}
-        colorsTime={[lockTimeSeconds, (lockTimeSeconds / 3) * 2, (lockTimeSeconds / 3), 0]}
-        size={170}
-        strokeWidth={12}
-        trailColor="#d6d6d6"
-      >
-        {renderTime}
-      </CountdownCircleTimer>
-    </Card.Body>
-  </Card>
-));
-
-const ParentComponent = () => {
-    const renderTime = useCallback(({ remainingTime }) => {
-        // Your render time logic
-    }, []); // Dependency array is empty if renderTime doesn't depend on props or state
-
-    return (
-        <LockCountDownComponent 
-            lockTimeSeconds={LOCK_TIME_SECONDS} 
-            renderTime={renderTime} 
-        />
-    );
-};
-
-Note on TimerRanOut function:
-the idea was to set a state and pass it to the form
-and show an alert or message indicating lock expired and give user option to go back to the event page
-the form will take it into consideration on availability of the Buy now button and maybe add a tooltip
-
-in practice - setting the state in the TimerRanOut function caused a re-render of the component and the timer started running again :(
-*/

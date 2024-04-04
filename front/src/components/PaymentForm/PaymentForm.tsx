@@ -3,15 +3,15 @@ import { Button, Card, Col, FloatingLabel, Form, Row } from 'react-bootstrap';
 import { SpanningSpinnner } from '../SpinnerComponent/SpinnerComponent';
 import { PaymentDetails } from '../../types';
 
-
 interface PaymentFormProps {
     purchaseTickets: () => Promise<void>;
     isLoading: boolean;
     setPaymentDetails: (paymentDetails: PaymentDetails) => void;
     price: number;
+    lockValid: boolean;
 }
 
-const PaymentForm: React.FC<PaymentFormProps> = ({ purchaseTickets, isLoading, setPaymentDetails, price }) => {
+const PaymentForm: React.FC<PaymentFormProps> = ({ purchaseTickets, isLoading, setPaymentDetails, price, lockValid }) => {
     const currentYear = new Date().getFullYear() % 100; // Mod to discard the first two digits
     const currentMonth = new Date().getMonth() + 1;
     const [isFormValidated, setFormValidated] = useState<boolean>(false);
@@ -66,7 +66,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({ purchaseTickets, isLoading, s
     }
 
     const BuyNowButton = () => {
-        return <Button disabled={isLoading} variant="primary" type="submit">
+        return <Button disabled={isLoading || !lockValid} variant="primary" type="submit">
             {isLoading ? <SpanningSpinnner /> : "Buy Now!"}
         </Button>
     }

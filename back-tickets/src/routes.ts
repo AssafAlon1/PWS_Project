@@ -19,7 +19,7 @@ export const getALLTicketsByEventId = async (req: Request, res: Response) => {
     const limit = parseInt(req.query.limit as string) || MAX_TICKET_LIMIT;
     let data: ICSTicketFlexible[];
     try {
-        console.log("Gonna fetch tickets for eventId: ", eventId);
+        console.log("Fetching tickets for eventId: ", eventId);
         data = await queryAllTicketsByEventID(eventId, skip, limit);
     }
     catch (error) {
@@ -57,7 +57,6 @@ export const createTickets = async (req: Request, res: Response) => {
         const errors = validationResults.filter(result => result.error);
         if (errors.length > 0) {
             console.error("Ticket schema validation failed");
-            console.log(errors);
             throw Error("Bad Request.");
         }
         const insertResult = await insertTickets(postData);
@@ -106,7 +105,6 @@ export const purchaseTicket = async (req: Request, res: Response) => {
         lock.quantity === postData.ticket_amount &&
         lock.expires  > new Date()
     ) !== null;
-    console.log("[DEBUG] doesUserHaveLock: ", doesUserHaveLock);
 
     // purchase the tickets from the available tickets:
     // if there are enough tickets available, lock them and purchase from the lock.
@@ -129,7 +127,7 @@ export const purchaseTicket = async (req: Request, res: Response) => {
   
     // Assuming the user has a lock on the tickets, purchase the tickets from the lock
     try {
-        console.log("gonna buy ticket from lock");
+        console.log("Buying ticket from lock");
         const purchaseInfo = await purchaseTicketFromLock(ticket, postData, publisherChannel);
         res.status(StatusCodes.OK).send({ order_id: purchaseInfo });
         return;

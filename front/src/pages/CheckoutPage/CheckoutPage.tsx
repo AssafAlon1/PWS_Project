@@ -59,7 +59,6 @@ const CheckoutPage: React.FC = () => {
                 throw new Error("No user found");
             }
             const result = await TicketApi.purchaseTickets(purchaseDetails, paymentDetails, username);
-            console.log("Result of purchaseTickets: ", result);
             if (result) {
                 setPurchaseId(result);
                 console.log("Purchase ID: ", result);
@@ -85,7 +84,6 @@ const CheckoutPage: React.FC = () => {
         const detailsForSuccess = { ...purchaseDetails };
         setPurchaseDetails(null);
 
-        console.log("Redirecting after purchase");
         navigate(SUCCESS_PATH, {
             state: {
                 event_name: detailsForSuccess.event_name,
@@ -161,10 +159,8 @@ const CheckoutPage: React.FC = () => {
 
     useEffect(() => {
         if (purchaseId) {
-            console.log("Purchase ID: ", purchaseId);
             afterPurchaseRedirect();
         }
-        console.log("no purchase ID...");
     }, [purchaseId]);
 
 

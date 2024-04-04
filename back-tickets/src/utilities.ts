@@ -61,7 +61,6 @@ export const purchaseTicketFromLock = async (ticket: ICSTicket, paymentInformati
     // If we sold all tickets, send new cheapest ticket
     try {
         if (await isSoldOut(ticket._id.toString())) {
-            console.log("All tickets sold out - sending new cheapest ticket");
             const newCheapestTicket = await queryCheapestTicketsByEventID(paymentInformation.event_id);
             const newCheapestMessage = {
                 eventId: paymentInformation.event_id,

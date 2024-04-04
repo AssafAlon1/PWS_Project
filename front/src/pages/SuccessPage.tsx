@@ -46,8 +46,6 @@ const SuccessPage: React.FC = () => {
             </Card.Body>
         }
         else { // Souldn't get here
-            console.log("Uhmmm... Why are you HERE?");
-            console.log(location.state);
             return <Card.Body>
                 <Card.Text>{message}</Card.Text>
                 <Link to={CATALOG_PATH}><Button variant="primary" onClick={handleReturnToCatalog}>Return to Catalog</Button></Link>

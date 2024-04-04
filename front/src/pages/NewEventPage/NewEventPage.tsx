@@ -114,7 +114,6 @@ const NewEventPage: React.FC = () => {
             if (imageURL != "") {
                 eventCreationRequest.image = imageURL;
             }
-            console.log(eventCreationRequest);
             const result = await EventApi.createEvent(eventCreationRequest);
             navigate(SUCCESS_PATH, { state: { operationType: "create", createdEventId: result, message: "Event created successfully!" } });
         }

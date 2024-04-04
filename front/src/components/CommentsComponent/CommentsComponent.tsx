@@ -60,9 +60,7 @@ const CommentsComponent: React.FC<CommentsComponentProps> = ({ eventId }) => {
                 return;
             }
             const newComments = await CommentApi.fetchComments(eventId, comments.length, MAX_COMMENTS);
-            console.log("newComments", newComments);
             if (newComments.length < MAX_COMMENTS) {
-                console.log("No longer hasMore");
                 setHasMore(false);
             }
             setComments(prevComments => [...prevComments ?? [], ...newComments]);

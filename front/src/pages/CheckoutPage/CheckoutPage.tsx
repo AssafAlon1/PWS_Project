@@ -47,7 +47,6 @@ const CheckoutPage: React.FC = () => {
             navigate(ERROR_PATH, { state: { message: "No user found" } });
             return;
         }
-        console.log("About to purchase tickets");
         setIsLoading(true);
         try {
             if (!paymentDetails) {
@@ -56,7 +55,6 @@ const CheckoutPage: React.FC = () => {
             const result = await TicketApi.purchaseTickets(purchaseDetails, paymentDetails, username);
             if (result) {
                 setPurchaseId(result);
-                console.log("Purchase ID: ", result);
             }
         }
         catch (err) {
@@ -66,12 +64,10 @@ const CheckoutPage: React.FC = () => {
             throw err;
         }
         setIsLoading(false);
-        console.log("Completed purchase");
     }
 
 
     const afterPurchaseRedirect = () => {
-        console.log(" >> After purchase redirect");
         if (context.updateNextEvent) {
             context.updateNextEvent();
         }
@@ -107,7 +103,6 @@ const CheckoutPage: React.FC = () => {
     };
 
     const TimerRanOut = () => {
-        console.log("Timer ran out");
         setLockValid(false);
     }
 

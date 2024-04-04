@@ -8,7 +8,6 @@ const axiosInstance = axios.create({ withCredentials: true, baseURL: API_GATEWAY
 const RealTicketApi = {
 
     fetchTickets: async (eventId: string, skip?: number, limit?: number): Promise<Ticket[] | null> => {
-        console.log("fetchAvailableTickets for eventID: ", eventId);
         const response = await axiosInstance.get(`/api/ticket/all/${eventId}`, {
             params: {
                 skip,
@@ -19,7 +18,6 @@ const RealTicketApi = {
     },
 
     fetchBackOfficeTickets: async (eventId: string, skip?: number, limit?: number): Promise<Ticket[] | null> => {
-        console.log("fetchBackOfficeTickets for eventID: ", eventId);
         const response = await axiosInstance.get(`/api/ticket/all/backoffice/${eventId}`, {
             params: {
                 skip,
@@ -37,7 +35,6 @@ const RealTicketApi = {
             ...paymentDetails, username
         }
         const result = await axiosInstance.put('/api/ticket', putData);
-        console.log("Completed purchase");
         return result.data.order_id;
 
     },
@@ -50,7 +47,6 @@ const RealTicketApi = {
             username: username
         }
         await axiosInstance.put(`/api/ticket/${eventId}`, putData);
-        console.log("Completed lock");
         return true;
     },
 }

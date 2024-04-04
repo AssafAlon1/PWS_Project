@@ -40,7 +40,6 @@ const RefundPage: React.FC = () => {
             setLoading(false);
             return;
         }
-        console.log("Got Action");
         setUserAction(fetchedAction);
         setLoading(false);
     }

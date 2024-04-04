@@ -26,9 +26,7 @@ export class PublisherChannel {
         }
         await this.buyChannel.assertExchange(BUY_TICKETS_EXCHANGE, 'fanout', { durable: false });
         await this.buyChannel.publish(BUY_TICKETS_EXCHANGE, '', Buffer.from(msg));
-        console.log(
-            `Publisher >>> | message "${msg}" published to exchange "${BUY_TICKETS_EXCHANGE}"`
-        );
+        console.log(`Published "${msg}" to "${BUY_TICKETS_EXCHANGE}"`);
     }
 
     async sendRefundEvent(msg: string) {
@@ -38,8 +36,6 @@ export class PublisherChannel {
 
         await this.refundChannel.assertExchange(REFUND_TICKETS_EXCHANGE, 'fanout', { durable: false });
         await this.refundChannel.publish(REFUND_TICKETS_EXCHANGE, '', Buffer.from(msg));
-        console.log(
-            `Publisher >>> | message "${msg}" published to exchange "${REFUND_TICKETS_EXCHANGE}"`
-        );
+        console.log(`Published "${msg}" to "${REFUND_TICKETS_EXCHANGE}"`);
     }
 }

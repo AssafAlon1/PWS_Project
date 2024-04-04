@@ -16,7 +16,6 @@ const changePermissionSchema = Joi.object({
 
 export async function loginRoute(req: Request, res: Response) {
   const credentials = req.body;
-  console.log(" >> User came with credentials: ", credentials);
   try {
     await User.validate(credentials);
   }
@@ -47,6 +46,7 @@ export async function loginRoute(req: Request, res: Response) {
   // We are Deployed - must use secure cookies with sameSite none
   res.cookie('token', token, { httpOnly: true, sameSite: sameSite, secure, maxAge: 172800000 });
   res.send('Logged in');
+  console.log("User logged in: " + user.username);
 }
 
 export async function logoutRoute(req: Request, res: Response) {

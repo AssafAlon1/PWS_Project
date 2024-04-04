@@ -21,7 +21,6 @@ export const getComment = async (req: Request, res: Response) => {
       throw new Error("Invalid query params");
     }
   } catch (err) {
-    console.log(err);
     skip = 0;
     limit = Number(MAX_COMMENTS);
   }

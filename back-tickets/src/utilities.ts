@@ -42,7 +42,6 @@ export const purchaseTicketFromLock = async (ticket: ICSTicket, paymentInformati
     // call shark to purchase the tickets
     try {
         // CREATE THE ORDER, AND UNDO CHANGES IF FAILED
-        console.log(`>> Buying ${paymentInformation.ticket_amount} tickets for of id ${ticket._id}`);
         orderResult = await axiosInstance.post("/api/buy", paymentInformation);
         if (orderResult.status != StatusCodes.OK) {
             console.error("I believe this code is unreachable. Can you see me?");

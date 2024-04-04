@@ -39,7 +39,6 @@ export const LoginPage: React.FC = () => {
 
     if (res === APIStatus.Success) {
       auth.setUser(providedUsername);
-      console.log("Logged in as: ", providedUsername);
       navigate(CATALOG_PATH);
       return;
     }

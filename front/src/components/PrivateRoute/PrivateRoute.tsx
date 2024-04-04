@@ -46,7 +46,6 @@ const PrivateRoute: React.FC<{ requiredRole?: number }> = ({ requiredRole }) => 
         return <Navigate to={ERROR_PATH} state={{ message: "To use the system like a user, please go to the front desk." }} />;
     }
 
-    console.log(" ### PrivateRoute approved :)");
     return <Outlet />;
 };
 

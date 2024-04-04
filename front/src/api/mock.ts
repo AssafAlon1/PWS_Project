@@ -224,19 +224,16 @@ export const MockUserActionApi = {
 
     },
     getUserClosestEvent: async (username: string): Promise<CSEvent | null> => {
-        console.log(" > Getting closest event for " + username);
         await new Promise(resolve => setTimeout(resolve, 1000));
         const userEventIds = MockUserActionApi.allUserActions
             .filter(action => action.username === username && !action.refund_time)
             .map(purchase => purchase.event_id);
         if (!userEventIds) {
-            console.log(" > No events found for " + username);
             return null;
         }
 
         const userEvents: CSEvent[] = userEventIds.map(eventId => MockEventApi.allEvents.find(event => event._id === eventId)).filter(event => event !== undefined) as CSEvent[];
         if (userEvents.length === 0) {
-            console.log(" > No events found for " + username);
             return null;
         }
 
@@ -251,11 +248,9 @@ export const MockUserActionApi = {
         }, userEvents[0]);
 
         if (nextEvent) {
-            console.log(" > Next event found for " + username + ": " + nextEvent.title);
             return nextEvent;
         }
 
-        console.log(" > SHOULDN'T BE REACHABLE No events found for " + username);
         return null;
     }
 }

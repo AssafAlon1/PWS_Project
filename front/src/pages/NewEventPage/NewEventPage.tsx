@@ -117,7 +117,7 @@ const NewEventPage: React.FC = () => {
             navigate(SUCCESS_PATH, { state: { operationType: "create", createdEventId: result, message: "Event created successfully!" } });
         }
         catch (error) {
-            console.log(error);
+            console.error(error);
             setDisplayError("Failed to create event. Please try again.");
         }
     }

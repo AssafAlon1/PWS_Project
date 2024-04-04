@@ -13,7 +13,6 @@ export const queryUserRole = async (username: string): Promise<number> => {
 
 export const hasPermission = async (username: string, requiredRole: UserRole): Promise<boolean> => {
   const userRole = await queryUserRole(username);
-  console.log(" > User role: " + userRole);
   return userRole <= requiredRole;
 }
 

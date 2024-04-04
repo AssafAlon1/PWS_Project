@@ -194,13 +194,11 @@ const EventDetails: React.FC = () => {
         }
 
         const onClickBuyNow = async () => {
-            console.log("Going to request buying tickets");
             setErrorMessage("");
             if (!eventId || !authContext || !authContext.user) {
                 setErrorMessage("Error: Missing event id or user information");
                 return;
             }
-            console.log("Locking ticket");
             try {
                 await TicketApi.lockTickets(eventId, ticketPurchaseDetails.ticket_name, ticketAmount, authContext.user);
                 setPurchaseDetails(ticketPurchaseDetails);

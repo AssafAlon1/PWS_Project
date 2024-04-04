@@ -10,7 +10,7 @@ import Joi from 'joi';
 
 const changePermissionSchema = Joi.object({
   username: Joi.string().required(),
-  permission: Joi.string().valid('W', 'M').required()
+  permission: Joi.string().valid("W", "M", "G").required()
 });
 
 
@@ -130,7 +130,8 @@ export async function updatePrivilegesRoute(req: Request, res: Response) {
   }
 
   try {
-    const role = updatePermissionRequest.permission === "M" ? UserRole.Manager : UserRole.Worker;
+    const role = updatePermissionRequest.permission === "M" ? UserRole.Manager :
+      updatePermissionRequest.permission === "W" ? UserRole.Worker : UserRole.Guest;
     const updateResult = updateRole(updatePermissionRequest.username, role);
     if (!updateResult) {
       throw new Error("Failed to update permission.")

@@ -20,7 +20,7 @@ export const purchaseTicketFromLock = async (ticket: ICSTicket, paymentInformati
         if (
             currentLock.username === paymentInformation.username &&
             currentLock.quantity === paymentInformation.ticket_amount &&
-            currentLock.expires > new Date(new Date().getTime() - LOCK_GRACE_PERIOD_SECONDS * 1000) && // TODO - Make sure when cleaning up old tickets, give 2 * LOCK_GRACE_PERIOD_SECONDS
+            currentLock.expires > new Date(new Date().getTime() - LOCK_GRACE_PERIOD_SECONDS * 1000) &&
             (!minLock || currentLock.expires < minLock.expires)
         ) {
             return currentLock;

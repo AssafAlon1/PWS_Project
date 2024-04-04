@@ -43,7 +43,6 @@ function keepSensitiveInfo(req: Request, res: Response, next: NextFunction) {
   next();
 }
 
-// TODO - add routes
 app.get(`${ALL_TICKET_PATH}/:eventId`, getALLTicketsByEventId);
 app.get(`${ALL_TICKET_PATH}/backoffice/:eventId`, keepSensitiveInfo, getALLTicketsByEventId);
 

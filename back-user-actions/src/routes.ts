@@ -1,8 +1,7 @@
 import { Request, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
 
-import { addRefundTicketsAction, queryUserClosestEvent, addBuyTicketsAction, queryActionByPurchaseId, queryAllUserActions } from './db.js';
-import { hasEventStarted } from "./utils.js";
+import { addRefundTicketsAction, queryUserClosestEvent, queryActionByPurchaseId, queryAllUserActions } from './db.js';
 import { ACTIONS_PATH, CLOSEST_EVENT_PATH, MAX_QUERY_LIMIT, ORDER_API_URL } from "./const.js";
 import axios from 'axios';
 
@@ -31,17 +30,13 @@ export const refundTickets = async (req: Request, res: Response) => {
             return res.status(StatusCodes.NOT_FOUND).send({ message: "Purchase doesn't exist or has already been refunded." });
         }
 
-        if (await hasEventStarted(postData.purchase_id)) {
-            return res.status(StatusCodes.BAD_REQUEST).send({ message: "Event has already started." });
-        }
-
         const refundInformation = {
             purchase_id: postData.purchase_id,
             event_id: refund_details.event_id,
             ticket_name: refund_details.ticket_name,
             ticket_amount: refund_details.ticket_amount,
         };
-        // TODO - refund with the order service
+
         const refundResult = await axiosInstance.post('/api/refund', refundInformation);
         if (refundResult.status !== StatusCodes.OK) {
             throw Error("Failed to refund tickets.");
@@ -100,7 +95,7 @@ export const getUserActions = async (req: Request, res: Response) => {
     }
 }
 
-// TODO - Only for the user that bought the tickets?
+// TODO - After merging refund with user space, this may not be used
 export const getUserActionByPurchaseId = async (req: Request, res: Response) => {
     console.log("GET " + `${ACTIONS_PATH}/:purchase_id`);
     try {

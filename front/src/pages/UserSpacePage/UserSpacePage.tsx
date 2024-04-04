@@ -36,7 +36,13 @@ const UserSpacePage: React.FC = () => {
       if (newActions.length < MAX_ACTIONS) {
         setHasMore(false);
       }
-      const newEvents = await Promise.all(newActions.map(action => EventApi.fetchEvent(action.event_id)));
+      const newEvents = await Promise.all(newActions.map(action => {
+        try {
+          return EventApi.fetchEvent(action.event_id);
+        } catch {
+          return null;
+        }
+      }));
       setUserActions(prevActions => [...prevActions, ...newActions]);
       setUserEvents(prevEvents => [...prevEvents, ...newEvents]);
     } catch {

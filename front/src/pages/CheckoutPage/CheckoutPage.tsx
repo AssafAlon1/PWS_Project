@@ -43,7 +43,6 @@ const CheckoutPage: React.FC = () => {
             console.error(err);
             return;
         }
-        // TODO - Take an additional look at this
         if (!username) {
             navigate(ERROR_PATH, { state: { message: "No user found" } });
             return;
@@ -53,10 +52,6 @@ const CheckoutPage: React.FC = () => {
         try {
             if (!paymentDetails) {
                 throw new Error("No payment details found");
-            }
-            const username = context.user;
-            if (!username) {
-                throw new Error("No user found");
             }
             const result = await TicketApi.purchaseTickets(purchaseDetails, paymentDetails, username);
             if (result) {

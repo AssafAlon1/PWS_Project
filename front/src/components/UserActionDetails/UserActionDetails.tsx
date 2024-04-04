@@ -147,7 +147,6 @@ const ActionDetails: React.FC<ActionDetailsProps> = ({ action, csevent, isLoadin
 }
 
 
-// TODO - Code duplication with CatalogEventDetails.tsx, maybe remove
 export const ActionPlaceholder = () => {
     return (
         <Card className="mb-2">

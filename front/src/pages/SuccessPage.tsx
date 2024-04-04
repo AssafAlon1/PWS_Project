@@ -34,6 +34,7 @@ const SuccessPage: React.FC = () => {
         else if (operationType == "refund" && orderId) { // TODO - More info
             return <Card.Body>
                 <Card.Text>Order ID: {orderId}</Card.Text>
+                <Card.Text>Tickets: {ticketQuantity} x {ticketName}</Card.Text>
                 <Card.Text>{message}</Card.Text>
                 <Link to={CATALOG_PATH}><Button variant="primary" onClick={handleReturnToCatalog}>Return to Catalog</Button></Link>
             </Card.Body>

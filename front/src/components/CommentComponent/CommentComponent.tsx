@@ -10,7 +10,7 @@ interface CommentProps {
 
 const CommentComponent: React.FC<CommentProps> = ({ comment }) => {
     return (
-        <Card className="mb-2" style={{ maxWidth: "90vw" }}>
+        <Card className="mb-2">
             <Card.Header>
                 By {comment.author} | At {getFormattedDateTime(comment.createdAt)}
             </Card.Header>

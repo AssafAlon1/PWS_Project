@@ -23,9 +23,9 @@ const clearExpiredLock = async (ticketId: string, username: string, quantity: nu
         }
       }
     ).exec();
-    
+
     // Re-add the locked tickets to the available amount - only if they weren't bought
-    if(result.modifiedCount === 1) {
+    if (result.modifiedCount === 1) {
       await CSTicket.updateOne(
         { _id: ticketId },
         {
@@ -40,7 +40,7 @@ const clearExpiredLock = async (ticketId: string, username: string, quantity: nu
     await session.commitTransaction();
 
     // TODO - remove? (what if one of the transactions failed?)
-    if (result.modifiedCount === 1) { 
+    if (result.modifiedCount === 1) {
       console.log(" >> Cleared ", quantity, " tickets held by expired locks with id: ", ticketId);
     }
   }
@@ -56,17 +56,11 @@ export const insertTickets = async (ticketData: ICSTicket[]): Promise<number> =>
     session = await startSession();
     session.startTransaction();
 
-    for (const ticket of ticketData) {
+    await Promise.all(ticketData.map(async (ticket) => {
       const newTicket = new CSTicket(ticket);
       await newTicket.validate();
       await newTicket.save();
-    }
-    // TODO - maybe use this instead of the for loop
-    // await Promise.all(ticketData.map(async (ticket) => {
-    //   const newTicket = new CSTicket(ticket);
-    //   await newTicket.validate();
-    //   await newTicket.save();
-    // }));
+    }));
 
     await session.commitTransaction();
     return StatusCodes.CREATED;
@@ -185,7 +179,7 @@ export const lockTickets = async (event_id: string, ticketName: string, quantity
 
     console.log("[OK] Locked tickets for event_id: ", event_id, " ticket_name: ", ticketName, " ticket_amount: ", quantity)
     return StatusCodes.OK;
-    }
+  }
   catch (err) {
     console.error("Failed to lock tickets for event_id: ", event_id, " ticket_name: ", ticketName, " ticket_amount: ", quantity);
     if (session) {
@@ -246,6 +240,6 @@ export const addTicketLock = async (ticketId: string, username: string, quantity
 }
 
 export const isSoldOut = async (ticketId: string): Promise<boolean> => {
-  const ticket = await CSTicket.findOne({ _id: ticketId, available: { $gt: 0 }}).exec();
+  const ticket = await CSTicket.findOne({ _id: ticketId, available: { $gt: 0 } }).exec();
   return !ticket;
 }

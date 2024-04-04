@@ -12,7 +12,7 @@ const mongooseEventSchema = new mongoose.Schema({
   end_date: { type: Date, required: true },
   location: { type: String, required: true },
   comment_count: { type: Number, required: false, default: 0 },
-  cheapest_ticket_name: { type: String, required: false },     // for enabling quick access to the cheapest ticket - TODO check if possible to maintain
+  cheapest_ticket_name: { type: String, required: false },     // for enabling quick access to the cheapest ticket
   cheapest_ticket_price: { type: Number, required: true },     // for catalog page 
   total_available_tickets: { type: Number, required: true },   // for catalog page
   image: { type: String, required: false },

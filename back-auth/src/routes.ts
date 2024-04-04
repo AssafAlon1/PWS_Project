@@ -6,6 +6,12 @@ import User from './models/user.js';
 import { StatusCodes } from "http-status-codes";
 import { UserRole } from './const.js';
 import { queryUserRole, updateRole } from './db.js';
+import Joi from 'joi';
+
+const changePermissionSchema = Joi.object({
+  username: Joi.string().required(),
+  permission: Joi.string().valid('W', 'M').required()
+});
 
 
 export async function loginRoute(req: Request, res: Response) {
@@ -106,11 +112,8 @@ export async function updatePrivilegesRoute(req: Request, res: Response) {
 
   const updatePermissionRequest = req.body as { username: string, permission: string };
 
-  // TODO - Consider JOI (not important...)
-  if (!updatePermissionRequest ||
-    !updatePermissionRequest.username ||
-    !updatePermissionRequest.permission ||
-    (updatePermissionRequest.permission !== "W" && updatePermissionRequest.permission !== "M")) {
+  const { error } = changePermissionSchema.validate(updatePermissionRequest);
+  if (error) {
     res.status(StatusCodes.BAD_REQUEST).send('Bad request');
     return;
   }

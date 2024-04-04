@@ -7,7 +7,7 @@ import { CATALOG_PATH } from '../paths';
 const SuccessPage: React.FC = () => {
     const location = useLocation();
     const message = location.state?.message ?? "Operation was completed successfully!";
-    const operationType = location.state?.operationType ?? "purchase";
+    const operationType = location.state?.operationType ?? "unknown";
     const eventName = location.state?.event_name;
     const ticketQuantity = location.state?.ticket_amount;
     const ticketName = location.state?.ticket_name;
@@ -53,7 +53,12 @@ const SuccessPage: React.FC = () => {
         }
     }
 
-    const title = operationType == "purchase" ? "Purchase Successful!" : (operationType == "refund" ? "Refund Successful!" : "Event Creation Successful!");
+    const title = operationType == "purchase" ?
+        "Purchase Successful!" :
+        (operationType == "refund" ?
+            "Refund Successful!" :
+            (operationType == "create" ?
+                "Event Created!" : "Success!"));
     return (
         <>
             <Card border="success">

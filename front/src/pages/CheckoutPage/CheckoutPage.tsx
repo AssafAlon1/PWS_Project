@@ -86,6 +86,7 @@ const CheckoutPage: React.FC = () => {
 
         navigate(SUCCESS_PATH, {
             state: {
+                operationType: "purchase",
                 event_name: detailsForSuccess.event_name,
                 ticket_amount: detailsForSuccess.ticket_amount,
                 ticket_name: detailsForSuccess.ticket_name,
@@ -173,15 +174,15 @@ const CheckoutPage: React.FC = () => {
                         purchaseTickets={performPurchase}
                         isLoading={isLoading}
                         setPaymentDetails={setPaymentDetails}
-                        price={price} 
-                        lockValid={lockValid}/>
+                        price={price}
+                        lockValid={lockValid} />
                 </Col>
                 <Col>
                     <OrderSummaryComponent />
                     <LockCountDownComponent />
                 </Col>
             </Row>
-            
+
             {/* Alert of failed purchase */}
             <Alert show={displayError && lockValid} variant="danger" onClose={() => setDisplayError(false)} dismissible className="mt-4 mb-4">
                 <Alert.Heading>Failed to purchase tickets</Alert.Heading>
@@ -197,7 +198,7 @@ const CheckoutPage: React.FC = () => {
                     Purchase request timed-out, Your ticket is no longer guaranteed. Please try again.
                 </p>
             </Alert>
-                {!lockValid && <Button onClick={() => navigate(CATALOG_PATH)}>Back to Catalog</Button>}
+            {!lockValid && <Button onClick={() => navigate(CATALOG_PATH)}>Back to Catalog</Button>}
         </>
     );
 };

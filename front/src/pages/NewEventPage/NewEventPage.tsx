@@ -81,7 +81,6 @@ const NewEventPage: React.FC = () => {
             ticket.price < 0 ||
             ticket.quantity <= 0 ||
             tickets.some(t => t.name === ticket.name)) {
-            // TODO - Show error message
             alert("Invalid ticket (make sure ticket name is unique)");
             return false;
         }

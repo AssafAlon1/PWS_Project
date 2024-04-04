@@ -39,7 +39,6 @@ const CommentsComponent: React.FC<CommentsComponentProps> = ({ eventId }) => {
             }
         }
         catch (err) {
-            // TODO - Tone it down with all the try,catch,throw (just handle it in fetchComments and check for response value)
             console.error(err);
             console.error(`Failed to fetch comments for event ${eventId}`);
             setFailedFetchingComments(true);

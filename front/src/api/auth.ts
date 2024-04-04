@@ -39,7 +39,7 @@ export const AuthApi = {
             return handleError(e);
         }
     },
-    getUserInfo: async (): Promise<{username: string, role: number} | null> => {
+    getUserInfo: async (): Promise<{ username: string, role: number } | null> => {
         try {
             const response = await axiosInst.get('/api/userinfo');
             return response.data;
@@ -49,7 +49,6 @@ export const AuthApi = {
     },
 };
 
-// TODO - Move to shared utils
 const handleError = async (e: unknown): Promise<APIStatus> => {
     // Handle errors here, check status code and return the appropriate APIStatus
     if (axios.isAxiosError(e) && e.response) {

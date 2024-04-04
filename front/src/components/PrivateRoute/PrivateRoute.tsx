@@ -27,10 +27,10 @@ const PrivateRoute: React.FC<{ requiredRole?: number }> = ({ requiredRole }) => 
     }
 
     if (!auth.user) {
-        return <Navigate to={LOGIN_PATH} />; // TODO - add some parameter saying "session expired"
+        return <Navigate to={LOGIN_PATH} />;
     }
 
-    if (requiredRole != undefined && auth.role > requiredRole) { // TODO - pass the required role as a parameter
+    if (requiredRole != undefined && auth.role > requiredRole) {
         return <Navigate to={ERROR_PATH} state={{ message: "You are not authorized to view this page. Bad boy ;)" }} />;
     }
 

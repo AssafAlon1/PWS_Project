@@ -27,7 +27,7 @@ export const consumeMessages = async () => {
         await channel.bindQueue(REFUND_TICKETS_QUEUE, REFUND_TICKETS_EXCHANGE, '');
 
         await channel.consume(REFUND_TICKETS_QUEUE, async (msg) => {
-            console.log(`Consumer >>> received message: ${msg.content.toString()}`);
+            console.log(`Consumer >>> received message: [REFUND] with ${msg.content.toString()}`);
             const refundTicketsAction = JSON.parse(msg.content.toString());
             const { error } = refundTicketSchema.validate(refundTicketsAction);
             if (error) {

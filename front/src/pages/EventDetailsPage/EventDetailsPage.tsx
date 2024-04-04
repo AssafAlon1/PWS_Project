@@ -69,10 +69,8 @@ const EventDetails: React.FC = () => {
         try {
             if (authContext.isBackOffice) {
                 fetchedTickets = await TicketApi.fetchBackOfficeTickets(eventId) ?? [];
-                console.log("Fetched backoffice tickets: ", fetchedTickets);
             } else {
                 fetchedTickets = await TicketApi.fetchTickets(eventId) ?? [];
-                console.log("Fetched regular tickets: ", fetchedTickets);
             }
             if (!fetchedTickets) {
                 throw new Error(`Failed to fetch tickets for event ${eventId}`);
@@ -186,7 +184,7 @@ const EventDetails: React.FC = () => {
     const BuyTicketComponent: React.FC<{ name: string, price: number, amountLeft: number, locked: number }> = ({ name, price, amountLeft, locked }) => {
         const [ticketAmount, setTicketAmount] = useState<number>(0);
         const [errorMessage, setErrorMessage] = useState<string>("");
-        // IMPORTANT TODO - The setErrorMessage isn't working, as observed by the debug `console.log`
+        // IMPORTANT TODO - The setErrorMessage isn't working, as observed by the debug `console.log` WAS THIS SOLVED?
 
         const ticketPurchaseDetails: PurchaseDetails = {
             event_id: eventId ?? "0",
@@ -197,13 +195,12 @@ const EventDetails: React.FC = () => {
         }
 
         const onClickBuyNow = async () => {
-            console.log("Buying tickets");
+            console.log("Going to request buying tickets");
             setErrorMessage("");
             if (!eventId || !authContext || !authContext.user) {
                 setErrorMessage("Error: Missing event id or user information");
                 return;
             }
-            console.log("Set purchase details to: ", ticketPurchaseDetails);
             console.log("Locking ticket");
             try {
                 await TicketApi.lockTickets(eventId, ticketPurchaseDetails.ticket_name, ticketAmount, authContext.user);

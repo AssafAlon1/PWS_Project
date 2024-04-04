@@ -41,7 +41,6 @@ const RefundPage: React.FC = () => {
             return;
         }
         console.log("Got Action");
-        console.log(fetchedAction);
         setUserAction(fetchedAction);
         setLoading(false);
     }
@@ -50,7 +49,6 @@ const RefundPage: React.FC = () => {
         setErrorText("");
         setLoading(true);
         try {
-            console.log(encodedPurchaseId);
             await UserActionApi.refundPurchase(purchaseId);
             setLoading(false);
             navigate(SUCCESS_PATH, { state: { message: "Refund was successful!", operationType: "refund", order_id: purchaseId } })

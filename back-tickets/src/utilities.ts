@@ -60,7 +60,7 @@ export const purchaseTicketFromLock = async (ticket: ICSTicket, paymentInformati
 
     // If we sold all tickets, send new cheapest ticket
     try {
-        if (isSoldOut(ticket._id.toString())) {
+        if (await isSoldOut(ticket._id.toString())) {
             const newCheapestTicket = await queryCheapestTicketsByEventID(paymentInformation.event_id);
             const newCheapestMessage = {
                 eventId: paymentInformation.event_id,
@@ -78,5 +78,7 @@ export const purchaseTicketFromLock = async (ticket: ICSTicket, paymentInformati
     return orderResult.data.order_id;
 }
 
-// TODO - In frontend, show amount of locked tickets ("xx tickets are about to be purchased...)
+
 // TODO - In frontend checkout page, indicate user if there's no available tickets to buy (maybe by kicking them out to the catalog or something)
+
+

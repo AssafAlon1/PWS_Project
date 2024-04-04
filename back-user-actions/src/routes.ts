@@ -73,7 +73,6 @@ export const getClosestEvent = async (req: Request, res: Response) => {
             return res.status(StatusCodes.NOT_FOUND).send({ message: "No events found." });
         }
 
-        // console.log(" >> Closest event: ", closestEvent);
         res.status(StatusCodes.OK).send(closestEvent);
     }
     catch (error) {
@@ -116,8 +115,6 @@ export const getUserActionByPurchaseId = async (req: Request, res: Response) => 
         if (action === null) {
             return res.status(StatusCodes.NOT_FOUND).send({ message: "Action not found." });
         }
-        console.log("Returning action ");
-        console.log(action);
         res.status(StatusCodes.OK).send(action);
     }
     catch (error) {

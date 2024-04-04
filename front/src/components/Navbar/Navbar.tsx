@@ -59,7 +59,6 @@ const NavbarComponent: React.FC = () => {
         context.setUser("");
         context.updateNextEvent();
         context.setBackOffice(false);
-        console.log("Updated what was was");
         navigate(LOGIN_PATH);
     }
 

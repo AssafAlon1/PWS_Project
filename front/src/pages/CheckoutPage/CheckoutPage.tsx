@@ -1,12 +1,12 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Alert, Card, Col, Row } from 'react-bootstrap';
+import { Alert, Button, Card, Col, Row } from 'react-bootstrap';
 import PaymentForm from '../../components/PaymentForm/PaymentForm';
 import { usePurchaseDetails } from '../../components/PurchaseDetailsContext/PurchaseDetailsContext';
 import TicketApi from '../../api/ticket';
 import { AuthContext } from '../../components/AuthProvider/AuthProvider';
 import { PaymentDetails } from '../../types';
-import { ERROR_PATH, SUCCESS_PATH } from '../../paths';
+import { CATALOG_PATH, ERROR_PATH, SUCCESS_PATH } from '../../paths';
 import { CountdownCircleTimer } from 'react-countdown-circle-timer'
 import { LOCK_TIME_SECONDS } from '../../const';
 import "./CheckoutPage.css";
@@ -14,9 +14,11 @@ import "./CheckoutPage.css";
 const CheckoutPage: React.FC = () => {
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [displayError, setDisplayError] = useState<boolean>(false);
+    const [lockValid, setLockValid] = useState<boolean>(true);
     const [purchaseId, setPurchaseId] = useState<string>("");
-    const { purchaseDetails, setPurchaseDetails } = usePurchaseDetails();
     const [paymentDetails, setPaymentDetails] = useState<PaymentDetails | null>(null);
+    const [dueDate] = useState<Date>(new Date(new Date().getTime() + LOCK_TIME_SECONDS * 1000));
+    const { purchaseDetails, setPurchaseDetails } = usePurchaseDetails();
     const navigate = useNavigate();
     const context = useContext(AuthContext);
 
@@ -57,7 +59,6 @@ const CheckoutPage: React.FC = () => {
                 throw new Error("No user found");
             }
             const result = await TicketApi.purchaseTickets(purchaseDetails, paymentDetails, username);
-            console.log("Result of purchaseTickets: ", result);
             if (result) {
                 setPurchaseId(result);
                 console.log("Purchase ID: ", result);
@@ -83,7 +84,6 @@ const CheckoutPage: React.FC = () => {
         const detailsForSuccess = { ...purchaseDetails };
         setPurchaseDetails(null);
 
-        console.log("Redirecting after purchase");
         navigate(SUCCESS_PATH, {
             state: {
                 event_name: detailsForSuccess.event_name,
@@ -110,26 +110,35 @@ const CheckoutPage: React.FC = () => {
         );
     };
 
-    const LockCountDownComponent = () => (
-        <Card className="mt-4">
+    const TimerRanOut = () => {
+        console.log("Timer ran out");
+        setLockValid(false);
+    }
+
+    const LockCountDownComponent = () => {
+        const timeLeft = Math.floor((dueDate.getTime() - new Date().getTime()) / 1000);
+        return <Card className="mt-4">
             <Card.Header>
-                <Card.Title>Ticket is saved for you for {LOCK_TIME_SECONDS/60} minutes</Card.Title>
+                <Card.Title>Ticket is saved for you for {LOCK_TIME_SECONDS / 60} minutes</Card.Title>
             </Card.Header>
             <Card.Body className="timer-wrapper">
-                    <CountdownCircleTimer 
-                        isPlaying
-                        duration={LOCK_TIME_SECONDS}
-                        colors={['#004777', '#F7B801', '#A30000', '#A30000']}
-                        colorsTime={[LOCK_TIME_SECONDS, (LOCK_TIME_SECONDS / 3) * 2, (LOCK_TIME_SECONDS / 3), 0]}
-                        size={170}
-                        strokeWidth={12}
-                        trailColor="#d6d6d6"
-                    >
-                        {renderTime}
-                    </CountdownCircleTimer>
+                <CountdownCircleTimer
+                    isPlaying
+                    initialRemainingTime={timeLeft}
+                    duration={LOCK_TIME_SECONDS}
+                    colors={['#004777', '#F7B801', '#A30000', '#A30000']}
+                    colorsTime={[LOCK_TIME_SECONDS, (LOCK_TIME_SECONDS / 3) * 2, (LOCK_TIME_SECONDS / 3), 0]}
+                    size={170}
+                    strokeWidth={12}
+                    updateInterval={1}
+                    trailColor="#d6d6d6"
+                    onComplete={() => TimerRanOut()}
+                >
+                    {renderTime}
+                </CountdownCircleTimer>
             </Card.Body>
         </Card>
-    )
+    }
 
     const price = (purchaseDetails?.price ?? 0) * (purchaseDetails?.ticket_amount ?? 0);
 
@@ -150,11 +159,8 @@ const CheckoutPage: React.FC = () => {
 
     useEffect(() => {
         if (purchaseId) {
-            console.log("Purchase ID: ", purchaseId);
-            console.log("IT'S REDIRECT TIME =D");
             afterPurchaseRedirect();
         }
-        console.log("no purchase ID...");
     }, [purchaseId]);
 
 
@@ -167,20 +173,31 @@ const CheckoutPage: React.FC = () => {
                         purchaseTickets={performPurchase}
                         isLoading={isLoading}
                         setPaymentDetails={setPaymentDetails}
-                        price={price} />
+                        price={price} 
+                        lockValid={lockValid}/>
                 </Col>
                 <Col>
                     <OrderSummaryComponent />
                     <LockCountDownComponent />
                 </Col>
             </Row>
-            {/* TODO - INDICATION IF TICKETS RAN OUT */}
-            <Alert show={displayError} variant="danger" onClose={() => setDisplayError(false)} dismissible>
+            
+            {/* Alert of failed purchase */}
+            <Alert show={displayError && lockValid} variant="danger" onClose={() => setDisplayError(false)} dismissible className="mt-4 mb-4">
                 <Alert.Heading>Failed to purchase tickets</Alert.Heading>
                 <p>
                     Something went wrong while trying to purchase your tickets. Please try again.
                 </p>
             </Alert>
+
+            {/* Alert of expired lock */}
+            <Alert show={!lockValid} variant="danger" className="mt-4 mb-4">
+                <Alert.Heading>Time's up!</Alert.Heading>
+                <p>
+                    Purchase request timed-out, Your ticket is no longer guaranteed. Please try again.
+                </p>
+            </Alert>
+                {!lockValid && <Button onClick={() => navigate(CATALOG_PATH)}>Back to Catalog</Button>}
         </>
     );
 };

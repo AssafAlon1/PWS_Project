@@ -60,7 +60,6 @@ const CommentsComponent: React.FC<CommentsComponentProps> = ({ eventId }) => {
             if (!eventId || comments === null) {
                 return;
             }
-            await new Promise(resolve => setTimeout(resolve, 1000)); // TODO - Remove
             const newComments = await CommentApi.fetchComments(eventId, comments.length, MAX_COMMENTS);
             console.log("newComments", newComments);
             if (newComments.length < MAX_COMMENTS) {

@@ -10,7 +10,7 @@ interface AuthContextProps {
     user: string | null;
     setUser: (user: string | null) => void;
     nextEvent: string | null;
-    updateNextEvent: () => void; // TODO - CSEvent?
+    updateNextEvent: () => void;
     updateLoggedIn: () => Promise<boolean>;
     role: number;
     isBackOffice: boolean;
@@ -30,7 +30,7 @@ export const AuthContext = createContext<AuthContextProps>({
 
 const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const [user, setUser] = useState<string | null>(null);
-    const [nextEvent, setNextEvent] = useState<string | null>(null); // TODO - CSEvent
+    const [nextEvent, setNextEvent] = useState<string | null>(null);
     const [role, setRole] = useState<number>(0);
     const navigate = useNavigate();
     const [isBackOffice, setBackOffice] = useState<boolean>(false);

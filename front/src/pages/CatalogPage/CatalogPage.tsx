@@ -27,7 +27,6 @@ const CatalogPage: React.FC = () => {
 
   const fetchMoreData = async () => {
     try {
-      await new Promise(resolve => setTimeout(resolve, 1000)); // TODO - Remove
       let newEvents: CSEvent[] = [];
       if (context.isBackOffice && context.role <= UserRole.Worker) {
         newEvents = await EventApi.fetchAllEvents(events.length, MAX_EVENTS_IN_PAGE);

@@ -3,7 +3,7 @@ import { CSEvent, CSEventCreationReqeust } from "../types";
 import { API_GATEWAY_URL } from "../const";
 // import { getUserEventIds } from "./userAction";
 
-const axiosInstance = axios.create({ withCredentials: true, baseURL: API_GATEWAY_URL }); // TODO - withCredentials?
+const axiosInstance = axios.create({ withCredentials: true, baseURL: API_GATEWAY_URL });
 
 // TODO - Paths (/api/event) to consts?
 const RealEventApi = {

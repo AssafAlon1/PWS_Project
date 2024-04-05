@@ -64,7 +64,7 @@ const ActionDetails: React.FC<ActionDetailsProps> = ({ action, csevent }) => {
                     order_id: action.purchase_id,
                     ticket_amount: action.ticket_amount,
                     ticket_name: action.ticket_name,
-                    // TODO - PRICE to action and then here
+                    price: action.price
                 }
             })
         }
@@ -178,12 +178,12 @@ const ActionDetails: React.FC<ActionDetailsProps> = ({ action, csevent }) => {
                         <EventInformationCard />
                         <Card>
                             <Card.Text>Tickets: {action.ticket_amount} x {action.ticket_name}</Card.Text>
+                            <Card.Text>Price: ${action.price}</Card.Text>
                             <Card.Text>Bought at: {formattedDate}</Card.Text>
                             {action.refund_time && <Card.Text>Refunded at: {getFormattedDate(action.refund_time)}</Card.Text>}
                             <ButtonWithTooltip
                                 buttonContent="Request Refund"
                                 buttonOnClick={() => setModalOpen(true)}
-                                // buttonOnClick={handleRefund}
                                 isDisabled={!isRefundable}
                                 tooltipContent={reasonNotRefundable}
                                 isLoading={isLoading} />

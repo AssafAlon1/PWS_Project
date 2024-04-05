@@ -131,8 +131,6 @@ const CheckoutPage: React.FC = () => {
         </Card>
     }
 
-    const price = (purchaseDetails?.price ?? 0) * (purchaseDetails?.ticket_amount ?? 0);
-
     const OrderSummaryComponent = () => {
         return (
             <Card>
@@ -142,7 +140,7 @@ const CheckoutPage: React.FC = () => {
                 <Card.Body>
                     <Card.Text>{purchaseDetails?.event_name}</Card.Text>
                     <Card.Text>Tickets: {purchaseDetails?.ticket_amount} x {purchaseDetails?.ticket_name}</Card.Text>
-                    <Card.Text>Total: ${price}</Card.Text>
+                    <Card.Text>Total: ${purchaseDetails?.price}</Card.Text>
                 </Card.Body>
             </Card>
         );
@@ -164,7 +162,7 @@ const CheckoutPage: React.FC = () => {
                         purchaseTickets={performPurchase}
                         isLoading={isLoading}
                         setPaymentDetails={setPaymentDetails}
-                        price={price}
+                        price={purchaseDetails?.price ?? 0}
                         lockValid={lockValid} />
                 </Col>
                 <Col>

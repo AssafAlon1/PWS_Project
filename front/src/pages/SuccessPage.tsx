@@ -14,6 +14,7 @@ const SuccessPage: React.FC = () => {
     const ticketPrice = location.state?.price;
     const orderId = location.state?.order_id;
     const createdEventId = location.state?.created_event_id;
+    const refundAmount = location.state?.price;
 
     const CardBody = () => {
         const authContext = useContext(AuthContext); // Is this OK? We need to update the next event after purchase...
@@ -31,10 +32,11 @@ const SuccessPage: React.FC = () => {
                 <Link to={CATALOG_PATH}><Button variant="primary" onClick={handleReturnToCatalog}>Return to Catalog</Button></Link>
             </Card.Body>
         }
-        else if (operationType == "refund" && orderId) {
+        else if (operationType == "refund" && orderId && ticketQuantity && ticketName && refundAmount) {
             return <Card.Body>
                 <Card.Text>Order ID: {orderId}</Card.Text>
                 <Card.Text>Tickets: {ticketQuantity} x {ticketName}</Card.Text>
+                <Card.Text>Total: ${refundAmount}</Card.Text>
                 <Card.Text>{message}</Card.Text>
                 <Link to={CATALOG_PATH}><Button variant="primary" onClick={handleReturnToCatalog}>Return to Catalog</Button></Link>
             </Card.Body>

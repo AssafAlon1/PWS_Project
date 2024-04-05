@@ -6,9 +6,7 @@ import { PaymentInformation, RefundInformation, paymentInformationSchema, refund
 import axios from 'axios';
 import { PublisherChannel } from './publisher-channel.js';
 
-// const axiosInstance = axios.create({ withCredentials: true, baseURL: PAYMER_PROVIDER_URL });
 const axiosPayment = axios.create({ baseURL: PAYMENT_PROVIDER_URL });
-
 
 export const buyTickets = async (req: Request, res: Response) => {
     console.log("POST " + BUY_PATH);
@@ -32,6 +30,7 @@ export const buyTickets = async (req: Request, res: Response) => {
             event_id: postData.event_id,
             ticket_name: postData.ticket_name,
             ticket_amount: postData.ticket_amount,
+            price: postData.charge,
             purchase_id: orderId,
             purchase_time: new Date(),
         };

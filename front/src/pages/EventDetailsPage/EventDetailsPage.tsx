@@ -109,7 +109,7 @@ const EventDetails: React.FC = () => {
                 <Card className="event-block">
                     <Card.Body>
                         <Card.Text>{event?.category}</Card.Text>
-                        { !authContext.isBackOffice && <Card.Text>From ${event.cheapest_ticket_price}</Card.Text>}
+                        {!authContext.isBackOffice && <Card.Text>From ${event.cheapest_ticket_price}</Card.Text>}
                         <Card.Text>{event.total_available_tickets} tickets available</Card.Text>
                     </Card.Body>
                 </Card>
@@ -184,7 +184,6 @@ const EventDetails: React.FC = () => {
     const BuyTicketComponent: React.FC<{ name: string, price: number, amountLeft: number, locked: number }> = ({ name, price, amountLeft, locked }) => {
         const [ticketAmount, setTicketAmount] = useState<number>(0);
         const [errorMessage, setErrorMessage] = useState<string>("");
-        // IMPORTANT TODO - The setErrorMessage isn't working, as observed by the debug `console.log` WAS THIS SOLVED?
 
         const ticketPurchaseDetails: PurchaseDetails = {
             event_id: eventId ?? "0",
@@ -195,13 +194,11 @@ const EventDetails: React.FC = () => {
         }
 
         const onClickBuyNow = async () => {
-            console.log("Going to request buying tickets");
             setErrorMessage("");
             if (!eventId || !authContext || !authContext.user) {
                 setErrorMessage("Error: Missing event id or user information");
                 return;
             }
-            console.log("Locking ticket");
             try {
                 await TicketApi.lockTickets(eventId, ticketPurchaseDetails.ticket_name, ticketAmount, authContext.user);
                 setPurchaseDetails(ticketPurchaseDetails);
@@ -222,7 +219,7 @@ const EventDetails: React.FC = () => {
                 <Card.Body>
                     <Card.Text>Price: <b>${price}</b></Card.Text>
                     <Card.Text><b>{amountLeft}</b> tickets left!</Card.Text>
-                    {locked ? <Card.Text>({locked} { locked === 1 ? "is" : "are"} saved for others)</Card.Text> : null}
+                    {locked ? <Card.Text>({locked} {locked === 1 ? "is" : "are"} saved for others)</Card.Text> : null}
                     <Card.Text>{amountLeft <= 0 ? "SOLD OUT!" : "Choose amount of tickets:"}</Card.Text>
                     <div className="direction-row">
                         <input disabled={amountLeft <= 0} className="tickets-amount" type="number" value={ticketAmount} onChange={(event) => setTicketAmount(Number(event.target.value))} />
@@ -233,8 +230,8 @@ const EventDetails: React.FC = () => {
                             buttonOnClick={onClickBuyNow}
                         />
                     </div>
-                    <Alert variant="danger" show={errorMessage !== ""} onClose={ () => setErrorMessage("")} dismissible>
-                        Oopsie woopsie!
+                    <Alert variant="danger" show={errorMessage !== ""} onClose={() => setErrorMessage("")} dismissible>
+                        {errorMessage}
                     </Alert>
                 </Card.Body>
             </Card>
@@ -284,8 +281,8 @@ const EventDetails: React.FC = () => {
                     key={index}
                     name={ticket.name}
                     price={ticket.price}
-                    amountLeft={ticket.available} 
-                    locked={ticket.locked_amount ? ticket.locked_amount : 0}/>
+                    amountLeft={ticket.available}
+                    locked={ticket.locked_amount ? ticket.locked_amount : 0} />
             });
         }
 
@@ -313,7 +310,7 @@ const EventDetails: React.FC = () => {
             />
         }
         {
-            ( authContext.isBackOffice && authContext.role <= UserRole.Manager) &&
+            (authContext.isBackOffice && authContext.role <= UserRole.Manager) &&
             <PostponeEventForm csEvent={event} refetchEvent={updateEvent} />
         }
     </>

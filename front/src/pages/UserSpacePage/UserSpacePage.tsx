@@ -36,8 +36,13 @@ const UserSpacePage: React.FC = () => {
       if (newActions.length < MAX_ACTIONS) {
         setHasMore(false);
       }
-      // TODO - Make sure the UI is nice and comfy when one fetch fails (for a single event)
-      const newEvents = await Promise.all(newActions.map(action => EventApi.fetchEvent(action.event_id)));
+      const newEvents = await Promise.all(newActions.map(action => {
+        try {
+          return EventApi.fetchEvent(action.event_id);
+        } catch {
+          return null;
+        }
+      }));
       setUserActions(prevActions => [...prevActions, ...newActions]);
       setUserEvents(prevEvents => [...prevEvents, ...newEvents]);
     } catch {
@@ -56,7 +61,6 @@ const UserSpacePage: React.FC = () => {
     setUserActions([]);
     let fetchedActions: UserAction[] = [];
     let fetchedEvents: (CSEvent | null)[] = [];
-    await new Promise(resolve => setTimeout(resolve, 500));
     try {
       fetchedActions = await UserActionApi.getUserActions(username, 0, MAX_ACTIONS) ?? [];
     }

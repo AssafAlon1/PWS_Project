@@ -41,7 +41,7 @@ app.use(cookieParser());
 let origin = process.env.ORIGIN;
 app.use(cors({
   origin: origin,
-  methods: ['GET', 'POST', 'PUT'], // TODO - PUT, DELETE?
+  methods: ['GET', 'POST', 'PUT'],
   // credentials: true,  // TODO - remove? Frontend needs to send cookies with requests
 }));
 
@@ -54,7 +54,7 @@ function keepSensitiveInfo(req: Request, res: Response, next: NextFunction) {
 app.get(EVENT_PATH, getUpcomingAvailableEvents); // Added for the frontend - only fetch events with available tickets
 app.get(`${EVENT_PATH}/all`, getUpcomingEvents); // Gets ALL events (even those who have no tickets left)
 app.get(`${EVENT_PATH}/:eventId`, getEventById);
-app.get(`${EVENT_PATH}/backoffice/:eventId`, keepSensitiveInfo, getEventById); 
+app.get(`${EVENT_PATH}/backoffice/:eventId`, keepSensitiveInfo, getEventById);
 app.get("/api/closest_event", getClosestEvent); // !! NOTE: this is NOT exposed to the API Gateway (therefore it's OK that it shares the same path as the user-actions service)
 
 app.post(EVENT_PATH, createEvent);

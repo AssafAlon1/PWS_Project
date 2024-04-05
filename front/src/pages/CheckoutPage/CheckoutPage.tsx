@@ -43,25 +43,18 @@ const CheckoutPage: React.FC = () => {
             console.error(err);
             return;
         }
-        // TODO - Take an additional look at this
         if (!username) {
             navigate(ERROR_PATH, { state: { message: "No user found" } });
             return;
         }
-        console.log("About to purchase tickets");
         setIsLoading(true);
         try {
             if (!paymentDetails) {
                 throw new Error("No payment details found");
             }
-            const username = context.user;
-            if (!username) {
-                throw new Error("No user found");
-            }
             const result = await TicketApi.purchaseTickets(purchaseDetails, paymentDetails, username);
             if (result) {
                 setPurchaseId(result);
-                console.log("Purchase ID: ", result);
             }
         }
         catch (err) {
@@ -71,12 +64,10 @@ const CheckoutPage: React.FC = () => {
             throw err;
         }
         setIsLoading(false);
-        console.log("Completed purchase");
     }
 
 
     const afterPurchaseRedirect = () => {
-        console.log(" >> After purchase redirect");
         if (context.updateNextEvent) {
             context.updateNextEvent();
         }
@@ -86,6 +77,7 @@ const CheckoutPage: React.FC = () => {
 
         navigate(SUCCESS_PATH, {
             state: {
+                operationType: "purchase",
                 event_name: detailsForSuccess.event_name,
                 ticket_amount: detailsForSuccess.ticket_amount,
                 ticket_name: detailsForSuccess.ticket_name,
@@ -111,7 +103,6 @@ const CheckoutPage: React.FC = () => {
     };
 
     const TimerRanOut = () => {
-        console.log("Timer ran out");
         setLockValid(false);
     }
 
@@ -173,15 +164,15 @@ const CheckoutPage: React.FC = () => {
                         purchaseTickets={performPurchase}
                         isLoading={isLoading}
                         setPaymentDetails={setPaymentDetails}
-                        price={price} 
-                        lockValid={lockValid}/>
+                        price={price}
+                        lockValid={lockValid} />
                 </Col>
                 <Col>
                     <OrderSummaryComponent />
                     <LockCountDownComponent />
                 </Col>
             </Row>
-            
+
             {/* Alert of failed purchase */}
             <Alert show={displayError && lockValid} variant="danger" onClose={() => setDisplayError(false)} dismissible className="mt-4 mb-4">
                 <Alert.Heading>Failed to purchase tickets</Alert.Heading>
@@ -197,7 +188,7 @@ const CheckoutPage: React.FC = () => {
                     Purchase request timed-out, Your ticket is no longer guaranteed. Please try again.
                 </p>
             </Alert>
-                {!lockValid && <Button onClick={() => navigate(CATALOG_PATH)}>Back to Catalog</Button>}
+            {!lockValid && <Button onClick={() => navigate(CATALOG_PATH)}>Back to Catalog</Button>}
         </>
     );
 };

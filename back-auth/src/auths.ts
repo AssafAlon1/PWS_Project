@@ -82,7 +82,7 @@ const getRequiredRole = (req: Request): UserRole => {
   // |===================|
   // | Paths for Tickets |
   // |===================|
-  
+
   if (url.match(/^\/api\/ticket\/all\/[^\/]+$/) && req.method == "GET") { // get all tickets for event 
     return UserRole["Guest"];
   }
@@ -127,7 +127,7 @@ const getRequiredRole = (req: Request): UserRole => {
   }
 
   // Shouldn't get here, require highest role.
-  console.log(" > Haven't entered a SINGLE if statement...");
+  console.log(" > Haven't matched any path, defaulting required role to Admin.");
   return UserRole["Admin"];
 }
 
@@ -154,7 +154,6 @@ export const isAuthorized = async (req: Request, res: Response, next: NextFuncti
     res.status(403).send({ message: "You have insufficient permission to perform this operation." });
     return StatusCodes.FORBIDDEN;
   }
-  console.log(" > User is authorized!");
   next();
 };
 

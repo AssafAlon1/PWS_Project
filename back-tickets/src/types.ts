@@ -1,6 +1,5 @@
 import Joi from 'joi';
 
-// TODO - move to another file..
 export const paymentInformationSchema = Joi.object({
     cc: Joi.string().required(),
     holder: Joi.string().required(),

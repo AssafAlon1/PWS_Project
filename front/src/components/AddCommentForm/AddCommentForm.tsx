@@ -23,13 +23,12 @@ const AddCommentForm: React.FC<AddCommentProps> = ({ eventId, updateComments }) 
 
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        
+
         if (!context.user) {
-            alert("Could not identify user. Please refresh the page and try again."); // TODO - error?
+            alert("Could not identify user. Please refresh the page and try again.");
             return;
         }
         try {
-            // TODO - Sanitize input?
             setPostStatus(PostStatus["LOADING"]);
             await CommentApi.postComment(context.user, eventId, event.currentTarget.comment.value);
             setPostStatus(PostStatus["SUCCESS"]);

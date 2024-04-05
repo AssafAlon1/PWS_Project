@@ -39,7 +39,6 @@ const CommentsComponent: React.FC<CommentsComponentProps> = ({ eventId }) => {
             }
         }
         catch (err) {
-            // TODO - Tone it down with all the try,catch,throw (just handle it in fetchComments and check for response value)
             console.error(err);
             console.error(`Failed to fetch comments for event ${eventId}`);
             setFailedFetchingComments(true);
@@ -60,11 +59,8 @@ const CommentsComponent: React.FC<CommentsComponentProps> = ({ eventId }) => {
             if (!eventId || comments === null) {
                 return;
             }
-            await new Promise(resolve => setTimeout(resolve, 1000)); // TODO - Remove
             const newComments = await CommentApi.fetchComments(eventId, comments.length, MAX_COMMENTS);
-            console.log("newComments", newComments);
             if (newComments.length < MAX_COMMENTS) {
-                console.log("No longer hasMore");
                 setHasMore(false);
             }
             setComments(prevComments => [...prevComments ?? [], ...newComments]);

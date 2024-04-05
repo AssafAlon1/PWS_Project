@@ -20,7 +20,7 @@ export const purchaseTicketFromLock = async (ticket: ICSTicket, paymentInformati
         if (
             currentLock.username === paymentInformation.username &&
             currentLock.quantity === paymentInformation.ticket_amount &&
-            currentLock.expires > new Date(new Date().getTime() - LOCK_GRACE_PERIOD_SECONDS * 1000) && // TODO - Make sure when cleaning up old tickets, give 2 * LOCK_GRACE_PERIOD_SECONDS
+            currentLock.expires > new Date(new Date().getTime() - LOCK_GRACE_PERIOD_SECONDS * 1000) &&
             (!minLock || currentLock.expires < minLock.expires)
         ) {
             return currentLock;
@@ -42,7 +42,6 @@ export const purchaseTicketFromLock = async (ticket: ICSTicket, paymentInformati
     // call shark to purchase the tickets
     try {
         // CREATE THE ORDER, AND UNDO CHANGES IF FAILED
-        console.log(`>> Buying ${paymentInformation.ticket_amount} tickets for of id ${ticket._id}`);
         orderResult = await axiosInstance.post("/api/buy", paymentInformation);
         if (orderResult.status != StatusCodes.OK) {
             console.error("I believe this code is unreachable. Can you see me?");
@@ -77,8 +76,5 @@ export const purchaseTicketFromLock = async (ticket: ICSTicket, paymentInformati
 
     return orderResult.data.order_id;
 }
-
-
-// TODO - In frontend checkout page, indicate user if there's no available tickets to buy (maybe by kicking them out to the catalog or something)
 
 

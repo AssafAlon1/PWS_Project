@@ -33,7 +33,7 @@ function CSRouter() {
                     <Route element={<PrivateRoute />}>
                         <Route path={CHECKOUT_PATH} element={<CheckoutPage />} />
                     </Route>
-                    <Route element={<PrivateRoute />}>
+                    <Route element={<PrivateRoute requiredRole={UserRole.Guest} />}>
                         <Route path={SUCCESS_PATH} element={<SuccessPage />} />
                     </Route>
                     <Route element={<PrivateRoute />}>

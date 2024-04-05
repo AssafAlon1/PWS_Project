@@ -1,88 +1,46 @@
-import axios, { isAxiosError } from "axios";
+import axios from "axios";
 
 import { APIStatus, UserAction } from "../types";
 import { API_GATEWAY_URL } from "../const";
 import { getFormattedDateTime } from "../utils/formatting";
 
-const axiosInstance = axios.create({ withCredentials: true, baseURL: API_GATEWAY_URL }); // TODO - withCredentials?
+const axiosInstance = axios.create({ withCredentials: true, baseURL: API_GATEWAY_URL });
 
-// TODO - rename to UserActionApi
 const RealUserActionApi = {
-    // TODO - will be moved to the tickets service (and forwarded to the user-actions service via rabbit)
-    purchaseTickets: async (eventId: string, ticketName: string, amount: number, username: string) => {
-        const purchaseTime = new Date();
-        const purchaseId = `${purchaseTime.getTime()}`;
-        try {
-            axiosInstance.post("/api/user_actions", { event_id: eventId, purchase_id: purchaseId, ticket_name: ticketName, amount, username, purchase_time: purchaseTime });
-        }
-        catch (error) {
-            throw new Error("Failed to purchase tickets");
-        }
-    },
     refundPurchase: async (purchaseId: string) => {
-        try {
-            await axiosInstance.put("/api/user_actions", { purchase_id: purchaseId });
-            console.log("Completed refund");
-            return APIStatus.Success;
-
-        } catch (error) {
-            if (isAxiosError(error)) {
-                throw new Error("Failed to refund purchase: " + error.response?.data.message); // TODO - Better handling?
-            }
-            throw new Error("Failed to refund purchase"); // TODO - Better handling?
-
-        }
+        await axiosInstance.put("/api/user_actions", { purchase_id: purchaseId });
+        console.log("Completed refund");
+        return APIStatus.Success;
     },
 
     getUserClosestEvent: async (username: string): Promise<string | null> => {
-        try {
-            const response = (await axiosInstance.get("/api/closest_event", {
-                params: {
-                    username
-                }
-            })).data;
-            if (!response.eventTitle || !response.eventStartDate) {
-                console.error("Couldn't find closest event for " + username);
-                return null;
+        const response = (await axiosInstance.get("/api/closest_event", {
+            params: {
+                username
             }
-            return `${response.eventTitle} (${getFormattedDateTime(response.eventStartDate)})`;
-        }
-        catch (error) {
+        })).data;
+        if (!response.eventTitle || !response.eventStartDate) {
             console.error("Couldn't find closest event for " + username);
             return null;
         }
+        return `${response.eventTitle} (${getFormattedDateTime(response.eventStartDate)})`;
     },
 
     getUserActions: async (username: string, skip?: number, limit?: number) => {
-        try {
-            const response = await axiosInstance.get("/api/user_actions", {
-                params: {
-                    username,
-                    skip,
-                    limit
-                }
-            });
-            return response.data;
-        } catch (error) {
-            if (isAxiosError(error)) {
-                throw new Error("Failed to fetch user actions: " + error.response?.data.message); // TODO - Better handling?
+        const response = await axiosInstance.get("/api/user_actions", {
+            params: {
+                username,
+                skip,
+                limit
             }
-            throw new Error("Failed to fetch user actions"); // TODO - Better handling?
-        }
+        });
+        return response.data;
     },
 
     getUserActionByPurchaseId: async (purchaseId: string): Promise<UserAction> => {
-        try {
-            const response = await axiosInstance.get(`/api/user_actions/${purchaseId}`);
-            return response.data as UserAction;
-        } catch (error) {
-            if (isAxiosError(error)) {
-                throw new Error("Failed to fetch user action: " + error.response?.data.message); // TODO - Better handling?
-            }
-            throw new Error("Failed to fetch user action"); // TODO - Better handling?
-        }
+        const response = await axiosInstance.get(`/api/user_actions/${purchaseId}`);
+        return response.data as UserAction;
     }
-
 }
 
 // import { MockUserActionApi } from "./mock";

@@ -40,7 +40,6 @@ const RefundPage: React.FC = () => {
             setLoading(false);
             return;
         }
-        console.log("Got Action");
         setUserAction(fetchedAction);
         setLoading(false);
     }
@@ -51,7 +50,16 @@ const RefundPage: React.FC = () => {
         try {
             await UserActionApi.refundPurchase(purchaseId);
             setLoading(false);
-            navigate(SUCCESS_PATH, { state: { message: "Refund was successful!", operationType: "refund", order_id: purchaseId } })
+            navigate(SUCCESS_PATH, {
+                state: {
+                    message: "Refund was successful!",
+                    operationType: "refund",
+                    order_id: purchaseId,
+                    ticket_amount: userAction?.ticket_amount,
+                    ticket_name: userAction?.ticket_name,
+                    // TODO - PRICE to action and then here
+                }
+            })
         }
         catch (error) {
             console.error("Failed to refund purchase");

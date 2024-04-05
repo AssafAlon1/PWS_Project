@@ -81,7 +81,6 @@ const NewEventPage: React.FC = () => {
             ticket.price < 0 ||
             ticket.quantity <= 0 ||
             tickets.some(t => t.name === ticket.name)) {
-            // TODO - Show error message
             alert("Invalid ticket (make sure ticket name is unique)");
             return false;
         }
@@ -118,7 +117,7 @@ const NewEventPage: React.FC = () => {
             navigate(SUCCESS_PATH, { state: { operationType: "create", createdEventId: result, message: "Event created successfully!" } });
         }
         catch (error) {
-            console.log(error);
+            console.error(error);
             setDisplayError("Failed to create event. Please try again.");
         }
     }

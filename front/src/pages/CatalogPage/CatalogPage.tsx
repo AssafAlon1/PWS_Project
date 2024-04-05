@@ -27,7 +27,6 @@ const CatalogPage: React.FC = () => {
 
   const fetchMoreData = async () => {
     try {
-      await new Promise(resolve => setTimeout(resolve, 1000)); // TODO - Remove
       let newEvents: CSEvent[] = [];
       if (context.isBackOffice && context.role <= UserRole.Worker) {
         newEvents = await EventApi.fetchAllEvents(events.length, MAX_EVENTS_IN_PAGE);
@@ -38,7 +37,7 @@ const CatalogPage: React.FC = () => {
       if (newEvents.length < MAX_EVENTS_IN_PAGE) {
         setHasMore(false);
       }
-      setEvents(prevEvents => [...prevEvents, ...newEvents]); // TODO - protect agains double insertion
+      setEvents(prevEvents => [...prevEvents, ...newEvents]);
     } catch {
       setDisplayError(true);
       setHasMore(false);
@@ -101,7 +100,6 @@ const CatalogPage: React.FC = () => {
         if (fetchedEvents.length == MAX_EVENTS_IN_PAGE) {
           setHasMore(true);
         }
-        // TODO - Maybe 401 handling?
       }
       catch {
         navigate(ERROR_PATH, { state: { message: "Failed to fetch events" } });

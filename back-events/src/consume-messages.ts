@@ -58,8 +58,8 @@ export const consumeMessages = async () => {
             const cheapest_ticket = JSON.parse(msg.content.toString());
             const { error } = cheapestTicketSchema.validate(cheapest_ticket);
             if (error) {
-                console.log(`[TICKET] >>> received invalid message x_x`);
-                console.log(error.message);
+                console.error(`[TICKET] >>> received invalid message x_x`);
+                console.error(error.message);
                 channel.ack(msg);
                 return;
             }
@@ -73,7 +73,7 @@ export const consumeMessages = async () => {
             const order_data = JSON.parse(msg.content.toString());
             const { error } = buyTicketSchema.validate(order_data);
             if (error) {
-                console.log(`[BUY] >>> received invalid message x_x`);
+                console.error(`[BUY] >>> received invalid message x_x`);
                 channel.ack(msg);
                 return;
             }
@@ -87,7 +87,7 @@ export const consumeMessages = async () => {
             const refund_data = JSON.parse(msg.content.toString());
             const { error } = refundTicketSchema.validate(refund_data);
             if (error) {
-                console.log(`[REFUND] >>> received invalid message x_x`);
+                console.error(`[REFUND] >>> received invalid message x_x`);
                 channel.ack(msg);
                 return;
             }

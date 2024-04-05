@@ -51,6 +51,11 @@ const ActionDetails: React.FC<ActionDetailsProps> = ({ action, csevent }) => {
         );
     };
 
+    const handleConfirm = async () => {
+        setModalOpen(false); // Close the modal first
+        handleRefund(); 
+    };
+
     const handleRefund = async () => {
         setErrorText("");
         setLoading(true);
@@ -70,7 +75,7 @@ const ActionDetails: React.FC<ActionDetailsProps> = ({ action, csevent }) => {
         }
         catch (error) {
             console.error("Failed to refund purchase");
-            setErrorText("Failed to refund purchase " + action.purchase_id + " Please try again later");
+            setErrorText("Failed to refund purchase... Please try again later");
             setLoading(false);
             return;
         }
@@ -188,17 +193,17 @@ const ActionDetails: React.FC<ActionDetailsProps> = ({ action, csevent }) => {
                                 tooltipContent={reasonNotRefundable}
                                 isLoading={isLoading} />
                         </Card>
-                        <ConfirmationModal 
-                            isOpen={isModalOpen} 
-                            onConfirm={handleRefund} 
-                            onCancel={() => setModalOpen(false)} 
-                            message={refundconfirmationMessage}
-                        />
                     </Container>
                     <Card.Text>{eventDetails?.description}</Card.Text>
                 </Card.Body>
             </Card >
             <Alert variant="danger" show={errorText !== ""} onClose={() => setErrorText("")} dismissible className="mt-2">{errorText}</Alert>
+            <ConfirmationModal 
+                isOpen={isModalOpen} 
+                onConfirm={handleConfirm} 
+                onCancel={() => setModalOpen(false)} 
+                message={refundconfirmationMessage}
+            />
         </Container>
     );
 }

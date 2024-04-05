@@ -185,7 +185,7 @@ const CheckoutPage: React.FC = () => {
             <Alert show={!lockValid} variant="danger" className="mt-4 mb-4">
                 <Alert.Heading>Time's up!</Alert.Heading>
                 <p>
-                    Purchase request timed-out, Your ticket is no longer guaranteed. Please try again.
+                    Purchase request timed-out. Your ticket is no longer guaranteed. Please try again.
                 </p>
             </Alert>
             {!lockValid && <Button onClick={() => navigate(CATALOG_PATH)}>Back to Catalog</Button>}

@@ -9,22 +9,47 @@ import { ThreeSpanningSpinners } from '../SpinnerComponent/SpinnerComponent';
 import { useNavigate } from 'react-router-dom';
 import UserActionApi from '../../api/userAction';
 import { SUCCESS_PATH } from '../../paths';
+import "./UserActionDetails.css";
 
 interface ActionDetailsProps {
     action: UserAction;
     csevent: CSEvent | null;
 }
 
+interface ConfirmationModalProps {
+    isOpen: boolean;
+    onConfirm: () => void;
+    onCancel: () => void;
+    message: string;
+}
+
 const ActionDetails: React.FC<ActionDetailsProps> = ({ action, csevent }) => {
     const [isLoadingEvent, setIsLoadingEvent] = useState<boolean>(false);
     const [isRefundable, setIsRefundable] = useState<boolean>(false);
     const [isLoading, setLoading] = useState<boolean>(false);
+    const [isModalOpen, setModalOpen] = useState(false);
     const [errorText, setErrorText] = useState<string>("");
     const [reasonNotRefundable, setReason] = useState<string>("Loading...");
     const [eventDetails, setEventDetails] = useState<CSEvent | null>(null);
     const formattedDate = getFormattedDate(action.purchase_time);
 
     const navigate = useNavigate();
+
+    // Internal component for the confirmation modal
+    const ConfirmationModal: React.FC<ConfirmationModalProps> = ({ isOpen, onConfirm, onCancel, message, }) => {
+        if (!isOpen) {
+            return null;
+        }
+        return (
+            <div className="modal">
+              <div className="modal-content">
+                <p>{message}</p>
+                <Button onClick={onConfirm} className='mb-2 mt-2'> OK </Button>
+                <Button  variant= "secondary" onClick={onCancel} className='mb-2 mt-2'> Cancel </Button>
+              </div>
+            </div>
+        );
+    };
 
     const handleRefund = async () => {
         setErrorText("");
@@ -138,6 +163,7 @@ const ActionDetails: React.FC<ActionDetailsProps> = ({ action, csevent }) => {
     const formattedEndDate = eventDetails?.end_date ? getFormattedDate(eventDetails.end_date) : "";
     const formattedStartTime = eventDetails?.start_date ? getFormattedTime(eventDetails.start_date) : "";
     const formattedEndTime = eventDetails?.end_date ? getFormattedTime(eventDetails.end_date) : "";
+    const refundconfirmationMessage = "Are you sure you want to refund your purchase of " + action.ticket_amount + " " + action.ticket_name + " tickets for " + title + "?";
     return (
         <Container>
             <Card className="mb-2">
@@ -156,11 +182,18 @@ const ActionDetails: React.FC<ActionDetailsProps> = ({ action, csevent }) => {
                             {action.refund_time && <Card.Text>Refunded at: {getFormattedDate(action.refund_time)}</Card.Text>}
                             <ButtonWithTooltip
                                 buttonContent="Request Refund"
-                                buttonOnClick={handleRefund}
+                                buttonOnClick={() => setModalOpen(true)}
+                                // buttonOnClick={handleRefund}
                                 isDisabled={!isRefundable}
                                 tooltipContent={reasonNotRefundable}
                                 isLoading={isLoading} />
                         </Card>
+                        <ConfirmationModal 
+                            isOpen={isModalOpen} 
+                            onConfirm={handleRefund} 
+                            onCancel={() => setModalOpen(false)} 
+                            message={refundconfirmationMessage}
+                        />
                     </Container>
                     <Card.Text>{eventDetails?.description}</Card.Text>
                 </Card.Body>

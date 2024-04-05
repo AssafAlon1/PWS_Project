@@ -55,6 +55,9 @@ export const getEventById = async (req: Request, res: Response) => {
   let data;
   try {
     data = await queryEventByID(id);
+    if (!data) {
+      throw Error("Event not found.");
+    }
   }
   catch (error) {
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({ message: "Internal Server Error" });
@@ -142,11 +145,11 @@ export const updateEvent = async (req: Request, res: Response) => {
 
   putData = req.body as Partial<ICSEvent>;
   const { error } = await updateEventSchema.validate(putData); // make sure only start and end times are updated
-  if(error){
+  if (error) {
     res.status(StatusCodes.BAD_REQUEST).send({ message: "Cannot update this!" });
     return;
   }
-  
+
   // Check the event exists
   try {
     event = await queryEventByID(eventId);
@@ -159,7 +162,7 @@ export const updateEvent = async (req: Request, res: Response) => {
     return;
   }
 
-  if( new Date(putData.start_date) < new Date(event.start_date) ){
+  if (new Date(putData.start_date) < new Date(event.start_date)) {
     res.status(StatusCodes.BAD_REQUEST).send({ message: "Cannot update event to start earlier!" });
     return;
   }

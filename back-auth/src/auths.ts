@@ -6,6 +6,7 @@ import { UserRole } from "./const.js";
 import { hasPermission } from "./db.js";
 
 const secretKey = process.env.JWT_SECRET;
+const sharedKey = process.env.SHARED_SECRET;
 
 export type TokenData = { username: string };
 
@@ -154,6 +155,11 @@ export const isAuthorized = async (req: Request, res: Response, next: NextFuncti
     res.status(403).send({ message: "You have insufficient permission to perform this operation." });
     return StatusCodes.FORBIDDEN;
   }
+
+  // Sign request as "validated and authorized by auth service"
+  const outgoingToken = jwt.sign({ username: user.username }, sharedKey);
+  req.headers.authorization = outgoingToken;
+
   next();
 };
 

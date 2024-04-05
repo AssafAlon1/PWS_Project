@@ -1,33 +1,54 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { getFormattedDate, getFormattedTime } from "../../utils/formatting";
-import { Button, Card, Container, Placeholder } from 'react-bootstrap';
+import { Alert, Button, Card, Container, Placeholder } from 'react-bootstrap';
 import { CSEvent, UserAction } from '../../types';
 import EventApi from '../../api/event';
 import ButtonWithTooltip from '../ButtonWithTooltip/ButtonWithTooltip';
 import MissingImage from "../../assets/MissingImage.png"
 import { ThreeSpanningSpinners } from '../SpinnerComponent/SpinnerComponent';
 import { useNavigate } from 'react-router-dom';
-import { REFUND_PATH } from '../../paths';
+import UserActionApi from '../../api/userAction';
+import { SUCCESS_PATH } from '../../paths';
 
 interface ActionDetailsProps {
     action: UserAction;
     csevent: CSEvent | null;
-    isLoadingRefund?: boolean;
-    onRefund?: () => void;
 }
 
-const ActionDetails: React.FC<ActionDetailsProps> = ({ action, csevent, isLoadingRefund, onRefund }) => {
-    const [isLoadingEvent, setIsLoadingEvent] = React.useState<boolean>(false);
-    const [isRefundable, setIsRefundable] = React.useState<boolean>(false);
-    const [reasonNotRefundable, setReason] = React.useState<string>("Loading...");
-    const [eventDetails, setEventDetails] = React.useState<CSEvent | null>(null);
+const ActionDetails: React.FC<ActionDetailsProps> = ({ action, csevent }) => {
+    const [isLoadingEvent, setIsLoadingEvent] = useState<boolean>(false);
+    const [isRefundable, setIsRefundable] = useState<boolean>(false);
+    const [isLoading, setLoading] = useState<boolean>(false);
+    const [errorText, setErrorText] = useState<string>("");
+    const [reasonNotRefundable, setReason] = useState<string>("Loading...");
+    const [eventDetails, setEventDetails] = useState<CSEvent | null>(null);
     const formattedDate = getFormattedDate(action.purchase_time);
 
     const navigate = useNavigate();
 
-    let handleRefund = onRefund;
-    if (!handleRefund) {
-        handleRefund = () => navigate(REFUND_PATH, { state: { purchase_id: action.purchase_id } });
+    const handleRefund = async () => {
+        setErrorText("");
+        setLoading(true);
+        try {
+            await UserActionApi.refundPurchase(action.purchase_id);
+            setLoading(false);
+            navigate(SUCCESS_PATH, {
+                state: {
+                    message: "Refund was successful!",
+                    operationType: "refund",
+                    order_id: action.purchase_id,
+                    ticket_amount: action.ticket_amount,
+                    ticket_name: action.ticket_name,
+                    // TODO - PRICE to action and then here
+                }
+            })
+        }
+        catch (error) {
+            console.error("Failed to refund purchase");
+            setErrorText("Failed to refund purchase " + action.purchase_id + " Please try again later");
+            setLoading(false);
+            return;
+        }
     }
 
     const updateEvent = async () => {
@@ -118,31 +139,34 @@ const ActionDetails: React.FC<ActionDetailsProps> = ({ action, csevent, isLoadin
     const formattedStartTime = eventDetails?.start_date ? getFormattedTime(eventDetails.start_date) : "";
     const formattedEndTime = eventDetails?.end_date ? getFormattedTime(eventDetails.end_date) : "";
     return (
-        <Card className="mb-2">
-            <Card.Header>
-                <Card.Title>
-                    {title}
-                </Card.Title>
-            </Card.Header>
-            <Card.Body >
-                <Container className="direction-row">
-                    <ImageComponent />
-                    <EventInformationCard />
-                    <Card>
-                        <Card.Text>Tickets: {action.ticket_amount} x {action.ticket_name}</Card.Text>
-                        <Card.Text>Bought at: {formattedDate}</Card.Text>
-                        {action.refund_time && <Card.Text>Refunded at: {getFormattedDate(action.refund_time)}</Card.Text>}
-                        <ButtonWithTooltip
-                            buttonContent="Request Refund"
-                            buttonOnClick={handleRefund ?? (() => { })}
-                            isDisabled={!isRefundable || !handleRefund}
-                            tooltipContent={reasonNotRefundable}
-                            isLoading={isLoadingRefund} />
-                    </Card>
-                </Container>
-                <Card.Text>{eventDetails?.description}</Card.Text>
-            </Card.Body>
-        </Card >
+        <Container>
+            <Card className="mb-2">
+                <Card.Header>
+                    <Card.Title>
+                        {title}
+                    </Card.Title>
+                </Card.Header>
+                <Card.Body >
+                    <Container className="direction-row">
+                        <ImageComponent />
+                        <EventInformationCard />
+                        <Card>
+                            <Card.Text>Tickets: {action.ticket_amount} x {action.ticket_name}</Card.Text>
+                            <Card.Text>Bought at: {formattedDate}</Card.Text>
+                            {action.refund_time && <Card.Text>Refunded at: {getFormattedDate(action.refund_time)}</Card.Text>}
+                            <ButtonWithTooltip
+                                buttonContent="Request Refund"
+                                buttonOnClick={handleRefund}
+                                isDisabled={!isRefundable}
+                                tooltipContent={reasonNotRefundable}
+                                isLoading={isLoading} />
+                        </Card>
+                    </Container>
+                    <Card.Text>{eventDetails?.description}</Card.Text>
+                </Card.Body>
+            </Card >
+            <Alert variant="danger" show={errorText !== ""} onClose={() => setErrorText("")} dismissible className="mt-2">{errorText}</Alert>
+        </Container>
     );
 }
 

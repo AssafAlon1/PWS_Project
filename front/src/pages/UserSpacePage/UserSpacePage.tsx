@@ -127,7 +127,7 @@ const UserSpacePage: React.FC = () => {
       return (
         <Container>
           <h2>Looks like you haven't made any purchases yet...</h2>
-          <h3>Go get some tickets!</h3>
+          <h3>Go get your tickets!</h3>
           <img height={"400px"} width={"600px"} style={{ borderRadius: "20px" }} src="https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExdW9hbDB2enZpOGFnNGk3eGRmemJ1anIxOXI1c3VhMjJpdmY0ZjBxbyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/8GjxwxtZWS29xlJnUH/giphy.gif" alt="Tickets GIF" />
         </Container>
       );
@@ -145,13 +145,13 @@ const UserSpacePage: React.FC = () => {
       </InfiniteScroll>
       <Alert show={errorText == "Failed to fetch events for actions."} variant="danger">{errorText}</Alert>
       <Alert show={displayErrorLoadMore} variant="danger" onClose={() => setDisplayErrorLoadMore(false)} dismissible>
-        <Alert.Heading>Failed to user :(</Alert.Heading>
+        <Alert.Heading>Failed to load user actions :(</Alert.Heading>
         <p>
           Something went wrong while trying to load more events. Please try refreshing the page.
         </p>
       </Alert>
     </Container>
-  }
+}
 
 
   useEffect(() => {

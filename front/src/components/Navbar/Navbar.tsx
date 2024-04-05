@@ -9,7 +9,7 @@ import React, { useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { AuthContext } from "../AuthProvider/AuthProvider";
 import { AuthApi } from "../../api/auth";
-import { CATALOG_PATH, CHECKOUT_PATH, ERROR_PATH, EVENT_PATH, LOGIN_PATH, NEW_EVENT_PATH, PROJECT_BASE, REFUND_PATH, USERSPACE_PATH } from "../../paths";
+import { CATALOG_PATH, CHECKOUT_PATH, ERROR_PATH, EVENT_PATH, LOGIN_PATH, NEW_EVENT_PATH, PROJECT_BASE, USERSPACE_PATH } from "../../paths";
 import { UserRole } from "../../const";
 
 const shouldDisplayGoBackButton = (path: string) => {
@@ -17,7 +17,6 @@ const shouldDisplayGoBackButton = (path: string) => {
         PROJECT_BASE + CHECKOUT_PATH,
         PROJECT_BASE + ERROR_PATH,
         PROJECT_BASE + USERSPACE_PATH,
-        PROJECT_BASE + REFUND_PATH,
         PROJECT_BASE + NEW_EVENT_PATH
     ].includes(path) || path.startsWith(PROJECT_BASE + EVENT_PATH);
 }
@@ -92,7 +91,6 @@ const NavbarComponent: React.FC = () => {
                         <ToggleBackOfficeButton />
                         {/* <Nav.Link as={Link} to={ERROR_PATH}>error</Nav.Link> */}
                         {(context.user && !context.isBackOffice) && <Nav.Link as={Link} to={USERSPACE_PATH}>User Space</Nav.Link>}
-                        {(context.user && !context.isBackOffice) && <Nav.Link as={Link} to={REFUND_PATH}>Refunds</Nav.Link>}
 
                         {(context.user && context.isBackOffice && context.role <= UserRole.Manager) && <Nav.Link as={Link} to={NEW_EVENT_PATH}>Create Event</Nav.Link>}
 

@@ -4,7 +4,6 @@ export const LOGIN_PATH = "/login";
 export const SIGNUP_PATH = "/signup";
 export const EVENT_PATH = "/events";
 export const CHECKOUT_PATH = "/checkout";
-export const REFUND_PATH = "/refund";
 export const USERSPACE_PATH = "/userspace";
 export const ERROR_PATH = "/error";
 export const NOTFOUND_PATH = "/notfound";

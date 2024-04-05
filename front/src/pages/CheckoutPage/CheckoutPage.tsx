@@ -89,8 +89,9 @@ const CheckoutPage: React.FC = () => {
 
 
     const renderTime = ({ remainingTime }: { remainingTime: number }) => {
+        const textWhenFinished = isLoading ? "Processing..." : "Ticket no longer guaranteed :(";
         if (remainingTime === 0) {
-            return <div className="timer">Ticket no longer guaranteed :(</div>;
+            return <div className="timer">{textWhenFinished}</div>;
         }
 
         return (
@@ -174,7 +175,7 @@ const CheckoutPage: React.FC = () => {
             </Row>
 
             {/* Alert of failed purchase */}
-            <Alert show={displayError && lockValid} variant="danger" onClose={() => setDisplayError(false)} dismissible className="mt-4 mb-4">
+            <Alert show={displayError} variant="danger" onClose={() => setDisplayError(false)} dismissible className="mt-4 mb-4">
                 <Alert.Heading>Failed to purchase tickets</Alert.Heading>
                 <p>
                     Something went wrong while trying to purchase your tickets. Please try again.
@@ -182,13 +183,13 @@ const CheckoutPage: React.FC = () => {
             </Alert>
 
             {/* Alert of expired lock */}
-            <Alert show={!lockValid} variant="danger" className="mt-4 mb-4">
+            <Alert show={!lockValid && !isLoading} variant="danger" className="mt-4 mb-4">
                 <Alert.Heading>Time's up!</Alert.Heading>
                 <p>
-                    Purchase request timed-out, Your ticket is no longer guaranteed. Please try again.
+                    Purchase request timed-out. Your ticket is no longer guaranteed. Please try again.
                 </p>
             </Alert>
-            {!lockValid && <Button onClick={() => navigate(CATALOG_PATH)}>Back to Catalog</Button>}
+            {(!lockValid && !isLoading) && <Button onClick={() => navigate(CATALOG_PATH)}>Back to Catalog</Button>}
         </>
     );
 };

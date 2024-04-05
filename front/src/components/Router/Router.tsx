@@ -12,9 +12,8 @@ import { SignUpPage } from '../../pages/SignupPage/SignupPage'
 import AuthProvider from '../AuthProvider/AuthProvider'
 import PrivateRoute from '../PrivateRoute/PrivateRoute'
 import UserSpacePage from '../../pages/UserSpacePage/UserSpacePage'
-import RefundPage from '../../pages/RefundPage/RefundPage'
 import NewEventPage from '../../pages/NewEventPage/NewEventPage'
-import { CATALOG_PATH, CHECKOUT_PATH, ERROR_PATH, EVENT_PATH, LOGIN_PATH, NEW_EVENT_PATH, PROJECT_BASE, REFUND_PATH, SIGNUP_PATH, SUCCESS_PATH, USERSPACE_PATH } from '../../paths'
+import { CATALOG_PATH, CHECKOUT_PATH, ERROR_PATH, EVENT_PATH, LOGIN_PATH, NEW_EVENT_PATH, PROJECT_BASE, SIGNUP_PATH, SUCCESS_PATH, USERSPACE_PATH } from '../../paths'
 import { UserRole } from '../../const'
 
 function CSRouter() {
@@ -38,9 +37,6 @@ function CSRouter() {
                     </Route>
                     <Route element={<PrivateRoute />}>
                         <Route path={USERSPACE_PATH} element={<UserSpacePage />} />
-                    </Route>
-                    <Route element={<PrivateRoute />}>
-                        <Route path={REFUND_PATH} element={<RefundPage />} />
                     </Route>
                     <Route element={<PrivateRoute requiredRole={UserRole.Manager} />}>
                         <Route path={NEW_EVENT_PATH} element={<NewEventPage />} />

@@ -43,9 +43,6 @@ const RealUserActionApi = {
     }
 }
 
-// import { MockUserActionApi } from "./mock";
-// const UserActionApi = MockUserActionApi;
-
 const UserActionApi = RealUserActionApi;
 
 

@@ -1,4 +1,4 @@
-import axios, { isAxiosError } from "axios";
+import axios from "axios";
 import { CSEvent, CSEventCreationReqeust } from "../types";
 import { API_GATEWAY_URL } from "../const";
 // import { getUserEventIds } from "./userAction";

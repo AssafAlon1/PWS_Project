@@ -17,7 +17,7 @@ export type PaymentInformation = {
     holder: string;
     cvv: string;
     exp: string;
-    charge: number;
+    charge: number; // the total price of the purchase
     username: string;
     event_id: string;
     ticket_name: string;

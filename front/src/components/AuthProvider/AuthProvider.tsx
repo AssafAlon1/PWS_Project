@@ -56,8 +56,13 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             setRole(UserRole.Unauthenticated);
             return;
         }
-        const closestEvent = await UserActionApi.getUserClosestEvent(user);
-        setNextEvent(closestEvent);
+        try {
+            const closestEvent = await UserActionApi.getUserClosestEvent(user);
+            setNextEvent(closestEvent);
+        }
+        catch (error) {
+            setNextEvent(null);
+        }
     }
 
     useEffect(() => {

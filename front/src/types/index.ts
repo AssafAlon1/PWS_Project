@@ -54,7 +54,7 @@ export interface PaymentDetails {
     holder: string;
     cvv: string;
     exp: string;
-    charge: number;
+    charge: number; // the total price of the purchase
 }
 
 export interface UserAction {
@@ -63,6 +63,7 @@ export interface UserAction {
     purchase_id: string;
     ticket_name: string;
     ticket_amount: number;
+    price: number;
     purchase_time: Date;
     refund_time?: Date;
 }

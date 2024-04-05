@@ -46,6 +46,14 @@ const clearExpiredLock = async (ticketId: string, username: string, quantity: nu
   }
   catch (err) {
     console.error("Failed to clear expired lock for ticket with id: ", ticketId, " for user: ", username);
+    if (session) {
+      await session.abortTransaction();
+    }
+  }
+  finally {
+    if (session) {
+      session.endSession();
+    }
   }
 }
 

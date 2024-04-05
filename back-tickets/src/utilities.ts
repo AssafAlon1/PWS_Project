@@ -78,6 +78,3 @@ export const purchaseTicketFromLock = async (ticket: ICSTicket, paymentInformati
 }
 
 
-// TODO - In frontend checkout page, indicate user if there's no available tickets to buy (maybe by kicking them out to the catalog or something)
-
-

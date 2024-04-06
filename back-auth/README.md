@@ -26,9 +26,10 @@ Shamelessly stolen from Workshop3, which had a skeleton provided by the wonderfu
 ## API Routes
 
 Supported API endpoints:
-| Method | Endpoint      | Description                                   |
-| ------ | ------------- | --------------------------------------------- |
-| POST   | /api/login    | Login with username and password              |
-| POST   | /api/logout   | Logout                                        |
-| POST   | /api/signup   | Sign up a new user with username and password |
-| GET    | /api/username | Gets the username of the current user         |
+| Method | Endpoint        | Description                                   |
+| ------ | --------------- | --------------------------------------------- |
+| POST   | /api/login      | Login with username and password              |
+| POST   | /api/logout     | Logout                                        |
+| POST   | /api/signup     | Sign up a new user with username and password |
+| PUT    | /api/permission | Updates the users permissions                 |
+| GET    | /api/userinfo   | Gets the username and role of the current user|

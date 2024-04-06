@@ -33,9 +33,9 @@ app.use(cors({
     // credentials: true,  // TODO - remove? Frontend needs to send cookies with requests
 }));
 
-app.put(ACTIONS_PATH, refundTickets);
 app.get(CLOSEST_EVENT_PATH, getClosestEvent);
 app.get(ACTIONS_PATH, getUserActions)
+app.put(ACTIONS_PATH, refundTickets);
 
 app.listen(port, () => {
     console.log(`Server running! port ${port}`);

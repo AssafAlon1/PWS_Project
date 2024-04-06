@@ -33,20 +33,13 @@ const PaymentForm: React.FC<PaymentFormProps> = ({ purchaseTickets, isLoading, s
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         const form = event.currentTarget;
+        setFormValidated(true);
         if (form.checkValidity() === false || !isFutureDate(year, month)) {
             event.stopPropagation();
-            setFormValidated(true);
             console.error("Form invalid");
             return;
         }
-        try {
-            await purchaseTickets();
-        }
-        catch {
-            // setting an Alert in case of purchase fail is handled in the parent component
-            // TODO - why are we even doing try/catch here???
-            setFormValidated(true);
-        } 
+        await purchaseTickets();
     }
 
     const YearOptions = () => {

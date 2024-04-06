@@ -61,7 +61,6 @@ const CheckoutPage: React.FC = () => {
             console.error("Failed to purchase tickets");
             setIsLoading(false);
             setDisplayError(true);
-            throw err; // TODO - WHY??
         }
         setIsLoading(false);
     }

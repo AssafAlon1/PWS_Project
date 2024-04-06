@@ -43,7 +43,8 @@ const PaymentForm: React.FC<PaymentFormProps> = ({ purchaseTickets, isLoading, s
             await purchaseTickets();
         }
         catch {
-            // TODO - HANDLE THIS RIGHT (show an error in the page probably. Maybe a toast?)
+            // setting an Alert in case of purchase fail is handled in the parent component
+            // TODO - why are we even doing try/catch here???
             setFormValidated(true);
         } 
     }

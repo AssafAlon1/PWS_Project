@@ -16,9 +16,18 @@ interface NewTicket {
     quantity: number;
 }
 
+interface AlertModalProps {
+    isOpen: boolean;
+    message: string;
+    onCancel: () => void;
+    onConfirm?: () => void;
+}
+
 const NewEventPage: React.FC = () => {
     const tomorrowDate = new Date(new Date().getTime() + 24 * 60 * 60 * 1000);
     const [isFormValidated, setFormValidated] = useState<boolean>(false);
+    const [errorModal, setErrorModal] = useState(false);
+    const [confirmModal, setConfirmModal] = useState(false);
     const [displayError, setDisplayError] = useState<string>("");
 
     const [eventName, setEventName] = useState<string>("");
@@ -76,12 +85,28 @@ const NewEventPage: React.FC = () => {
         return VALID_CATEGORIES.map((catagory: string, index: number) => <option key={index}>{catagory}</option>);
     }
 
+    const AlertModal: React.FC<AlertModalProps> = ({ isOpen, message, onCancel, onConfirm }) => {
+        if (!isOpen) {
+            return null;
+        }
+        return (
+            <div className="modal">
+              <div className="modal-content">
+                <p>{message}</p>
+                { !onConfirm && <Button onClick={onCancel} className='mb-2 mt-2'> Got it! </Button> }
+                { onConfirm && <Button onClick={onConfirm} className='mb-2 mt-2'> I'm sure </Button> }
+                { onConfirm && <Button variant="secondary" onClick={onCancel} className='mb-2 mt-2'> Cancel </Button> }
+              </div>
+            </div>
+        );
+    };
+
     const addTicket = (ticket: NewTicket): boolean => {
         if (ticket.name === "" ||
             ticket.price < 0 ||
             ticket.quantity <= 0 ||
             tickets.some(t => t.name === ticket.name)) {
-            alert("Invalid ticket (make sure ticket name is unique)");
+            setErrorModal(true);
             return false;
         }
         setTickets([...tickets, ticket]);
@@ -213,24 +238,31 @@ const NewEventPage: React.FC = () => {
 
     const TicketDetails = ({ ticket, onRemove }: { ticket: NewTicket, onRemove: () => void }) => {
         return (
-            <Card className="mb-4 me-2 position-relative">
-                <Button
-                    variant="danger"
-                    className="position-absolute top-0 end-0 m-2 btn-sm"
-                    onClick={onRemove}
-                >
-                    x
-                </Button>
-                <Card.Body>
-                    <Card.Title>{ticket.name}</Card.Title>
-                    <Card.Text>
-                        Price: ${ticket.price}
-                    </Card.Text>
-                    <Card.Text>
-                        Quantity: {ticket.quantity}
-                    </Card.Text>
-                </Card.Body>
-            </Card>
+            <Container>
+                <Card className="mb-4 me-2 position-relative">
+                    <Button
+                        variant="danger"
+                        className="position-absolute top-0 end-0 m-2 btn-sm"
+                        onClick={onRemove}
+                    >
+                        x
+                    </Button>
+                    <Card.Body>
+                        <Card.Title>{ticket.name}</Card.Title>
+                        <Card.Text>
+                            Price: ${ticket.price}
+                        </Card.Text>
+                        <Card.Text>
+                            Quantity: {ticket.quantity}
+                        </Card.Text>
+                    </Card.Body>
+                </Card>
+                <AlertModal
+                    isOpen={errorModal}
+                    message="Invalid ticket (make sure ticket name is unique)"
+                    onCancel={() => setErrorModal(false)}
+                />
+            </Container>
         )
     }
 
@@ -378,14 +410,21 @@ const NewEventPage: React.FC = () => {
                                     <Row xs={1} lg={2}>
                                         {tickets.map((ticket, index) => (
                                             <Col md={6} key={index} style={{ marginBottom: '20px' }}>
-                                                <TicketDetails
+                                                 <TicketDetails
                                                     ticket={ticket}
                                                     onRemove={() => {
-                                                        if (!confirm("Are you sure you want to remove ticket " + ticket.name + "?")) {
-                                                            return;
-                                                        }
+                                                        setConfirmModal(true);
+                                                    }} 
+                                                />
+                                                <AlertModal
+                                                    isOpen={confirmModal}
+                                                    message="Are you sure you want to remove ticket?"
+                                                    onCancel={() => setConfirmModal(false)}
+                                                    onConfirm={() => {
+                                                        setConfirmModal(false);
                                                         setTickets(tickets.filter(t => t.name !== ticket.name));
-                                                    }} />
+                                                    }}
+                                                />                                                
                                             </Col>
                                         ))}
                                     </Row>

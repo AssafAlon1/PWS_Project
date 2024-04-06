@@ -1,3 +1,4 @@
+import jwt from "jsonwebtoken";
 import express from 'express';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
@@ -13,6 +14,8 @@ import { consumeMessages } from './consume-messages.js';
 dotenv.config();
 const dbUri = process.env.DB_CONNECTION_STRING;
 const port = process.env.PORT || 3000;
+const sharedKey = process.env.SHARED_SECRET;
+
 
 const publisherChannel = new PublisherChannel();
 
@@ -38,24 +41,56 @@ app.use(cors({
   // credentials: true,  // TODO - remove? Frontend needs to send cookies with requests
 }));
 
+const verifyJWT = (token: string): { username: string } | false => {
+  try {
+    const verifiedToken = jwt.verify(token, sharedKey) as { username: string };
+    if (!verifiedToken.username) {
+      throw new Error("Invalid token");
+    }
+    return verifiedToken;
+  }
+  catch (err) {
+    console.error("Invalid token provided");
+    return false;
+  }
+};
+
+function validateToken(req: Request, res: Response, next: NextFunction) {
+  const token = req.headers.authorization;
+  if (!token) {
+    res.status(401).send('Unauthorized');
+    return;
+  }
+
+  const result = verifyJWT(token);
+  if (!result) {
+    res.status(401).send('Unauthorized');
+    return;
+  }
+
+  req.headers['username'] = result.username;
+
+  next();
+}
+
 function keepSensitiveInfo(req: Request, res: Response, next: NextFunction) {
   req.keepSensitiveInfo = true;
   next();
 }
 
-app.get(`${ALL_TICKET_PATH}/:eventId`, getALLTicketsByEventId);
-app.get(`${ALL_TICKET_PATH}/backoffice/:eventId`, keepSensitiveInfo, getALLTicketsByEventId);
+app.get(`${ALL_TICKET_PATH}/:eventId`, validateToken, getALLTicketsByEventId);
+app.get(`${ALL_TICKET_PATH}/backoffice/:eventId`, validateToken, keepSensitiveInfo, getALLTicketsByEventId);
 
-app.post(`${TICKET_PATH}s`, createTickets);
+app.post(`${TICKET_PATH}s`, validateToken, createTickets);
 
 // Middleware to attach publisherChannel to the request
 function attachPublisherChannel(req: Request, res: Response, next: NextFunction) {
   req.publisherChannel = publisherChannel;
   next();
 }
-app.put(TICKET_PATH, attachPublisherChannel, purchaseTicket);
+app.put(TICKET_PATH, validateToken, attachPublisherChannel, purchaseTicket);
 
-app.put(`${TICKET_PATH}/:eventId`, lockTicket);
+app.put(`${TICKET_PATH}/:eventId`, validateToken, lockTicket);
 
 
 app.listen(port, () => {

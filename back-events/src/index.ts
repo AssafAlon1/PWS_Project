@@ -90,9 +90,9 @@ app.get(`${EVENT_PATH}/:eventId`, validateToken, getEventById);
 app.get(`${EVENT_PATH}/backoffice/:eventId`, validateToken, keepSensitiveInfo, getEventById);
 app.get("/api/closest_event", getClosestEvent); // !! NOTE: this is NOT exposed to the API Gateway (therefore it's OK that it shares the same path as the user-actions service)
 
-app.post(EVENT_PATH, createEvent);
+app.post(EVENT_PATH, validateToken, createEvent);
 
-app.put(`${EVENT_PATH}/:eventId/postpone`, updateEvent);
+app.put(`${EVENT_PATH}/:eventId/postpone`, validateToken, updateEvent);
 
 app.listen(port, () => {
   console.log(`Server running! port ${port}`);

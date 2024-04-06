@@ -1,3 +1,4 @@
+```json
 Events Schema: {
     _id : Types.ObjectId
     title : string
@@ -53,3 +54,4 @@ User Actions Schema: {
     purchase_time : Date
     refund_time : Date
 }
+```

@@ -27,10 +27,9 @@ Shamelessly stolen from Workshop2, which had a skeleton provided by the wonderfu
 ## API Routes
 
 Your API should support the following endpoints:
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET    | /api/comment/{id} | Returns a comment with a certain id. *(deprecated)* |
-| GET    | /api/comment/{event_id}?skip={skip}&limit={limit} | Returns multiple comments with pagination enforced for a specific event. |
-| POST   | /api/comment | Creates a new comment. |
+| Method | Endpoint                                            | Description                                                              |
+| ------ | --------------------------------------------------- | ------------------------------------------------------------------------ |
+| GET    | /api/comment/{event_id}[?skip={skip}&limit={limit}] | Returns multiple comments with pagination enforced for a specific event. |
+| POST   | /api/comment                                        | Creates a new comment.                                                   |
 
 **THIS API ISN'T FINAL. WE ARE INDECISIVE**

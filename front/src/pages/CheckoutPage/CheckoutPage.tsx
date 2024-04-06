@@ -61,7 +61,6 @@ const CheckoutPage: React.FC = () => {
             console.error("Failed to purchase tickets");
             setIsLoading(false);
             setDisplayError(true);
-            throw err;
         }
         setIsLoading(false);
     }
@@ -106,12 +105,14 @@ const CheckoutPage: React.FC = () => {
     const TimerRanOut = () => {
         setLockValid(false);
     }
+    
+    const ticket_count = purchaseDetails?.ticket_amount ?? 0;
 
     const LockCountDownComponent = () => {
         const timeLeft = Math.floor((dueDate.getTime() - new Date().getTime()) / 1000);
         return <Card className="mt-4">
             <Card.Header>
-                <Card.Title>Ticket is saved for you for {LOCK_TIME_SECONDS / 60} minutes</Card.Title>
+                <Card.Title>{ticket_count} ticket{ticket_count > 1 ? 's are' : ' is'} saved for you for {LOCK_TIME_SECONDS / 60} minutes</Card.Title>
             </Card.Header>
             <Card.Body className="timer-wrapper">
                 <CountdownCircleTimer

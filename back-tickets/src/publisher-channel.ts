@@ -33,8 +33,6 @@ export class PublisherChannel {
         // The empty string as the second argument represents the routing key, which is not used by fanout exchanges
         // `Buffer.from(msg)` converts the message string into a buffer for transmission
         await this.channel.publish(exchange, '', Buffer.from(msg));
-        console.log(
-            `Publisher >>> | message "${msg}" published to exchange "${exchange}"`
-        );
+        console.log(`Published "${msg}" published to exchange "${exchange}"`);
     }
 }

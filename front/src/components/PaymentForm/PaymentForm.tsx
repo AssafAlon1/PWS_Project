@@ -33,19 +33,13 @@ const PaymentForm: React.FC<PaymentFormProps> = ({ purchaseTickets, isLoading, s
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         const form = event.currentTarget;
+        setFormValidated(true);
         if (form.checkValidity() === false || !isFutureDate(year, month)) {
             event.stopPropagation();
-            setFormValidated(true);
-            console.log("Form invalid");
+            console.error("Form invalid");
             return;
         }
-        try {
-            await purchaseTickets();
-        }
-        catch {
-            // TODO - HANDLE THIS RIGHT (show an error in the page probably. Maybe a toast?)
-            setFormValidated(true);
-        } 
+        await purchaseTickets();
     }
 
     const YearOptions = () => {

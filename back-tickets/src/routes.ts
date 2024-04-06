@@ -87,7 +87,7 @@ export const purchaseTicket = async (req: Request, res: Response) => {
     postData = req.body as PaymentInformation;
     const { error } = paymentInformationSchema.validate(postData);
     if (error) {
-        console.log("Payment Information invalid", error);
+        console.error("Payment Information invalid", error);
         res.status(StatusCodes.BAD_REQUEST).send({ message: "Payment Information invalid." });
         return;
     }
@@ -108,8 +108,9 @@ export const purchaseTicket = async (req: Request, res: Response) => {
 
     // purchase the tickets from the available tickets:
     // if there are enough tickets available, lock them and purchase from the lock.
+    // Shouldn't get here.... but just in case
     if(!doesUserHaveLock) {
-        console.log("User doesn't have a lock on the tickets - attempting lock");
+        console.error("User doesn't have a lock on the tickets - attempting lock");
         if (ticket.available < postData.ticket_amount) {
             console.error("Not enough tickets available.");
             res.status(StatusCodes.BAD_REQUEST).send({ message: "Not enough tickets available." });
@@ -146,7 +147,7 @@ export const lockTicket = async (req: Request, res: Response) => {
         postData = req.body;
         const { error } = lockRequestSchema.validate(postData);
         if (error) {
-            console.log("Bad request", error);
+            console.error("Bad request", error);
             res.status(StatusCodes.BAD_REQUEST).send({ message: "Bad Request." });
             return;
         }

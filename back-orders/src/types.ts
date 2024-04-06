@@ -17,6 +17,7 @@ export type RefundInformation = {
     event_id: string,
     ticket_name: string,
     ticket_amount: number,
+    username: string,
 }
 
 export const paymentInformationSchema = Joi.object({
@@ -37,4 +38,5 @@ export const refundInformationSchema = Joi.object({
     event_id: Joi.string().required(),
     ticket_name: Joi.string().required(),
     ticket_amount: Joi.number().integer().min(1).required(),
+    username: Joi.string().required(),
 });

@@ -1,11 +1,16 @@
+import jwt from "jsonwebtoken";
 import { Request, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
 
 import { addRefundTicketsAction, queryUserClosestEvent, queryActionByPurchaseId, queryAllUserActions } from './db.js';
 import { ACTIONS_PATH, CLOSEST_EVENT_PATH, MAX_QUERY_LIMIT, ORDER_API_URL } from "./const.js";
 import axios from 'axios';
+import dotenv from "dotenv";
+
+dotenv.config();
 
 const axiosInstance = axios.create({ withCredentials: true, baseURL: ORDER_API_URL });
+const sharedKey = process.env.SHARED_SECRET;
 
 
 // TODO - verify (not necessarily here, but not in the front end)
@@ -35,15 +40,24 @@ export const refundTickets = async (req: Request, res: Response) => {
             event_id: refund_details.event_id,
             ticket_name: refund_details.ticket_name,
             ticket_amount: refund_details.ticket_amount,
+            username: refund_details.username,
         };
 
-        const refundResult = await axiosInstance.post('/api/refund', refundInformation);
+        // Create Token for order API service
+        const outgoingToken = jwt.sign({ username: refundInformation.username }, sharedKey);
+        const postHeaders = {
+            headers: {
+                authorization: outgoingToken,
+            }
+        };
+
+        const refundResult = await axiosInstance.post('/api/refund', refundInformation, postHeaders);
         if (refundResult.status !== StatusCodes.OK) {
             throw Error("Failed to refund tickets.");
         }
 
-        const insertResult = await addRefundTicketsAction(postData.purchase_id, refundDate);
-        // irl, we would've checked for failure here.
+        await addRefundTicketsAction(postData.purchase_id, refundDate);
+        // irl, we would've checked for failure here (const result = (...))
         // in practice, we don't have much to do if this fails =/
 
         res.status(StatusCodes.OK).send({ message: "Refund success for purchase " + postData.purchase_id });

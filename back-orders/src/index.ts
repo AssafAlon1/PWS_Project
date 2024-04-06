@@ -64,7 +64,7 @@ function attachPublisherChannel(req: Request, res: Response, next: NextFunction)
 }
 
 app.post(BUY_PATH, validateToken, attachPublisherChannel, buyTickets);
-app.post(REFUND_PATH, attachPublisherChannel, refundTickets);
+app.post(REFUND_PATH, validateToken, attachPublisherChannel, refundTickets);
 
 
 app.listen(port, () => {

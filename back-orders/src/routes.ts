@@ -58,6 +58,13 @@ export const refundTickets = async (req: Request, res: Response) => {
             return;
         }
 
+        // Blocking refund for purchases not made by the user
+        if (postData.username !== req.headers["username"]) {
+            console.error(`User ${req.headers["username"]} tried refunding order of ${postData.username} - Unauthorized!`);
+            res.status(StatusCodes.FORBIDDEN).send({ message: "Unauthorized" });
+            return;
+        }
+
         await axiosPayment.post("/_functions/refund", { orderId: postData.purchase_id });
 
         const refundData = {

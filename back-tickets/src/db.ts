@@ -39,9 +39,8 @@ const clearExpiredLock = async (ticketId: string, username: string, quantity: nu
 
     await session.commitTransaction();
 
-    // TODO - remove? (what if one of the transactions failed?)
     if (result.modifiedCount === 1) {
-      console.log(" >> Cleared ", quantity, " tickets held by expired locks with id: ", ticketId);
+      console.log("[OK] Cleared ", quantity, " tickets held by expired locks with id: ", ticketId);
     }
   }
   catch (err) {

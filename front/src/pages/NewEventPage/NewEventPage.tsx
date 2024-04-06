@@ -119,7 +119,7 @@ const NewEventPage: React.FC = () => {
         if (form.checkValidity() === false) {
             event.stopPropagation();
             setFormValidated(true);
-            console.log("Form invalid");
+            console.error("Form invalid");
             setDisplayError("Invalid Form. Please check the form and try again.");
             return;
         }

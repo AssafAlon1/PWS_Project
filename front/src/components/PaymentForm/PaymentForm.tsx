@@ -36,7 +36,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({ purchaseTickets, isLoading, s
         if (form.checkValidity() === false || !isFutureDate(year, month)) {
             event.stopPropagation();
             setFormValidated(true);
-            console.log("Form invalid");
+            console.error("Form invalid");
             return;
         }
         try {

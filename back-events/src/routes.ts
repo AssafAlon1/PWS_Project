@@ -60,7 +60,7 @@ export const getEventById = async (req: Request, res: Response) => {
     }
   }
   catch (error) {
-    res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({ message: "Internal Server Error" });
+    res.status(StatusCodes.NOT_FOUND).send({ message: "Event not found." });
     return;
   }
 
@@ -68,11 +68,7 @@ export const getEventById = async (req: Request, res: Response) => {
     delete data.comment_count;
   }
 
-  if (data) {
-    res.status(StatusCodes.OK).send(data);
-  } else {
-    res.status(StatusCodes.NOT_FOUND).send({ message: "Event not found." });
-  }
+  res.status(StatusCodes.OK).send(data);
 };
 
 export const createEvent = async (req: Request, res: Response) => {

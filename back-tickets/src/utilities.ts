@@ -1,4 +1,5 @@
-import { ICSTicket, lockSchema, ticketSchema } from "./models/CSTicket.js";
+import jwt from "jsonwebtoken";
+import { ICSTicket } from "./models/CSTicket.js";
 import { isSoldOut, queryCheapestTicketsByEventID, removeTicketLock, addTicketLock } from "./db.js"
 import { LOCK_GRACE_PERIOD_SECONDS, ORDER_API_URL } from "./const.js";
 import { PaymentInformation } from "./types.js";
@@ -6,8 +7,12 @@ import { PublisherChannel } from "./publisher-channel.js";
 
 import { StatusCodes } from "http-status-codes";
 import axios from "axios";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 const axiosInstance = axios.create({ withCredentials: true, baseURL: ORDER_API_URL });
+const sharedKey = process.env.SHARED_SECRET;
 
 export const purchaseTicketFromLock = async (ticket: ICSTicket, paymentInformation: PaymentInformation, publisherChannel: PublisherChannel) => {
     let orderResult;
@@ -41,8 +46,16 @@ export const purchaseTicketFromLock = async (ticket: ICSTicket, paymentInformati
 
     // call shark to purchase the tickets
     try {
+        // Create Token for order API service
+        const outgoingToken = jwt.sign({ username: paymentInformation.username }, sharedKey);
+        const postHeaders = {
+            headers: {
+                authorization: outgoingToken,
+            }
+        };
+
         // CREATE THE ORDER, AND UNDO CHANGES IF FAILED
-        orderResult = await axiosInstance.post("/api/buy", paymentInformation);
+        orderResult = await axiosInstance.post("/api/buy", paymentInformation, postHeaders);
         if (orderResult.status != StatusCodes.OK) {
             console.error("I believe this code is unreachable. Can you see me?");
             throw Error("Failed buying ticket!");

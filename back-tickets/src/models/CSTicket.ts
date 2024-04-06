@@ -27,7 +27,7 @@ const mongooseTicketSchema = new mongoose.Schema({
     available: { type: Number, required: true },
     total: { type: Number, required: true },
     price: { type: Number, required: true },
-    locked: { type: [mongooseLockSchema], required: true, default: []}, // TODO - is dis oki?
+    locked: { type: [mongooseLockSchema], required: true, default: [] }, // TODO - is dis oki?
 });
 
 export const ticketSchema = Joi.object({

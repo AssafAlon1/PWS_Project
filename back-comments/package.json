@@ -26,6 +26,7 @@
     "express": "^4.19.1",
     "http-status-codes": "^2.3.0",
     "joi": "^17.12.2",
+    "jsonwebtoken": "^9.0.2",
     "mongoose": "^6.7.5"
   }
 }

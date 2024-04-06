@@ -1,6 +1,5 @@
 import jwt from "jsonwebtoken";
 import { NextFunction, Request, Response } from "express";
-import { body, validationResult } from 'express-validator';
 import { StatusCodes } from "http-status-codes";
 import { UserRole } from "./const.js";
 import { hasPermission } from "./db.js";

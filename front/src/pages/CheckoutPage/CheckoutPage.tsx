@@ -104,6 +104,7 @@ const CheckoutPage: React.FC = () => {
 
     const TimerRanOut = () => {
         setLockValid(false);
+        setDisplayError(false);
     }
     
     const ticket_count = purchaseDetails?.ticket_amount ?? 0;

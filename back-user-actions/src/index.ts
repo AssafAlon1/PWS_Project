@@ -5,7 +5,7 @@ import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import { consumeMessages } from './consume-messages.js';
 import { ACTIONS_PATH, CLOSEST_EVENT_PATH } from './const.js';
-import { getClosestEvent, getUserActionByPurchaseId, getUserActions, refundTickets } from './routes.js';
+import { getClosestEvent, getUserActions, refundTickets } from './routes.js';
 
 dotenv.config();
 
@@ -34,9 +34,8 @@ app.use(cors({
 }));
 
 app.put(ACTIONS_PATH, refundTickets);
-app.get(ACTIONS_PATH, getUserActions)
-app.get(`${ACTIONS_PATH}/:purchase_id`, getUserActionByPurchaseId)
 app.get(CLOSEST_EVENT_PATH, getClosestEvent);
+app.get(ACTIONS_PATH, getUserActions)
 
 app.listen(port, () => {
     console.log(`Server running! port ${port}`);

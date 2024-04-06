@@ -35,7 +35,7 @@ export const getALLTicketsByEventId = async (req: Request, res: Response) => {
             }, 0);
         });
     }
-    data.forEach(ticket => {delete ticket.locked});
+    data.forEach(ticket => { delete ticket.locked });
 
     res.status(StatusCodes.OK).send(data);
 }
@@ -103,13 +103,14 @@ export const purchaseTicket = async (req: Request, res: Response) => {
     const doesUserHaveLock: boolean = ticket.locked.find(lock =>
         lock.username === postData.username &&
         lock.quantity === postData.ticket_amount &&
-        lock.expires  > new Date()
+        lock.expires > new Date()
     ) !== null;
 
     // purchase the tickets from the available tickets:
     // if there are enough tickets available, lock them and purchase from the lock.
-    if(!doesUserHaveLock) {
-        console.log("User doesn't have a lock on the tickets - attempting lock");
+    // Shouldn't get here.... but just in case
+    if (!doesUserHaveLock) {
+        console.error("User doesn't have a lock on the tickets - attempting lock");
         if (ticket.available < postData.ticket_amount) {
             console.error("Not enough tickets available.");
             res.status(StatusCodes.BAD_REQUEST).send({ message: "Not enough tickets available." });
@@ -124,7 +125,7 @@ export const purchaseTicket = async (req: Request, res: Response) => {
             return;
         }
     }
-  
+
     // Assuming the user has a lock on the tickets, purchase the tickets from the lock
     try {
         console.log("Buying ticket from lock");
@@ -132,11 +133,11 @@ export const purchaseTicket = async (req: Request, res: Response) => {
         res.status(StatusCodes.OK).send({ order_id: purchaseInfo });
         return;
     }
-    catch(error) {
-        console.error("Failed purchasing ticket from lock: ", error);
+    catch (error) {
+        console.error("Failed purchasing ticket from lock");
         res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({ message: "Failed purchasing ticket" });
         return;
-    }      
+    }
 }
 
 export const lockTicket = async (req: Request, res: Response) => {

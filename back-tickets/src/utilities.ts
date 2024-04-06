@@ -53,9 +53,9 @@ export const purchaseTicketFromLock = async (ticket: ICSTicket, paymentInformati
                 authorization: outgoingToken,
             }
         };
-        
+
         // CREATE THE ORDER, AND UNDO CHANGES IF FAILED
-        orderResult = await axiosInstance.post("/api/buy", paymentInformation, postHeaders );
+        orderResult = await axiosInstance.post("/api/buy", paymentInformation, postHeaders);
         if (orderResult.status != StatusCodes.OK) {
             console.error("I believe this code is unreachable. Can you see me?");
             throw Error("Failed buying ticket!");

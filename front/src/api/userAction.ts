@@ -9,7 +9,6 @@ const axiosInstance = axios.create({ withCredentials: true, baseURL: API_GATEWAY
 const RealUserActionApi = {
     refundPurchase: async (purchaseId: string) => {
         await axiosInstance.put("/api/user_actions", { purchase_id: purchaseId });
-        console.log("Completed refund");
         return APIStatus.Success;
     },
 
@@ -34,13 +33,8 @@ const RealUserActionApi = {
                 limit
             }
         });
-        return response.data;
+        return response.data as UserAction[];
     },
-
-    getUserActionByPurchaseId: async (purchaseId: string): Promise<UserAction> => {
-        const response = await axiosInstance.get(`/api/user_actions/${purchaseId}`);
-        return response.data as UserAction;
-    }
 }
 
 const UserActionApi = RealUserActionApi;

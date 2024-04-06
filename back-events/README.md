@@ -29,11 +29,14 @@ Base was stolen from HW3, which had a skeleton provided by the wonderful course 
 ## API Routes
 
 Supported API endpoints:
-| Method | Endpoint                                   | Description                                               |
-| ------ | ------------------------------------------ | --------------------------------------------------------- |
-| GET    | /api/event[?limit={limit}&skip={skip}]     | Gets upcomming events that still have tickets for sale.   |
-| GET    | /api/event/all[?limit={limit}&skip={skip}] | Gets unfiltered events. (only for authorized users in BO) |
-| POST   | /api/event/{id}                            | Get the data of the specifiied even                       |
-| POST   | /api/event                                 | Add an event. (only for authorized users in BO)           |
+| Method | Endpoint                                   | Description                                                       |
+| ------ | ------------------------------------------ | ----------------------------------------------------------------- |
+| GET    | /api/event[?limit={limit}&skip={skip}]     | Gets upcomming events that still have tickets for sale.           |
+| GET    | /api/event/all[?limit={limit}&skip={skip}] | Gets unfiltered events. (only for authorized users in BO)         |
+| GET    | /api/event/{id}                            | Gets the data of the specifiied even (regular users)              |
+| GET    | /api/event/backoffice/{id}                 | Gets the data of the specifiied even (for authorized users in BO) |
+| GET    | /api/closest_event                         | Gets the closest upcoming event (NOT exposed to gateway)          |
+| POST   | /api/event                                 | Add an event. (only for authorized users in BO)                   |
+| PUT    | /api/event/{id}/postpone                   | Postpone an event. (only for authorized users in BO)              |
 
 **THIS API ISN'T FINAL. WE ARE INDECISIVE**

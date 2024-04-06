@@ -27,8 +27,6 @@ const RealCommentApi = {
     }
 }
 
-// import { MockCommentApi } from "./mock";
-// const CommentApi = MockCommentApi;
 const CommentApi = RealCommentApi;
 
 

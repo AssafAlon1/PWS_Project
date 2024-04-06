@@ -109,26 +109,3 @@ export const getUserActions = async (req: Request, res: Response) => {
     }
 }
 
-// TODO - After merging refund with user space, this may not be used
-export const getUserActionByPurchaseId = async (req: Request, res: Response) => {
-    console.log("GET " + `${ACTIONS_PATH}/:purchase_id`);
-    try {
-        // const username = req.query.username as string;
-        const purchase_id = req.params.purchase_id;
-        if (!purchase_id) {
-            console.error("Invalid parameters.")
-            throw Error("Invalid parameters.");
-        }
-
-        const action = await queryActionByPurchaseId(purchase_id);
-        if (action === null) {
-            return res.status(StatusCodes.NOT_FOUND).send({ message: "Action not found." });
-        }
-        res.status(StatusCodes.OK).send(action);
-    }
-    catch (error) {
-        console.error("Invalid parameters");
-        res.status(StatusCodes.BAD_REQUEST).send({ message: "Bad Request." });
-    }
-}
-

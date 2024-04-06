@@ -35,7 +35,7 @@ const PostponeEventForm: React.FC<{ csEvent: CSEvent | null, refetchEvent: () =>
         if (form.checkValidity() === false) {
             event.stopPropagation();
             setFormValidated(true);
-            console.log("Form invalid");
+            console.error("Form invalid");
             setPostponeStatus("ERROR");
             return;
         }

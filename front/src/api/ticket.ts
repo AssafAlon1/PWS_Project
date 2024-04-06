@@ -51,9 +51,6 @@ const RealTicketApi = {
     },
 }
 
-// import { MockTicketApi } from "./mock";
-// const TicketApi = MockTicketApi;
-
 const TicketApi = RealTicketApi;
 
 

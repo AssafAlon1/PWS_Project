@@ -39,9 +39,8 @@ const clearExpiredLock = async (ticketId: string, username: string, quantity: nu
 
     await session.commitTransaction();
 
-    // TODO - remove? (what if one of the transactions failed?)
     if (result.modifiedCount === 1) {
-      console.log(" >> Cleared ", quantity, " tickets held by expired locks with id: ", ticketId);
+      console.log("[OK] Cleared ", quantity, " tickets held by expired locks with id: ", ticketId);
     }
   }
   catch (err) {
@@ -158,14 +157,13 @@ export const lockTickets = async (event_id: string, ticketName: string, quantity
 
     // Add the tickets to the locked array
     const lockedExpires = expires ? expires : new Date();
-    const expirationTime = new Date(lockedExpires.getTime() + LOCK_TIME_SECONDS * 1000); // TODO - is dis oki?
+    const expirationTime = new Date(lockedExpires.getTime() + LOCK_TIME_SECONDS * 1000); 
     await CSTicket.updateOne(
       { _id: ticket._id },
       {
         $push: {
           locked: {
             quantity: quantity,
-            // expires: lockedExpires.setSeconds(lockedExpires.getSeconds() + LOCK_TIME_SECONDS),
             expires: expirationTime,
             username: username
           }

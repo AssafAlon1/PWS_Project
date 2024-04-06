@@ -135,7 +135,7 @@ const ActionDetails: React.FC<ActionDetailsProps> = ({ action, csevent }) => {
     const EventInformationCard = () => {
         if (isLoadingEvent) {
             return (
-                <Card className="me-2">
+                <Card className="me-2 stay-big-inner">
                     <Card.Text>Loading event information...</Card.Text>
                     <Card.Body className="direction-row">
                         <ThreeSpanningSpinners />
@@ -145,7 +145,7 @@ const ActionDetails: React.FC<ActionDetailsProps> = ({ action, csevent }) => {
         }
         if (!eventDetails) {
             return (
-                <Card className="me-2">
+                <Card className="me-2 stay-big-inner">
                     <Card.Body>
                         <Card.Text>Failed fetching event information</Card.Text>
                         <Button variant="light" onClick={updateEvent}>Retry</Button>
@@ -154,7 +154,7 @@ const ActionDetails: React.FC<ActionDetailsProps> = ({ action, csevent }) => {
             );
         }
         return (
-            <Card className="me-2">
+            <Card className="me-2 stay-big-inner">
                 <Card.Text>Event Category: {eventDetails?.category}</Card.Text>
                 <Card.Text>Date: {formattedStartDate + ((formattedEndDate == formattedStartDate) ? "" : " - " + formattedEndDate)}</Card.Text>
                 <Card.Text>Time: {formattedStartTime} - {formattedEndTime}</Card.Text>
@@ -171,17 +171,17 @@ const ActionDetails: React.FC<ActionDetailsProps> = ({ action, csevent }) => {
     const refundconfirmationMessage = "Are you sure you want to refund your purchase of " + action.ticket_amount + " " + action.ticket_name + " tickets for " + title + "?";
     return (
         <Container>
-            <Card className="mb-2">
+            <Card className="mb-2 stay-big-outer">
                 <Card.Header>
                     <Card.Title>
                         {title}
                     </Card.Title>
                 </Card.Header>
-                <Card.Body >
+                <Card.Body className="stay-big-outer">
                     <Container className="direction-row">
                         <ImageComponent />
                         <EventInformationCard />
-                        <Card>
+                        <Card className="stay-big-inner">
                             <Card.Text>Tickets: {action.ticket_amount} x {action.ticket_name}</Card.Text>
                             <Card.Text>Price: ${action.price}</Card.Text>
                             <Card.Text>Bought at: {formattedDate}</Card.Text>

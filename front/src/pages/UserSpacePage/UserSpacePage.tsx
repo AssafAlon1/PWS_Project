@@ -9,7 +9,6 @@ import { MAX_ACTIONS } from '../../const';
 import ActionDetails, { ActionPlaceholder } from '../../components/UserActionDetails/UserActionDetails';
 import { AuthContext } from '../../components/AuthProvider/AuthProvider';
 import { CSEvent } from '../../types';
-import "./UserSpacePage.css";
 
 const UserSpacePage: React.FC = () => {
   const [userActions, setUserActions] = useState<UserAction[]>([]);
@@ -133,7 +132,7 @@ const UserSpacePage: React.FC = () => {
         </Container>
       );
     }
-    return <Container className="stay-big">
+    return <Container style={{ paddingTop: '100px' }}>
       <ErrorFetchingActions />
       <InfiniteScroll
         dataLength={userActions.length}

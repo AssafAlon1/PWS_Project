@@ -20,9 +20,3 @@
     /* visibility: hidden; */
     display: none
 }
-
-.custom {
-    max-height: 80px;
-    overflow-y: auto; /* Only vertical scrollbars appear when necessary */
-    overflow-x: hidden; /* Prevents horizontal overflow */      
-}

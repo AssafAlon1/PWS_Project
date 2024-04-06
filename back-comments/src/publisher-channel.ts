@@ -26,6 +26,6 @@ export class PublisherChannel {
         await this.channel.assertExchange(exchange, 'fanout', { durable: false });
 
         await this.channel.publish(exchange, '', Buffer.from(msg));
-        console.log(`Published "${msg}" to "${exchange}"`);
+        console.log(`Publishing "${msg}" to "${exchange}"`);
     }
 }

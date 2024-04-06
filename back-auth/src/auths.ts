@@ -127,7 +127,7 @@ const getRequiredRole = (req: Request): UserRole => {
   }
 
   // Shouldn't get here, require highest role.
-  console.error(" > Haven't matched any path, defaulting required role to Admin.");
+  console.log(" > Haven't matched any path, defaulting required role to Admin.");
   return UserRole["Admin"];
 }
 

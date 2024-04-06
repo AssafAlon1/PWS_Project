@@ -7,7 +7,7 @@ import cors from 'cors';
 import { Request, Response, NextFunction } from 'express';
 import { consumeMessages } from './consume-messages.js';
 import { ACTIONS_PATH, CLOSEST_EVENT_PATH } from './const.js';
-import { getClosestEvent, getUserActions, refundTickets } from './routes.js';
+import { getClosestEvent, getUserActionByPurchaseId, getUserActions, refundTickets } from './routes.js';
 
 dotenv.config();
 

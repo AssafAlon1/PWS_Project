@@ -84,7 +84,7 @@ const NavbarComponent: React.FC = () => {
 
     return (
         <>
-            <Navbar bg="light" variant="light" fixed="top" className="custom">
+            <Navbar bg="light" variant="light" fixed="top">
                 <Container>
                     <Navbar.Brand as={Link} to={CATALOG_PATH}>CS Events</Navbar.Brand>
                     <Nav className="me-auto">

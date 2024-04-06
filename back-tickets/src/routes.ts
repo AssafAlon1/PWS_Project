@@ -87,7 +87,7 @@ export const purchaseTicket = async (req: Request, res: Response) => {
     postData = req.body as PaymentInformation;
     const { error } = paymentInformationSchema.validate(postData);
     if (error) {
-        console.error("Payment Information invalid", error);
+        console.log("Payment Information invalid", error);
         res.status(StatusCodes.BAD_REQUEST).send({ message: "Payment Information invalid." });
         return;
     }
@@ -147,7 +147,7 @@ export const lockTicket = async (req: Request, res: Response) => {
         postData = req.body;
         const { error } = lockRequestSchema.validate(postData);
         if (error) {
-            console.error("Bad request", error);
+            console.log("Bad request", error);
             res.status(StatusCodes.BAD_REQUEST).send({ message: "Bad Request." });
             return;
         }

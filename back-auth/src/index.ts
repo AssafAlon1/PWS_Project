@@ -109,3 +109,67 @@ app.listen(port, () => {
   console.log("ORIGIN: " + origin);
 });
 
+
+/*
+import express, { Request, Response, NextFunction } from 'express';
+
+
+const app: express.Application = express();
+
+app.use(express.json()); // Middleware to parse JSON bodies
+
+
+
+// Apply sanitization middleware to all incoming requests
+app.post('/data', sanitizeInput, (req: Request, res: Response): void => {
+  // Validate request after sanitization
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+
+  // Your logic after input has been sanitized
+  res.status(200).json({ message: 'Data processed safely', data: req.body });
+});
+
+*/
+
+
+
+
+/*
+import * as express from 'express';
+// const express = require('express');
+const { body, validationResult } = require('express-validator');
+const app = express();
+
+app.use(express.json()); // Middleware to parse JSON bodies
+
+// Middleware to sanitize all fields against XSS
+const sanitizeInput = (req, res, next) => {
+  Object.keys(req.body).forEach(key => {
+    // Escaping potentially dangerous characters
+    body(key).escape().run(req);
+  });
+  next();
+};
+
+// Apply sanitization middleware to all incoming requests
+app.post('/data', sanitizeInput, (req, res) => {
+  // Validate request after sanitization
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+
+  // Your logic after input has been sanitized
+  res.status(200).json({ message: 'Data processed safely', data: req.body });
+});
+
+// Start your Express server
+app.listen(3000, () => {
+  console.log('Server listening on port 3000');
+});
+
+
+*/

@@ -19,9 +19,14 @@ import { AuthContext } from '../../components/AuthProvider/AuthProvider';
 import PostponeEventForm from '../../components/PostponeEventForm/PostponeEventForm';
 import { UserRole } from '../../const';
 
+interface LoadingModalProps {
+    isLocking: boolean;
+}
+
 const EventDetails: React.FC = () => {
     const [event, setEvent] = useState<CSEvent | null>(null);
     const [tickets, setTickets] = useState<Ticket[] | null>(null);
+    const [isLocking, setLocking] =  useState<boolean>(false);
 
     const { eventId } = useParams();
     const navigate = useNavigate();
@@ -181,6 +186,20 @@ const EventDetails: React.FC = () => {
         </Card>
     }
 
+    const LoadingModal: React.FC<LoadingModalProps> = ({ isLocking }) => {
+        if (!isLocking) {
+            return null;
+        }
+        return (
+            <div className="modal">
+              <div className="modal-content direction-row">
+                <p>Proccessing request...</p>
+                <ThreeSpanningSpinners/>
+              </div>
+            </div>
+        );
+    };
+
     const BuyTicketComponent: React.FC<{ name: string, price: number, amountLeft: number, locked: number }> = ({ name, price, amountLeft, locked }) => {
         const [ticketAmount, setTicketAmount] = useState<number>(0);
         const [errorMessage, setErrorMessage] = useState<string>("");
@@ -200,11 +219,15 @@ const EventDetails: React.FC = () => {
                 return;
             }
             try {
+                setLocking(true);
                 await TicketApi.lockTickets(eventId, ticketPurchaseDetails.ticket_name, ticketAmount, authContext.user);
                 setPurchaseDetails(ticketPurchaseDetails);
+                setLocking(false);
                 navigate(CHECKOUT_PATH);
+                return;
             }
             catch (error) {
+                setLocking(false);
                 console.error("Failed to lock ticket: ", error);
                 setErrorMessage("Error: Failed to lock ticket");
                 return;
@@ -226,10 +249,11 @@ const EventDetails: React.FC = () => {
                         <ButtonWithTooltip
                             buttonContent={errorMessage ? "Try Again" : "Buy Now!"}
                             tooltipContent={ticketAmount <= 0 ? "Cannot buy less than 1 ticket" : "Not enough tickets left"}
-                            isDisabled={ticketAmount <= 0 || ticketAmount > amountLeft}
+                            isDisabled={ticketAmount <= 0 || ticketAmount > amountLeft || isLocking}
                             buttonOnClick={onClickBuyNow}
                         />
                     </div>
+                    <LoadingModal isLocking={isLocking} />
                     <Alert variant="danger" show={errorMessage !== ""} onClose={() => setErrorMessage("")} dismissible>
                         {errorMessage}
                     </Alert>

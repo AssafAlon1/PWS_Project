@@ -36,7 +36,7 @@ const ActionDetails: React.FC<ActionDetailsProps> = ({ action, csevent }) => {
     const navigate = useNavigate();
 
     // Internal component for the confirmation modal
-    const ConfirmationModal: React.FC<ConfirmationModalProps> = ({ isOpen, onConfirm, onCancel, message, }) => {
+    const ConfirmationModal: React.FC<ConfirmationModalProps> = ({ isOpen, onConfirm, onCancel, message }) => {
         if (!isOpen) {
             return null;
         }

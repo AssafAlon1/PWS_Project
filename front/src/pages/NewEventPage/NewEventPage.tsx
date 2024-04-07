@@ -9,6 +9,7 @@ import { CSEventCreationReqeust } from '../../types';
 import ButtonWithTooltip from '../../components/ButtonWithTooltip/ButtonWithTooltip';
 import './NewEventPage.css';
 import { SUCCESS_PATH } from '../../paths';
+import { ThreeSpanningSpinners } from '../../components/SpinnerComponent/SpinnerComponent';
 
 interface NewTicket {
     name: string;
@@ -29,6 +30,7 @@ const NewEventPage: React.FC = () => {
     const [errorModal, setErrorModal] = useState(false);
     const [confirmModal, setConfirmModal] = useState(false);
     const [displayError, setDisplayError] = useState<string>("");
+    const [isLoading, setLoading] = useState<boolean>(false);
 
     const [eventName, setEventName] = useState<string>("");
     const [catagory, setCatagory] = useState<string>(VALID_CATEGORIES[0]);
@@ -138,7 +140,9 @@ const NewEventPage: React.FC = () => {
             if (imageURL != "") {
                 eventCreationRequest.image = imageURL;
             }
+            setLoading(true);
             const result = await EventApi.createEvent(eventCreationRequest);
+            setLoading(false);
             navigate(SUCCESS_PATH, { state: { operationType: "create", createdEventId: result, message: "Event created successfully!" } });
         }
         catch (error) {
@@ -230,7 +234,7 @@ const NewEventPage: React.FC = () => {
                     </Row>
                 </div>
                 <Col>
-                    <Button disabled={isDisabled} onClick={onClickTicket}>Add Ticket</Button>
+                    <Button disabled={isDisabled || isLoading} onClick={onClickTicket}>Add Ticket</Button>
                 </Col>
             </Card>
         );
@@ -437,13 +441,14 @@ const NewEventPage: React.FC = () => {
                     <Col>
                         <ButtonWithTooltip
                             buttonContent="Create Event"
-                            tooltipContent="Event must have at least one ticket"
-                            isDisabled={tickets.length === 0}
+                            tooltipContent={isLoading ? "Loading..." : "Event must have at least one ticket"}
+                            isDisabled={tickets.length === 0 || isLoading}
                             buttonType="submit"
                             placement="top"
                         />
                     </Col>
                 </Row>
+                {isLoading && <ThreeSpanningSpinners />}
             </Form >
 
             <Alert

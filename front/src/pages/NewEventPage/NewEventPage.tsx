@@ -28,7 +28,6 @@ const NewEventPage: React.FC = () => {
     const tomorrowDate = new Date(new Date().getTime() + 24 * 60 * 60 * 1000);
     const [isFormValidated, setFormValidated] = useState<boolean>(false);
     const [errorModal, setErrorModal] = useState(false);
-    const [confirmModal, setConfirmModal] = useState(false);
     const [displayError, setDisplayError] = useState<string>("");
     const [isLoading, setLoading] = useState<boolean>(false);
 
@@ -240,14 +239,15 @@ const NewEventPage: React.FC = () => {
         );
     }
 
-    const TicketDetails = ({ ticket, onRemove }: { ticket: NewTicket, onRemove: () => void }) => {
+    const TicketDetails = ({ ticket }: { ticket: NewTicket}) => {
+    const [confirmModal, setConfirmModal] = useState(false);
         return (
             <Container>
                 <Card className="mb-4 me-2 position-relative">
                     <Button
                         variant="danger"
                         className="position-absolute top-0 end-0 m-2 btn-sm"
-                        onClick={onRemove}
+                        onClick={() => setConfirmModal(true)}
                     >
                         x
                     </Button>
@@ -262,9 +262,13 @@ const NewEventPage: React.FC = () => {
                     </Card.Body>
                 </Card>
                 <AlertModal
-                    isOpen={errorModal}
-                    message="Invalid ticket (make sure ticket name is unique)"
-                    onCancel={() => setErrorModal(false)}
+                    isOpen={confirmModal}
+                    message="Are you sure you want to remove ticket?"
+                    onCancel={() => setConfirmModal(false)}
+                    onConfirm={() => {
+                        setConfirmModal(false);
+                        setTickets(tickets.filter(t => t.name !== ticket.name));
+                    }}
                 />
             </Container>
         )
@@ -412,22 +416,9 @@ const NewEventPage: React.FC = () => {
                             <div style={{ maxHeight: '400px', overflowY: 'auto', }}>
                                 <Container className="tickets-wrapper">
                                     {tickets.map((ticket, index) => (
-                                        <div>
+                                        <div key={index}>
                                             <TicketDetails
-                                                key={index}
                                                 ticket={ticket}
-                                                onRemove={() => {
-                                                    setConfirmModal(true);
-                                                }}
-                                            />
-                                            <AlertModal
-                                                isOpen={confirmModal}
-                                                message="Are you sure you want to remove ticket?"
-                                                onCancel={() => setConfirmModal(false)}
-                                                onConfirm={() => {
-                                                    setConfirmModal(false);
-                                                    setTickets(tickets.filter(t => t.name !== ticket.name));
-                                                }}
                                             />
                                         </div>
                                     ))}
@@ -463,6 +454,12 @@ const NewEventPage: React.FC = () => {
                     {displayError}
                 </p>
             </Alert>
+
+            <AlertModal
+                isOpen={errorModal}
+                message="Invalid ticket (make sure ticket name is unique)"
+                onCancel={() => setErrorModal(false)}
+            />
         </>
     );
 };

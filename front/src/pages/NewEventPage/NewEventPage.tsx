@@ -405,8 +405,8 @@ const NewEventPage: React.FC = () => {
                         </Row>
                         <Row>
                             <h2>Ticket Details</h2>
-                            <div style={{ maxHeight: '400px', overflowY: 'auto' }}>
-                                <Container style={{ width: "27vw" }}>
+                            <div style={{ maxHeight: '400px', overflowY: 'auto', }}>
+                                <Container className="tickets-wrapper">
                                     <Row xs={1} lg={2}>
                                         {tickets.map((ticket, index) => (
                                             <Col md={6} key={index} style={{ marginBottom: '20px' }}>

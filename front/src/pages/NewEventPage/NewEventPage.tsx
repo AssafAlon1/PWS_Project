@@ -414,6 +414,7 @@ const NewEventPage: React.FC = () => {
                                     {tickets.map((ticket, index) => (
                                         <div>
                                             <TicketDetails
+                                                key={index}
                                                 ticket={ticket}
                                                 onRemove={() => {
                                                     setConfirmModal(true);

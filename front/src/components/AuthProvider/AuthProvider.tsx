@@ -33,7 +33,7 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const [nextEvent, setNextEvent] = useState<string | null>(null);
     const [role, setRole] = useState<number>(0);
     const navigate = useNavigate();
-    const [isBackOffice, setBackOffice] = useState<boolean>(false);
+    const [isBackOffice, setBackOffice] = useState<boolean>(localStorage.getItem('isBackOffice') === 'true');
 
     const updateLoggedIn = async (): Promise<boolean> => {
         const result = await AuthApi.getUserInfo();
@@ -71,6 +71,10 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         }
         updateNextEvent();
     }, [user]);
+
+    useEffect(() => {
+        localStorage.setItem('isBackOffice', isBackOffice.toString());
+    }, [isBackOffice]);
 
     return (
         <AuthContext.Provider value={{ user, setUser, nextEvent, updateNextEvent, updateLoggedIn, role, isBackOffice, setBackOffice }}>

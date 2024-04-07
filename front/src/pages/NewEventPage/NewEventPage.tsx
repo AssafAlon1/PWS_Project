@@ -407,27 +407,25 @@ const NewEventPage: React.FC = () => {
                             <h2>Ticket Details</h2>
                             <div style={{ maxHeight: '400px', overflowY: 'auto', }}>
                                 <Container className="tickets-wrapper">
-                                    <Row xs={1} lg={2}>
-                                        {tickets.map((ticket, index) => (
-                                            <Col md={6} key={index} style={{ marginBottom: '20px' }}>
-                                                <TicketDetails
-                                                    ticket={ticket}
-                                                    onRemove={() => {
-                                                        setConfirmModal(true);
-                                                    }}
-                                                />
-                                                <AlertModal
-                                                    isOpen={confirmModal}
-                                                    message="Are you sure you want to remove ticket?"
-                                                    onCancel={() => setConfirmModal(false)}
-                                                    onConfirm={() => {
-                                                        setConfirmModal(false);
-                                                        setTickets(tickets.filter(t => t.name !== ticket.name));
-                                                    }}
-                                                />
-                                            </Col>
-                                        ))}
-                                    </Row>
+                                    {tickets.map((ticket, index) => (
+                                        <div>
+                                            <TicketDetails
+                                                ticket={ticket}
+                                                onRemove={() => {
+                                                    setConfirmModal(true);
+                                                }}
+                                            />
+                                            <AlertModal
+                                                isOpen={confirmModal}
+                                                message="Are you sure you want to remove ticket?"
+                                                onCancel={() => setConfirmModal(false)}
+                                                onConfirm={() => {
+                                                    setConfirmModal(false);
+                                                    setTickets(tickets.filter(t => t.name !== ticket.name));
+                                                }}
+                                            />
+                                        </div>
+                                    ))}
                                 </Container>
                             </div>
                         </Row>

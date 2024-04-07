@@ -9,6 +9,7 @@ import { CSEventCreationReqeust } from '../../types';
 import ButtonWithTooltip from '../../components/ButtonWithTooltip/ButtonWithTooltip';
 import './NewEventPage.css';
 import { SUCCESS_PATH } from '../../paths';
+import { ThreeSpanningSpinners } from '../../components/SpinnerComponent/SpinnerComponent';
 
 interface NewTicket {
     name: string;
@@ -27,14 +28,14 @@ const NewEventPage: React.FC = () => {
     const tomorrowDate = new Date(new Date().getTime() + 24 * 60 * 60 * 1000);
     const [isFormValidated, setFormValidated] = useState<boolean>(false);
     const [errorModal, setErrorModal] = useState(false);
-    const [confirmModal, setConfirmModal] = useState(false);
     const [displayError, setDisplayError] = useState<string>("");
+    const [isLoading, setLoading] = useState<boolean>(false);
 
     const [eventName, setEventName] = useState<string>("");
     const [catagory, setCatagory] = useState<string>(VALID_CATEGORIES[0]);
     const [description, setDescription] = useState<string>("");
     const [location, setLocation] = useState<string>("");
-    const [orginaizer, setOrginaizer] = useState<string>("");
+    const [organizer, setOrganizer] = useState<string>("");
     const [imageURL, setImageURL] = useState<string>("");
 
     const [startDate, setStartDate] = useState<string>(tomorrowDate.toISOString().split('T')[0]);
@@ -53,8 +54,8 @@ const NewEventPage: React.FC = () => {
         setDescription(e.target.value);
     }
 
-    const handleOrginaizerChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setOrginaizer(e.target.value);
+    const handleOrganizerChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setOrganizer(e.target.value);
     }
 
     const handleLocationChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -91,12 +92,12 @@ const NewEventPage: React.FC = () => {
         }
         return (
             <div className="modal">
-              <div className="modal-content">
-                <p>{message}</p>
-                { !onConfirm && <Button onClick={onCancel} className='mb-2 mt-2'> Got it! </Button> }
-                { onConfirm && <Button onClick={onConfirm} className='mb-2 mt-2'> I'm sure </Button> }
-                { onConfirm && <Button variant="secondary" onClick={onCancel} className='mb-2 mt-2'> Cancel </Button> }
-              </div>
+                <div className="modal-content">
+                    <p>{message}</p>
+                    {!onConfirm && <Button onClick={onCancel} className='mb-2 mt-2'> Got it! </Button>}
+                    {onConfirm && <Button onClick={onConfirm} className='mb-2 mt-2'> I'm sure </Button>}
+                    {onConfirm && <Button variant="secondary" onClick={onCancel} className='mb-2 mt-2'> Cancel </Button>}
+                </div>
             </div>
         );
     };
@@ -128,7 +129,7 @@ const NewEventPage: React.FC = () => {
                 title: eventName,
                 category: catagory,
                 description: description,
-                organizer: orginaizer,
+                organizer: organizer,
                 start_date: new Date(startDate + 'T' + startTime),
                 end_date: new Date(endDate + 'T' + endTime),
                 location: location,
@@ -138,7 +139,9 @@ const NewEventPage: React.FC = () => {
             if (imageURL != "") {
                 eventCreationRequest.image = imageURL;
             }
+            setLoading(true);
             const result = await EventApi.createEvent(eventCreationRequest);
+            setLoading(false);
             navigate(SUCCESS_PATH, { state: { operationType: "create", createdEventId: result, message: "Event created successfully!" } });
         }
         catch (error) {
@@ -230,20 +233,21 @@ const NewEventPage: React.FC = () => {
                     </Row>
                 </div>
                 <Col>
-                    <Button disabled={isDisabled} onClick={onClickTicket}>Add Ticket</Button>
+                    <Button disabled={isDisabled || isLoading} onClick={onClickTicket}>Add Ticket</Button>
                 </Col>
             </Card>
         );
     }
 
-    const TicketDetails = ({ ticket, onRemove }: { ticket: NewTicket, onRemove: () => void }) => {
+    const TicketDetails = ({ ticket }: { ticket: NewTicket}) => {
+    const [confirmModal, setConfirmModal] = useState(false);
         return (
             <Container>
                 <Card className="mb-4 me-2 position-relative">
                     <Button
                         variant="danger"
                         className="position-absolute top-0 end-0 m-2 btn-sm"
-                        onClick={onRemove}
+                        onClick={() => setConfirmModal(true)}
                     >
                         x
                     </Button>
@@ -258,9 +262,13 @@ const NewEventPage: React.FC = () => {
                     </Card.Body>
                 </Card>
                 <AlertModal
-                    isOpen={errorModal}
-                    message="Invalid ticket (make sure ticket name is unique)"
-                    onCancel={() => setErrorModal(false)}
+                    isOpen={confirmModal}
+                    message="Are you sure you want to remove ticket?"
+                    onCancel={() => setConfirmModal(false)}
+                    onConfirm={() => {
+                        setConfirmModal(false);
+                        setTickets(tickets.filter(t => t.name !== ticket.name));
+                    }}
                 />
             </Container>
         )
@@ -312,17 +320,17 @@ const NewEventPage: React.FC = () => {
                             </FloatingLabel>
                         </Form.Group>
 
-                        <Form.Group controlId="formEventOrginaizer" className="mb-2">
-                            <FloatingLabel label="Event Orginaizer">
+                        <Form.Group controlId="formEventOrganizer" className="mb-2">
+                            <FloatingLabel label="Event Organizer">
                                 <Form.Control
                                     required
                                     type="text"
                                     pattern="^[a-zA-Z\s\-0-9']+$"
-                                    placeholder="Enter event orginaizer"
-                                    value={orginaizer}
-                                    onChange={handleOrginaizerChange}
+                                    placeholder="Enter event organizer"
+                                    value={organizer}
+                                    onChange={handleOrganizerChange}
                                 />
-                                <Form.Control.Feedback type="invalid">Event orginaizer must be non-empty and in English</Form.Control.Feedback>
+                                <Form.Control.Feedback type="invalid">Event organizer must be non-empty and in English</Form.Control.Feedback>
                             </FloatingLabel>
                         </Form.Group>
 
@@ -405,29 +413,15 @@ const NewEventPage: React.FC = () => {
                         </Row>
                         <Row>
                             <h2>Ticket Details</h2>
-                            <div style={{ maxHeight: '400px', overflowY: 'auto' }}>
-                                <Container style={{ width: "27vw" }}>
-                                    <Row xs={1} lg={2}>
-                                        {tickets.map((ticket, index) => (
-                                            <Col md={6} key={index} style={{ marginBottom: '20px' }}>
-                                                 <TicketDetails
-                                                    ticket={ticket}
-                                                    onRemove={() => {
-                                                        setConfirmModal(true);
-                                                    }} 
-                                                />
-                                                <AlertModal
-                                                    isOpen={confirmModal}
-                                                    message="Are you sure you want to remove ticket?"
-                                                    onCancel={() => setConfirmModal(false)}
-                                                    onConfirm={() => {
-                                                        setConfirmModal(false);
-                                                        setTickets(tickets.filter(t => t.name !== ticket.name));
-                                                    }}
-                                                />                                                
-                                            </Col>
-                                        ))}
-                                    </Row>
+                            <div style={{ maxHeight: '400px', overflowY: 'auto', }}>
+                                <Container className="tickets-wrapper">
+                                    {tickets.map((ticket, index) => (
+                                        <div key={index}>
+                                            <TicketDetails
+                                                ticket={ticket}
+                                            />
+                                        </div>
+                                    ))}
                                 </Container>
                             </div>
                         </Row>
@@ -439,13 +433,14 @@ const NewEventPage: React.FC = () => {
                     <Col>
                         <ButtonWithTooltip
                             buttonContent="Create Event"
-                            tooltipContent="Event must have at least one ticket"
-                            isDisabled={tickets.length === 0}
+                            tooltipContent={isLoading ? "Loading..." : "Event must have at least one ticket"}
+                            isDisabled={tickets.length === 0 || isLoading}
                             buttonType="submit"
                             placement="top"
                         />
                     </Col>
                 </Row>
+                {isLoading && <ThreeSpanningSpinners />}
             </Form >
 
             <Alert
@@ -459,6 +454,12 @@ const NewEventPage: React.FC = () => {
                     {displayError}
                 </p>
             </Alert>
+
+            <AlertModal
+                isOpen={errorModal}
+                message="Invalid ticket (make sure ticket name is unique)"
+                onCancel={() => setErrorModal(false)}
+            />
         </>
     );
 };

@@ -111,7 +111,6 @@ const PaymentForm: React.FC<PaymentFormProps> = ({ purchaseTickets, isLoading, s
                                 <FloatingLabel label="Year">
                                     <Form.Select
                                         value={year}
-                                        // isValid={isFutureDate(year, month)}
                                         isInvalid={!isFutureDate(year, month)}
                                         onChange={(event) => setYear(parseInt(event.target.value))}
                                     >
@@ -123,7 +122,6 @@ const PaymentForm: React.FC<PaymentFormProps> = ({ purchaseTickets, isLoading, s
                                 <FloatingLabel label="Month">
                                     <Form.Select
                                         value={month}
-                                        // isValid={isFutureDate(year, month)}
                                         isInvalid={!isFutureDate(year, month)}
                                         onChange={(event) => setMonth(parseInt(event.target.value))}
                                     >

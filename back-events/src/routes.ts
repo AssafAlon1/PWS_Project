@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import jwt from "jsonwebtoken";
 import { Request, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
 
@@ -7,7 +8,8 @@ import { ICSEvent, JoiEventCreationRequestSchema, eventSchema, updateEventSchema
 import { MAX_QUERY_LIMIT, TICKET_API_URL } from "./const.js";
 import { CSEventWithTickets } from "./types.js";
 import axios from "axios";
-import Joi from 'joi';
+
+const sharedKey = process.env.SHARED_SECRET;
 
 const axiosInstance = axios.create({ withCredentials: true, baseURL: TICKET_API_URL });
 
@@ -120,7 +122,15 @@ export const createEvent = async (req: Request, res: Response) => {
 
   // Insertion was successful - add the tickets
   try {
-    await axiosInstance.post('/api/tickets', postData.tickets.map(ticket => ({ ...ticket, eventId: insertResult })));
+
+    const outgoingToken = jwt.sign({ username: req.headers["username"] }, sharedKey);
+    const postHeaders = {
+      headers: {
+        authorization: outgoingToken,
+      }
+    };
+
+    await axiosInstance.post('/api/tickets', postData.tickets.map(ticket => ({ ...ticket, eventId: insertResult })), postHeaders);
     res.status(StatusCodes.CREATED).send({ _id: insertResult });
   }
   catch (error) {

@@ -34,7 +34,7 @@ const NewEventPage: React.FC = () => {
     const [catagory, setCatagory] = useState<string>(VALID_CATEGORIES[0]);
     const [description, setDescription] = useState<string>("");
     const [location, setLocation] = useState<string>("");
-    const [orginaizer, setOrginaizer] = useState<string>("");
+    const [organizer, setOrganizer] = useState<string>("");
     const [imageURL, setImageURL] = useState<string>("");
 
     const [startDate, setStartDate] = useState<string>(tomorrowDate.toISOString().split('T')[0]);
@@ -53,8 +53,8 @@ const NewEventPage: React.FC = () => {
         setDescription(e.target.value);
     }
 
-    const handleOrginaizerChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setOrginaizer(e.target.value);
+    const handleOrganizerChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setOrganizer(e.target.value);
     }
 
     const handleLocationChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -128,7 +128,7 @@ const NewEventPage: React.FC = () => {
                 title: eventName,
                 category: catagory,
                 description: description,
-                organizer: orginaizer,
+                organizer: organizer,
                 start_date: new Date(startDate + 'T' + startTime),
                 end_date: new Date(endDate + 'T' + endTime),
                 location: location,
@@ -312,17 +312,17 @@ const NewEventPage: React.FC = () => {
                             </FloatingLabel>
                         </Form.Group>
 
-                        <Form.Group controlId="formEventOrginaizer" className="mb-2">
-                            <FloatingLabel label="Event Orginaizer">
+                        <Form.Group controlId="formEventOrganizer" className="mb-2">
+                            <FloatingLabel label="Event Organizer">
                                 <Form.Control
                                     required
                                     type="text"
                                     pattern="^[a-zA-Z\s\-0-9']+$"
-                                    placeholder="Enter event orginaizer"
-                                    value={orginaizer}
-                                    onChange={handleOrginaizerChange}
+                                    placeholder="Enter event organizer"
+                                    value={organizer}
+                                    onChange={handleOrganizerChange}
                                 />
-                                <Form.Control.Feedback type="invalid">Event orginaizer must be non-empty and in English</Form.Control.Feedback>
+                                <Form.Control.Feedback type="invalid">Event organizer must be non-empty and in English</Form.Control.Feedback>
                             </FloatingLabel>
                         </Form.Group>
 

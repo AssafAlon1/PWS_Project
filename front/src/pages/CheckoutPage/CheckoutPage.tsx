@@ -185,13 +185,13 @@ const CheckoutPage: React.FC = () => {
             </Alert>
 
             {/* Alert of expired lock */}
-            <Alert show={!lockValid && !isLoading} variant="danger" className="mt-4 mb-4">
+            <Alert show={!lockValid && !isLoading && !purchaseId} variant="danger" className="mt-4 mb-4">
                 <Alert.Heading>Time's up!</Alert.Heading>
                 <p>
                     Purchase request timed-out. Your ticket is no longer guaranteed. Please try again.
                 </p>
             </Alert>
-            {(!lockValid && !isLoading) && <Button onClick={() => navigate(CATALOG_PATH)}>Back to Catalog</Button>}
+            {(!lockValid && !isLoading && !purchaseId) && <Button onClick={() => navigate(CATALOG_PATH)}>Back to Catalog</Button>}
         </>
     );
 };

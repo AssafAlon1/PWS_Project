@@ -26,7 +26,6 @@ interface LoadingModalProps {
 const EventDetails: React.FC = () => {
     const [event, setEvent] = useState<CSEvent | null>(null);
     const [tickets, setTickets] = useState<Ticket[] | null>(null);
-    const [isLocking, setLocking] =  useState<boolean>(false);
 
     const { eventId } = useParams();
     const navigate = useNavigate();
@@ -203,6 +202,7 @@ const EventDetails: React.FC = () => {
     const BuyTicketComponent: React.FC<{ name: string, price: number, amountLeft: number, locked: number }> = ({ name, price, amountLeft, locked }) => {
         const [ticketAmount, setTicketAmount] = useState<number>(0);
         const [errorMessage, setErrorMessage] = useState<string>("");
+        const [isLocking, setLocking] =  useState<boolean>(false);
 
         const ticketPurchaseDetails: PurchaseDetails = {
             event_id: eventId ?? "0",

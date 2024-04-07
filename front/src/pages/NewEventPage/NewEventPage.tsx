@@ -91,12 +91,12 @@ const NewEventPage: React.FC = () => {
         }
         return (
             <div className="modal">
-              <div className="modal-content">
-                <p>{message}</p>
-                { !onConfirm && <Button onClick={onCancel} className='mb-2 mt-2'> Got it! </Button> }
-                { onConfirm && <Button onClick={onConfirm} className='mb-2 mt-2'> I'm sure </Button> }
-                { onConfirm && <Button variant="secondary" onClick={onCancel} className='mb-2 mt-2'> Cancel </Button> }
-              </div>
+                <div className="modal-content">
+                    <p>{message}</p>
+                    {!onConfirm && <Button onClick={onCancel} className='mb-2 mt-2'> Got it! </Button>}
+                    {onConfirm && <Button onClick={onConfirm} className='mb-2 mt-2'> I'm sure </Button>}
+                    {onConfirm && <Button variant="secondary" onClick={onCancel} className='mb-2 mt-2'> Cancel </Button>}
+                </div>
             </div>
         );
     };
@@ -410,11 +410,11 @@ const NewEventPage: React.FC = () => {
                                     <Row xs={1} lg={2}>
                                         {tickets.map((ticket, index) => (
                                             <Col md={6} key={index} style={{ marginBottom: '20px' }}>
-                                                 <TicketDetails
+                                                <TicketDetails
                                                     ticket={ticket}
                                                     onRemove={() => {
                                                         setConfirmModal(true);
-                                                    }} 
+                                                    }}
                                                 />
                                                 <AlertModal
                                                     isOpen={confirmModal}
@@ -424,7 +424,7 @@ const NewEventPage: React.FC = () => {
                                                         setConfirmModal(false);
                                                         setTickets(tickets.filter(t => t.name !== ticket.name));
                                                     }}
-                                                />                                                
+                                                />
                                             </Col>
                                         ))}
                                     </Row>

@@ -1,3 +1,7 @@
+.event-details {
+    min-width: 700px;
+}
+
 .ticket-container {
     display: flex;
     flex-wrap: wrap;

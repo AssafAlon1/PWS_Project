@@ -191,10 +191,10 @@ const EventDetails: React.FC = () => {
         }
         return (
             <div className="modal">
-              <div className="modal-content direction-row">
-                <p>Proccessing request...</p>
-                <ThreeSpanningSpinners/>
-              </div>
+                <div className="modal-content direction-row">
+                    <p>Proccessing request...</p>
+                    <ThreeSpanningSpinners />
+                </div>
             </div>
         );
     };
@@ -202,7 +202,7 @@ const EventDetails: React.FC = () => {
     const BuyTicketComponent: React.FC<{ name: string, price: number, amountLeft: number, locked: number }> = ({ name, price, amountLeft, locked }) => {
         const [ticketAmount, setTicketAmount] = useState<number>(0);
         const [errorMessage, setErrorMessage] = useState<string>("");
-        const [isLocking, setLocking] =  useState<boolean>(false);
+        const [isLocking, setLocking] = useState<boolean>(false);
 
         const ticketPurchaseDetails: PurchaseDetails = {
             event_id: eventId ?? "0",
@@ -316,7 +316,7 @@ const EventDetails: React.FC = () => {
                     {authContext.isBackOffice && <Card.Title>Tickets:</Card.Title>}
                     {!authContext.isBackOffice && <Card.Title>Buy Tickets:</Card.Title>}
                 </Card.Header>
-                <Card.Body className="direction-row">
+                <Card.Body className="direction-row ticket-container">
                     <TicketBody />
                 </Card.Body>
             </Card>

@@ -56,6 +56,10 @@
     /* margin: 10px; */
 }
 
+.card-text {
+    white-space: break-spaces;
+}
+
 .read-the-docs {
   color: #888;
 }

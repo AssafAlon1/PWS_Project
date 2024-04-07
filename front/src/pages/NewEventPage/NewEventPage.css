@@ -31,4 +31,6 @@
     flex-direction: row;
     flex-wrap: wrap;
     display: flex;
+    justify-content: space-around;
+    width: 32vw;
 }
